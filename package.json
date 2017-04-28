@@ -1,0 +1,9 @@
+{
+  "name": "compactd",
+  "version": "0.0.0",
+  "description": "Remote music player that allows to play music remotely",
+  "main": "index.js",
+  "repository": "https://github.com/compactd/compactd.git",
+  "author": "vinz243",
+  "license": "MIT"
+}
