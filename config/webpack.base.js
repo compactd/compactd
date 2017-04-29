@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-
+console.log(path.join(__dirname, '../../../client/src/styles'));
 module.exports = {
   entry: {
     application: "./client/src/index.tsx",
@@ -53,7 +53,7 @@ module.exports = {
          }, {
            loader: "sass-loader",
            options: {
-             includePaths: [path.join(__dirname, '../client/src/styles')]
+             includePaths: [path.join(__dirname, '../../../client/src/styles')]
            }
          }]
        }
