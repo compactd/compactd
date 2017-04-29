@@ -2,7 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: "./client/src/index.tsx",
+  entry: {
+    application: "./client/src/index.tsx",
+    vendor: ['react', 'react-dom', 'react-redux', 'react-router', 'react-router-redux', 'redux']
+  },
   output: {
     filename: "bundle.js",
     path: path.join(__dirname, "../client/dist")
@@ -12,14 +15,13 @@ module.exports = {
   devtool: "source-map",
 
   resolve: {
-    // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".ts", ".tsx", ".js", ".json"],
+    extensions: [".ts", ".tsx", ".js", ".json", ".scss"],
     alias: {
     }
   },
   plugins: [
     new webpack.ProvidePlugin({
-      'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'  // fetch API
+      'fetch': 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'  // fetch API
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
@@ -63,7 +65,6 @@ module.exports = {
   // This is important because it allows us to avoid bundling all of our
   // dependencies, which allows browsers to cache those libraries between builds.
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM'
+
   },
 };
