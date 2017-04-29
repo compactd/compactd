@@ -5,5 +5,17 @@
   "main": "index.js",
   "repository": "https://github.com/compactd/compactd.git",
   "author": "vinz243",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "lodash": "^4.17.4",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "source-map-loader": "^0.2.1",
+    "typescript": "^2.3.2",
+    "@types/react": "^15.0.23",
+    "@types/react-dom": "^15.5.0",
+    "awesome-typescript-loader": "^3.1.3"
+  }
 }
