@@ -1,5 +1,5 @@
 const path = require('path');
-
+const webpack = require('webpack');
 
 module.exports = {
   entry: "./client/src/index.tsx",
@@ -17,7 +17,16 @@ module.exports = {
     alias: {
     }
   },
-
+  plugins: [
+    new webpack.ProvidePlugin({
+      'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'  // fetch API
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      filename: 'vendor.bundle.js',
+      minChunks: Infinity
+    })
+  ],
   module: {
     rules: [
       // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
