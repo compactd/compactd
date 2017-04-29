@@ -1,4 +1,6 @@
 const path = require('path');
+
+
 module.exports = {
   entry: "./client/src/index.tsx",
   output: {
@@ -11,7 +13,9 @@ module.exports = {
 
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".ts", ".tsx", ".js", ".json"]
+    extensions: [".ts", ".tsx", ".js", ".json"],
+    alias: {
+    }
   },
 
   module: {
@@ -26,7 +30,22 @@ module.exports = {
       },
 
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
+      {
+         test: /\.scss$/,
+         use: [{
+           loader: "style-loader"
+         }, {
+           loader: "css-loader"
+         }, {
+           loader: 'postcss-loader'
+         }, {
+           loader: "sass-loader",
+           options: {
+             includePaths: [path.join(__dirname, '../client/src/styles')]
+           }
+         }]
+       }
     ]
   },
 
