@@ -1,7 +1,7 @@
 import * as Defs from 'definitions';
 import { ILibraryAction } from './actions.d';
 // import * as IFetch from '@types/whatwg-fetch';
-import "whatwg-fetch";
+// import "whatwg-fetch";
 
 
 const RESOLVE_ARTIST = 'compactd/library/RESOLVE_ARTIST';
@@ -47,6 +47,7 @@ export function reducer (state: Defs.ILibraryState = initialState,
         }
       };
   }
+  return state;
 }
 
 function fetchArtist (id: Defs.IDatabaseID): Promise<ILibraryAction> {

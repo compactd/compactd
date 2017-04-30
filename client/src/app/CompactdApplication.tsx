@@ -9,8 +9,10 @@ interface ICompactdApplicationProps {
 }
 export class CompactdApplication extends
   React.Component<ICompactdApplicationProps, {}> {
-    
+
   render (): JSX.Element {
-    return <Provider store={this.props.store}></Provider>;
+    return <Provider store={this.props.store}>
+      <div className="foobar">Hello, redux</div>
+    </Provider>;
   }
 }

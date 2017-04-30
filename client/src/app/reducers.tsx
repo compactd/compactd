@@ -1,5 +1,7 @@
-import {combineReducers} from 'redux';
+import {combineReducers, Reducer} from 'redux';
+import {ICompactdState} from 'definitions';
+import {reducer as library} from 'features/library';
 
-export default combineReducers({
-  
-})
+export const reducers = combineReducers({
+  library
+}) as Reducer<ICompactdState>;

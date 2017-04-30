@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-console.log(path.join(__dirname, '../../../client/src/styles'));
 module.exports = {
   entry: {
     application: "./client/src/index.tsx",
@@ -17,11 +16,13 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".json", ".scss"],
     alias: {
+      features: path.join(__dirname, '../client/src/features'),
+      app: path.join(__dirname, '../client/src/app')
     }
   },
   plugins: [
     new webpack.ProvidePlugin({
-      'fetch': 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'  // fetch API
+      // 'fetch': 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'  // fetch API
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',

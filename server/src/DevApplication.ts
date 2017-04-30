@@ -4,7 +4,8 @@ import * as path from 'path';
 import * as express from 'express';
 import * as webpackDevMiddleware from 'webpack-dev-middleware';
 
-const config = require('../../config/webpack.development');
+const conf = path.join(__dirname, '../../config/webpack.development');
+const config = require(conf);
 
 export class DevApplication extends CompactdApplication {
   compiler: webpack.Compiler;
@@ -25,7 +26,7 @@ export class DevApplication extends CompactdApplication {
   route () {
     super.route();
     this.app.get('*', function (req: express.Request, res: express.Response) {
-      res.sendFile(path.join(__dirname, '../../../../client/index.html'));
+      res.sendFile(path.join(__dirname, '../../client/index.html'));
     });
   }
 
