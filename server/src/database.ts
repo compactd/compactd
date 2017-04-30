@@ -1,0 +1,1 @@
+import PouchDB from 'pouch'
