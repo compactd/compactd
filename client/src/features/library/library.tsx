@@ -1,5 +1,4 @@
-import * as State from '../../definitions/state';
-import { IDatabaseID, IArtist } from '../../definitions/common';
+import * as Defs from 'definitions';
 import { ILibraryAction } from './actions.d';
 // import * as IFetch from '@types/whatwg-fetch';
 import "whatwg-fetch";
@@ -19,7 +18,7 @@ const mezmerize = {
   artist: soad
 };
 
-const initialState: State.ILibraryState = {
+const initialState: Defs.ILibraryState = {
   albumsById: {
     '3': {...mezmerize, _id: 3},
     '42': mezmerize
@@ -32,8 +31,8 @@ const initialState: State.ILibraryState = {
   tracks: []
 };
 
-export function reducer (state: State.ILibraryState = initialState,
-  action: ILibraryAction): State.ILibraryState {
+export function reducer (state: Defs.ILibraryState = initialState,
+  action: ILibraryAction): Defs.ILibraryState {
   switch (action.type) {
     case RESOLVE_ARTIST:
       return {...state,
@@ -50,13 +49,13 @@ export function reducer (state: State.ILibraryState = initialState,
   }
 }
 
-function fetchArtist (id: IDatabaseID): Promise<ILibraryAction> {
+function fetchArtist (id: Defs.IDatabaseID): Promise<ILibraryAction> {
   return fetch('/api/artist').then((response) => {
     return response.json();
   }).then((artist) => {
     return Promise.resolve({
       type: RESOLVE_ARTIST,
-      artist: artist as IArtist
+      artist: artist as Defs.IArtist
     } as ILibraryAction);
   });
 }
