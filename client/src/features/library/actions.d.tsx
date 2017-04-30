@@ -15,3 +15,7 @@ interface IActionResolveAlbum {
 }
 
 export type ILibraryAction = IActionResolveArtist | IActionResolveAlbum;
+
+export type ILibraryActions = {
+  fetchArtist: (artist: IArtist) => void;
+}

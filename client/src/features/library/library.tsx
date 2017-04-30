@@ -60,3 +60,7 @@ function fetchArtist (id: Defs.IDatabaseID): Promise<ILibraryAction> {
     } as ILibraryAction);
   });
 }
+
+export const actions = {
+  fetchArtist
+};
