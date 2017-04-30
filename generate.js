@@ -9,6 +9,57 @@ function writeTemplate (content, base, ...filename) {
   const target = path.join(base, sub);
   console.log(`  ${chalk.dim('Writing')} ${chalk.blue(sub)}`);
   fs.writeFileSync(target, content);
+  console.log(`\n${content}`.split('\n').join('\n    '));
+  console.log();
+
+}
+
+if (process.argv.includes('component')) {
+  console.log();
+  const feature = changeCase.camelCase(
+    process.argv[process.argv.indexOf('component') + 1]);
+  const name = process.argv[process.argv.indexOf('component') + 2];
+  if (!feature) {
+    return console.log(`  ${chalk.red('✗ Missing feature/component name')}`)
+  }
+
+  console.log(`  Generating component ${name} for ${feature}`);
+  console.log();
+
+  const base = path.join(__dirname, 'client/src/features');
+  const pascalName = changeCase.pascalCase(name);
+
+  const dir = path.join(base, feature, 'components', pascalName);
+  console.log(chalk.dim(`  mkdirp  ${path.join(feature,
+    'components', pascalName)}`));
+  mkdirp.sync(dir);
+  console.log();
+
+  writeTemplate(`import * as React from 'react';
+import {I${changeCase.pascalCase(feature)}Actions} from '../../actions.d';
+
+require('./${pascalName}.scss');
+
+interface I${pascalName}Props {
+  actions: I${changeCase.pascalCase(feature)}Actions;
+}
+
+export class ${pascalName} extends React.Component<I${pascalName}Props, {}>{
+  render (): JSX.Element {
+    const {actions} = this.props;
+    return <div className="${changeCase.paramCase(pascalName)}">
+    </div>
+  }
+}`, base, feature, `${pascalName}.tsx`)
+
+  writeTemplate(`export * from './${pascalName}';`, base, feature, 'index.tsx');
+
+  writeTemplate(`div.${changeCase.paramCase(pascalName)}{
+
+}
+`, base, feature, `${pascalName}.scss`);
+  console.log();
+  console.log(chalk.green('  ✔ Done'))
 }
 
 if (process.argv.includes('feature')) {
@@ -51,7 +102,7 @@ interface I${pascalName}ActionBase {
 
 export type I${pascalName}Action = {};
 
-export type ILibraryActions = {
+export type I${pascalName}Actions = {
   action1: (<params>) => void;
 }
 `, base, folder, `actions.d.tsx`);

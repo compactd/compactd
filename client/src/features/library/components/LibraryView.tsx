@@ -5,6 +5,7 @@ import { createStructuredSelector } from 'reselect';
 import {actions} from '../library';
 import {ILibraryActions, ILibraryAction} from '../actions.d';
 import {ILibraryState, ICompactdState} from 'definitions';
+import {ArtistsView} from './ArtistsView';
 
 interface ILibraryViewProps {
   actions: ILibraryActions;
@@ -18,7 +19,9 @@ interface ILibraryViewProps {
 }))
 class LibraryView extends React.Component<ILibraryViewProps, {}> {
   render (): JSX.Element {
-    return <div>{(this.props.library.albumsById)['3'].name}</div>;
+    const {library, actions} = this.props;
+    const content = <ArtistsView artists={library.artists} actions={actions} />;
+    return <div>{content}</div>;
   }
 }
 
