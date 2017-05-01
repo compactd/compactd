@@ -1,6 +1,7 @@
 import test from 'ava';
 import {createValidator} from '.';
 import * as Schemas from './Schemas';
+import * as Perms from './Permissions';
 
 test('createValidator - should eval complex validator', t => {
   const validator = createValidator(Schemas.TrackSchema);
@@ -85,4 +86,90 @@ test('createValidator - should throw for invalid value', t => {
   }));
 
   t.pass();
+});
+
+test('createValidator - allows only admin/app to create track', t => {
+  const validator = createValidator(Schemas.TrackSchema,
+    Perms.TrackPermissions);
+
+  const props = {
+    name: 'foo',
+    artist: '42',
+    album: '1337',
+    number: 1337
+  };
+
+  let validate = {} as any;
+
+  eval(`validate = ${validator}`);
+
+  validate(props, undefined, {
+    roles: ['_admin']
+  });
+
+  validate(props, undefined, {
+    roles: ['foo', 'app', 'end_user']
+  });
+
+  t.throws(() => validate(props, undefined, {
+    roles: ['end_user', 'user', 'foo']
+  }));
+
+});
+
+test('createValidator - allows only admin/app to update track', t => {
+  const validator = createValidator(Schemas.TrackSchema,
+    Perms.TrackPermissions);
+
+  const props = {
+    name: 'bar',
+    number: 42
+  };
+  const old = {
+    name: 'foo',
+    artist: '42',
+    album: '1337',
+    number: 1337
+  };
+
+  let validate = {} as any;
+  eval(`validate = ${validator}`);
+
+  validate(props, old, {
+    roles: ['_admin']
+  });
+
+  validate(props, old, {
+    roles: ['foo', 'app', 'end_user']
+  });
+
+  t.throws(() => validate(props, old, {
+    roles: ['foo']
+  }));
+
+});
+
+test('createValidator - allows only to update specific props', t => {
+  const validator = createValidator(Schemas.TrackSchema,
+    Perms.TrackPermissions);
+
+  const props = {
+    name: 'bar',
+    number: 42,
+    artist: 'foo'
+  };
+  const old = {
+    name: 'foo',
+    artist: '42',
+    album: '1337',
+    number: 1337
+  };
+
+  let validate = {} as any;
+  eval(`validate = ${validator}`);
+
+  t.throws(() => validate(props, old, {
+    roles: ['_admin']
+  }), Object);
+
 });
