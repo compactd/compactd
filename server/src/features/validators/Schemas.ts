@@ -1,20 +1,20 @@
 export type Validator = (value: any) => string;
 const types = {
-  string: Object.assign(function (key: string, value: any) {
-    return typeof value === 'string' ? '' : (typeof value === 'undefined' ? '' :
-      'Field ' + key + ' must be a string but got a '  + typeof value);
-  }, {required: function (key: string, value: any) {
-    return typeof value === 'string' ? '' : (typeof value === 'undefined' ?
-      'Field ' + key + ' is required' :
-      'Field ' + key + ' must be a string but got a '  + typeof value);
+  string: Object.assign(function (k: string, v: any) {
+    return typeof v === 'string' ? '' : (typeof v === 'undefined' ? '' :
+      'Field ' + k + ' must be a string but got a '  + typeof v);
+  }, {required: function (k: string, v: any) {
+    return typeof v === 'string' ? '' : (typeof v === 'undefined' ?
+      'Field ' + k + ' is required' :
+      'Field ' + k + ' must be a string but got a '  + typeof v);
   }}),
-  number: Object.assign(function (key: string, value: any) {
-    return typeof value === 'number' ? '' : (typeof value === 'undefined' ? '' :
-      'Field ' + key + ' must be a number but got a '  + typeof value);
-  }, {required: function (key: string, value: any) {
-    return typeof value === 'number' ? '' : (typeof value === 'undefined' ?
-      'Field ' + key + ' is required' :
-      'Field ' + key + ' must be a number but got a '  + typeof value);
+  number: Object.assign(function (k: string, v: any) {
+    return typeof v === 'number' ? '' : (typeof v === 'undefined' ? '' :
+      'Field ' + k + ' must be a number but got a '  + typeof v);
+  }, {required: function (k: string, v: any) {
+    return typeof v === 'number' ? '' : (typeof v === 'undefined' ?
+      'Field ' + k + ' is required' :
+      'Field ' + k + ' must be a number but got a '  + typeof v);
   }}),
 
 }

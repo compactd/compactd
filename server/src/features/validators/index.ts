@@ -1,29 +1,27 @@
 import {ISchema} from './Schemas';
 
-function validate (schema: any, props: any) {
-  var err = Object.keys(schema).map(function (key): string {
-    return eval('(' + schema[key] + ')')(key, props[key]);
-  }).find(function (el: string): boolean {
-    return el !== '';
+const validate = function (s: any, p: any) {
+  var l = Object.keys;
+  var e = l(s).map(function (k): string {
+    return eval('(' + s[k] + ')')(k, p[k]);
+  }).find(function (e: string): boolean {
+    return e !== '';
   });
-  if (err) {
-    throw({forbidden: err});
+  if (e) {
+    throw({forbidden: e});
   }
-  const extra = Object.keys(props).filter(function (key): boolean {
-    return !~Object.keys(schema).indexOf(key);
+  var x = l(p).filter(function (k): boolean {
+    return !~l(s).indexOf(k);
   });
-  if (extra.length > 0) {
-    throw({forbidden: 'Keys ' + extra.join(', ') + ' aren\'t allowed'});
+  if (x.length) {
+    throw({forbidden: 'Keys ' + x.join(', ') + ' aren\'t allowed'});
   }
 }
 
 export function createValidator (schema: ISchema): string {
-  return `function(newDoc, oldDoc, userCtx) {
-  var _schema = ${JSON.stringify(schema, (key, val) => {
+  return `function(d,o,u) {
+  (${validate.toString()})(${JSON.stringify(schema, (key, val) => {
     return typeof val === 'function' ? val.toString() : val;
-  })};
-
-  ${validate.toString()}
-  validate(_schema, newDoc);
+  })}, d);
 }`.replace(/(\s\s+|\n)/g, ' ')
 }
