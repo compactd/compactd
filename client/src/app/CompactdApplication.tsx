@@ -2,11 +2,11 @@ import * as React from 'react';
 import { render } from "react-dom";
 import { Provider } from 'react-redux';
 import * as Redux from 'redux';
-import { ICompactdState } from 'definitions';
+import { CompactdState } from 'definitions';
 import LibraryView from 'features/library/components/LibraryView';
 
 interface ICompactdApplicationProps {
-  store: Redux.Store<ICompactdState>;
+  store: Redux.Store<CompactdState>;
 }
 export class CompactdApplication extends
   React.Component<ICompactdApplicationProps, {}> {

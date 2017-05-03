@@ -1,37 +1,37 @@
 import * as Compactd from './common.d';
 
-export interface ILibraryState {
+export interface LibraryState {
   albumsById: {
-    [id: string]: Compactd.IAlbum & {tracks?: [Compactd.ITrack]}
+    [id: string]: Compactd.Album & {tracks?: [Compactd.Track]}
   };
   artistsById: {
-    [id: string]: Compactd.IArtist & {albums?: [Compactd.IAlbum]}
+    [id: string]: Compactd.Artist & {albums?: [Compactd.Album]}
   };
-  albums: Compactd.IAlbum[];
-  artists: Compactd.IArtist[];
-  tracks: Compactd.ITrack[];
+  albums: Compactd.Album[];
+  artists: Compactd.Artist[];
+  tracks: Compactd.Track[];
 }
 
-export interface IPlayerState {
+export interface PlayerState {
   /**
    * An array containing a list of the next tracks
    */
-  nextTracks: [Compactd.ITrack];
+  nextTracks: [Compactd.Track];
   /**
    * Previously-player tracks
    */
-  prevTracks: [Compactd.ITrack];
+  prevTracks: [Compactd.Track];
   /**
    *  Currently playing track
    */
-  current:    Compactd.ITrack;
+  current:    Compactd.Track;
   /**
    * Is it playing right now?
    */
   playing:    boolean;
 }
 
-export interface ICompactdState {
-  library: ILibraryState;
-  player: IPlayerState;
+export interface CompactdState {
+  library: LibraryState;
+  player: PlayerState;
 }

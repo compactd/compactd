@@ -3,21 +3,21 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import {actions} from '../library';
-import {ILibraryActions, ILibraryAction} from '../actions.d';
-import {ILibraryState, ICompactdState} from 'definitions';
+import {LibraryActions, LibraryAction} from '../actions.d';
+import {LibraryState, CompactdState} from 'definitions';
 import {ArtistsView} from './ArtistsView';
 
-interface ILibraryViewProps {
-  actions: ILibraryActions;
-  library: ILibraryState;
+interface LibraryViewProps {
+  actions: LibraryActions;
+  library: LibraryState;
 }
 
 @(connect as any)(createStructuredSelector({
-  library: (state: ICompactdState) => state.library
-}), (dispatch: Dispatch<ILibraryAction>) => ({
+  library: (state: CompactdState) => state.library
+}), (dispatch: Dispatch<LibraryAction>) => ({
   actions: bindActionCreators(actions, dispatch)
 }))
-class LibraryView extends React.Component<ILibraryViewProps, {}> {
+class LibraryView extends React.Component<LibraryViewProps, {}> {
   render (): JSX.Element {
     const {library, actions} = this.props;
     const content = <ArtistsView artists={library.artists} actions={actions} />;

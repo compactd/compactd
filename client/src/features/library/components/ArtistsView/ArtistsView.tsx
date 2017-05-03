@@ -1,15 +1,18 @@
 import * as React from 'react';
-import {ILibraryActions} from '../../actions.d';
-import {IArtist} from 'definitions';
+import {LibraryActions} from '../../actions.d';
+import {Artist} from 'definitions';
 
 require('./ArtistsView.scss');
 
-interface IArtistViewProps {
-  actions: ILibraryActions;
-  artists: IArtist[];
+interface ArtistViewProps {
+  actions: LibraryActions;
+  artists: Artist[];
 }
 
-export class ArtistsView extends React.Component<IArtistViewProps, {}>{
+export class ArtistsView extends React.Component<ArtistViewProps, {}>{
+  componentDidMount () {
+    this.props.actions.fetchAllArtists();
+  }
   render (): JSX.Element {
     const {actions, artists} = this.props;
     const content = artists.map((artist) => {

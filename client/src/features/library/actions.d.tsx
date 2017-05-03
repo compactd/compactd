@@ -1,21 +1,27 @@
-import {IArtist, IAlbum} from '../../definitions/common';
+import {Album, Artist} from 'compactd-models';
 
-interface ILibraryActionBase {
+interface LibraryActionBase {
   type: string;
 };
 
-interface IActionResolveArtist {
+interface ActionResolveAllArtists {
+  type: 'compactd/library/RESOLVE_ALL_ARTISTS';
+  artists: Artist[];
+}
+
+interface ActionResolveArtist {
   type: 'compactd/library/RESOLVE_ARTIST';
-  artist: IArtist;
+  artist: Artist;
 }
 
-interface IActionResolveAlbum {
+interface ActionResolveAlbum {
   type: 'compactd/library/RESOLVE_ALBUM';
-  album: IAlbum;
+  album: Album;
 }
 
-export type ILibraryAction = IActionResolveArtist | IActionResolveAlbum;
+export type LibraryAction = ActionResolveArtist | ActionResolveAlbum | ActionResolveAllArtists;
 
-export type ILibraryActions = {
-  fetchArtist: (artist: IArtist) => void;
+export type LibraryActions = {
+  fetchArtist: (artist: Artist) => void;
+  fetchAllArtists: () => void;
 }

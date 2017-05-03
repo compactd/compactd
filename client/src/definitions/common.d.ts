@@ -1,38 +1,38 @@
-export type IDatabaseID = number;
+export type DatabaseID = number;
 
-export interface IArtist {
+export interface Artist {
   name: string;
-  _id: IDatabaseID;
+  _id: DatabaseID;
 }
 
-export interface IAlbum {
+export interface Album {
   name: string;
-  artist: IArtist;
-  _id: IDatabaseID;
+  artist: Artist;
+  _id: DatabaseID;
 }
 
-export interface IUAlbum {
+export interface UAlbum {
   name: string;
-  artist: IDatabaseID;
-  _id: IDatabaseID;
+  artist: DatabaseID;
+  _id: DatabaseID;
 }
 /**
  * Represents an album track
  */
-export interface ITrack {
+export interface Track {
   name: string;
   number?: number;
-  _id: IDatabaseID;
-  artist: IArtist;
+  _id: DatabaseID;
+  artist: Artist;
   track_artist?: string;
-  album: IAlbum;
+  album: Album;
 }
 
-export interface IUTrack {
+export interface UTrack {
   name: string;
   number?: number;
-  _id: IDatabaseID;
-  artist: IDatabaseID;
+  _id: DatabaseID;
+  artist: DatabaseID;
   track_artist?: string;
-  album: IDatabaseID;
+  album: DatabaseID;
 }
