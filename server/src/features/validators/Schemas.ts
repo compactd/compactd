@@ -16,7 +16,9 @@ const types = {
       'Field ' + k + ' is required' :
       'Field ' + k + ' must be a number but got a '  + typeof v);
   }}),
-
+  any: function () {
+    return '';
+  }
 }
 export interface ISchema {
   [name: string]: string | ISchema | Validator;
@@ -37,4 +39,8 @@ export const TrackSchema: ISchema = {
   album: types.string.required,
   number: types.number,
   track_artist: types.string
+}
+
+export const ConfigSchema: ISchema = {
+  value: types.any
 }

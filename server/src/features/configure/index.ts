@@ -1,8 +1,16 @@
-import {DetachedDatabaseConfigurator} from './DetachedDatabaseConfigurator';
+import {DatabaseConfigurator} from './DatabaseConfigurator';
+import PouchDB from '../../database';
 
-const configurator = new DetachedDatabaseConfigurator({
-  adminPassword: 'password',
-  adminUsername: 'admin'
-});
+export async function configure () {
+  const configurator = new DatabaseConfigurator({
+    adminPassword: 'password',
+    adminUsername: 'admin',
+    couchHost: 'localhost',
+    couchPort: 5984
+  });
 
-configurator.startServer().then(() => configurator.endAdminParty());
+  await configurator.configure();
+
+}
+
+configure().then(console.log).catch(console.log);
