@@ -1571,9 +1571,9 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
-compactd-models@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.3.1.tgz#85f707812ede2bb5ffd3ed02c5191923e01ddfde"
+compactd-models@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.3.3.tgz#f39ab32b2b8e5702769dd996626dee8f1875d0f6"
   dependencies:
     docuri "^4.2.2"
     fs-tree-diff "^0.5.6"
@@ -2253,6 +2253,10 @@ enhanced-resolve@^3.0.0, enhanced-resolve@^3.1.0:
     memory-fs "^0.4.0"
     object-assign "^4.0.1"
     tapable "^0.2.5"
+
+ensure-posix-path@^1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/ensure-posix-path/-/ensure-posix-path-1.0.2.tgz#a65b3e42d0b71cfc585eb774f9943c8d9b91b0c2"
 
 equal-length@^1.0.0:
   version "1.0.1"
@@ -4527,6 +4531,12 @@ map-obj@^1.0.0, map-obj@^1.0.1:
 map-stream@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.1.0.tgz#e56aa94c4c8055a16404a0674b78f215f7c8e194"
+
+matcher-collection@^1.0.0:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/matcher-collection/-/matcher-collection-1.0.4.tgz#2f66ae0869996f29e43d0b62c83dd1d43e581755"
+  dependencies:
+    minimatch "^3.0.2"
 
 matcher@^0.1.1:
   version "0.1.2"
@@ -7996,6 +8006,13 @@ vm-browserify@0.0.4:
 vuvuzela@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/vuvuzela/-/vuvuzela-1.0.3.tgz#3be145e58271c73ca55279dd851f12a682114b0b"
+
+walk-sync@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/walk-sync/-/walk-sync-0.3.1.tgz#558a16aeac8c0db59c028b73c66f397684ece465"
+  dependencies:
+    ensure-posix-path "^1.0.0"
+    matcher-collection "^1.0.0"
 
 warning@^3.0.0:
   version "3.0.0"

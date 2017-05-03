@@ -22,20 +22,20 @@ exports.trackerURI = getRoute().route(routes.tracker);
 exports.libraryURI = getRoute().route(routes.library);
 function mapArtistToParams(artist) {
     return {
-        name: slug(artist.name)
+        name: slug(artist.name).toLowerCase()
     };
 }
 exports.mapArtistToParams = mapArtistToParams;
 function mapAlbumToParams(album) {
     return {
-        name: slug(album.name),
+        name: slug(album.name).toLowerCase(),
         artist: exports.artistURI(album.artist).name
     };
 }
 exports.mapAlbumToParams = mapAlbumToParams;
 function mapTrackToParams(track) {
     return {
-        name: slug(track.name),
+        name: slug(track.name).toLowerCase(),
         artist: exports.artistURI(track.artist).name,
         album: exports.albumURI(track.album).name,
         number: track.number <= 9 ? `0${track.number}` : `${track.number}`

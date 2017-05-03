@@ -108,20 +108,20 @@ export const libraryURI = getRoute<FileParams>().route(routes.library);
 
 export function mapArtistToParams (artist: Artist | ArtistParams): ArtistParams {
   return {
-    name: slug(artist.name)
+    name: slug(artist.name).toLowerCase()
   };
 }
 
 export function mapAlbumToParams (album: Album | AlbumParams): AlbumParams {
   return {
-    name: slug(album.name),
+    name: slug(album.name).toLowerCase(),
     artist: artistURI(album.artist).name
   };
 }
 
 export function mapTrackToParams (track: Track | TrackParams): TrackParams {
   return {
-    name: slug(track.name),
+    name: slug(track.name).toLowerCase(),
     artist: artistURI(track.artist).name,
     album: albumURI(track.album).name,
     number: track.number <= 9 ? `0${track.number}` : `${track.number}`

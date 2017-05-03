@@ -11,17 +11,20 @@ export class DevApplication extends CompactdApplication {
   compiler: webpack.Compiler;
   constructor (host: string, port: number) {
     super(host, port);
-    this.compiler = webpack(config);
+    
+    this.compiler = (~process.argv.indexOf('--no-webpack')
+      || process.env.NO_WEBPACK) ? undefined : webpack(config);
   }
   configure () {
     super.configure();
-    this.app.use(webpackDevMiddleware(this.compiler, {
-      noInfo: true,
-      publicPath: '/',
-      stats: {
-        colors: true
-      }
-    }));
+    if (this.compiler)
+      this.app.use(webpackDevMiddleware(this.compiler, {
+        noInfo: true,
+        publicPath: '/',
+        stats: {
+          colors: true
+        }
+      }));
   }
   route () {
     super.route();

@@ -3,6 +3,7 @@ import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
 import * as path from 'path';
 import * as PouchDB from 'pouchdb';
+import endpoints from './endpoints';
 
 const expressPouchDB: any = require('express-pouchdb');
 
@@ -18,14 +19,14 @@ export class CompactdApplication {
   }
 
   protected setupCouchDB () {
-    this.app.use('/database', expressPouchDB(PouchDB.defaults({
-      prefix: './database/',
-    } as any), {
-      couchConfig: {
-        database_dir: path.join(__dirname, '../../database'),
-        view_index_dir: path.join(__dirname, '../../views'),
-      }
-    }));
+    // this.app.use('/database', expressPouchDB(PouchDB.defaults({
+    //   prefix: './database/',
+    // } as any), {
+    //   couchConfig: {
+    //     database_dir: path.join(__dirname, '../../database'),
+    //     view_index_dir: path.join(__dirname, '../../views'),
+    //   }
+    // }));
   }
   public start () {
     return new Promise<undefined>((resolve, reject) => {
@@ -52,6 +53,6 @@ export class CompactdApplication {
    * Creates the routes
    */
   route () {
-
+    endpoints(this.app);
   }
 }

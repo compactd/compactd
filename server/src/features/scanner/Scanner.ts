@@ -10,47 +10,65 @@ import FSTree = require('fs-tree-diff');
 
 const walkSync = require('walk-sync');
 
-class Scanner {
+export class Scanner {
   entries: FSTree.FSEntries;
   library: string;
   path: string;
-  constructor (path: string, library: string) {
-    this.path = path;
+  constructor (library: string) {
     this.library = library;
   }
-
+  async updateLibrary (pouchDB: typeof PouchDB, props: any) {
+    const libraries = new pouchDB<Models.Library>('libraries');
+    const lib = await libraries.get(this.library);
+    await libraries.put(Object.assign({}, lib, props));
+  }
   async scan (pouchDB: typeof PouchDB) {
+    const libraries = new pouchDB<Models.Library>('libraries');
+    const lib = await libraries.get(this.library);
+
+    await this.updateLibrary(pouchDB, {status: 'scanning'});
+
+    this.path = lib.path;
+    const timestamp = Date.now();
     this.walkDirectory();
 
     const patch = await this.getPatch();
     await patch.reduce((acc, entry) => {
       return acc.then(() => this.databaseEntryCreator(pouchDB, entry));
     }, Promise.resolve());
+
+    await this.serializeEntries('/home/vincent/.compactd/');
+
+    await this.updateLibrary(pouchDB, {status: 'ready'});
   }
 
   walkDirectory () {
-    this.entries = walkSync(this.path);
+    this.entries = walkSync.entries(this.path);
   }
 
   getSerializedEntries (dir: string): Promise<FSTree.FSEntries> {
     const file = path.join(dir, `fstrees/${this.library}.entries.json`);
 
     return new Promise<FSTree.FSEntries>((resolve, reject) => {
-      if (!existsSync(file)) resolve()
+      if (!existsSync(file)) return resolve([]);
       readFile(file, 'utf8', function (err, content) {
         if (err) return reject (err);
 
-        resolve((JSON.parse(content) as any).entries);
+        resolve((JSON.parse(content) as any).entries.map((el: Defs.SerializedFSEntry) => {
+          return Object.assign({}, el, {isDirectory: () => el.dir})
+        }));
       });
     });
   }
 
-  serializeEntries (dir: string): Promise<undefined> {
-    mkdirp.sync(path.join(dir, 'fstree'));
+  serializeEntries (dir: string) {
+    mkdirp.sync(path.join(dir, 'fstree/libraries'));
     const file = path.join(dir, `fstree/${this.library}.entries.json`);
 
     return new Promise((resolve, reject) => {
-      writeFile(file, JSON.stringify({entries: this.entries}), function (err) {
+      writeFile(file, JSON.stringify({entries: this.entries.map((el) => {
+        return Object.assign({}, el, {dir: el.isDirectory()})
+      })}), function (err) {
         if (err) return reject (err);
 
         resolve();
@@ -60,16 +78,20 @@ class Scanner {
 
   async getPatch () {
     const serialized = await this.getSerializedEntries('/home/vincent/.compactd/');
-    const staled = FSTree.fromEntries(serialized);
-    const current = FSTree.fromEntries(this.entries);
+    const staled = FSTree.fromEntries(serialized || []);
+    const current = FSTree.fromEntries(this.entries || []);
 
     return staled.calculatePatch(current);
   }
 
-  ffprobe (path: string){
+  ffprobe (file: string){
+    const exts = ['.mp4', '.mp3', '.m4a', '.flac', '.ogg', '.wav', '.wmv', '.alac'];
     return new Promise((resolve, reject) => {
+      if (!exts.includes(path.extname(file))) {
+        return resolve(); 
+      }
       const ffmpeg = Ffmpeg();
-      ffmpeg.ffprobe([path], (err, data) => {
+      ffmpeg.input(file).ffprobe((err: Error, data: any) => {
         if (err) return reject(err);
 
         resolve(data);
@@ -94,9 +116,16 @@ class Scanner {
   }
   async databaseEntryCreator (pouchDB: typeof PouchDB, [op, file, entry]: FSTree.PatchEntry) {
     switch (op) {
+      case 'mkdir':
+        console.log(`Scanning ${file}`);
+        return;
       case 'create': 
         const source = path.join(this.path, file);
+        
         const probed: any = await this.ffprobe(source);
+        if (!probed || !probed.format || !probed.format.tags) {
+          return; 
+        }
         
         const ext = path.extname(file);
         const tags = probed.format.tags;
@@ -113,7 +142,8 @@ class Scanner {
         }));
 
         const trackName = tags.title || tags.TITLE;
-        const trackNumber = (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1];
+        const trackNumber = (tags.track || tags.TRACK) ?
+          (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
         const trackID = Models.trackURI(Models.mapTrackToParams({
           name: albumName,
           artist: artistID,
@@ -135,16 +165,16 @@ class Scanner {
         const fileID = Models.fileURI(Models.mapFileToParams(fileProps));
 
         const docs = {
-          artist: {
+          artists: {
             _id: artistID,
             name: artistName
           },
-          album: {
+          albums: {
             _id: albumID,
             name: albumName,
             artist: artistID
           },
-          track: {
+          tracks: {
             _id: trackID,
             name: albumName,
             artist: artistID,
@@ -152,7 +182,7 @@ class Scanner {
             album: albumID,
             number: trackNumber
           },
-          file: Object.assign({}, fileProps, {
+          files: Object.assign({}, fileProps, {
             _id: fileID,
             hash: Models.fileURI(fileID).hash
           })
