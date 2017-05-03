@@ -9,15 +9,15 @@ export interface IDB {
 
 export const dbs: IDB[] = [
   {
-    name: 'artist',
+    name: 'artists',
     schema: Schemas.ArtistSchema,
     perms: Perms.ArtistPermissions
   }, {
-    name: 'album',
+    name: 'albums',
     schema: Schemas.AlbumSchema,
     perms: Perms.AlbumPermissions
   }, {
-    name: 'track',
+    name: 'tracks',
     schema: Schemas.TrackSchema,
     perms: Perms.TrackPermissions
   }, {
