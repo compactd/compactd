@@ -36,15 +36,15 @@ if (process.argv.includes('component')) {
   console.log();
 
   writeTemplate(`import * as React from 'react';
-import {I${changeCase.pascalCase(feature)}Actions} from '../../actions.d';
+import {${changeCase.pascalCase(feature)}Actions} from '../../actions.d';
 
 require('./${pascalName}.scss');
 
-interface I${pascalName}Props {
-  actions: I${changeCase.pascalCase(feature)}Actions;
+interface ${pascalName}Props {
+  actions: ${changeCase.pascalCase(feature)}Actions;
 }
 
-export class ${pascalName} extends React.Component<I${pascalName}Props, {}>{
+export class ${pascalName} extends React.Component<${pascalName}Props, {}>{
   render (): JSX.Element {
     const {actions} = this.props;
     return <div className="${changeCase.paramCase(pascalName)}">
@@ -80,13 +80,13 @@ if (process.argv.includes('feature')) {
   mkdirp.sync(dir);
   console.log();
   writeTemplate(`import * as Defs from 'definitions';
-import { I${pascalName}Action } from './actions.d';
+import { ${pascalName}Action } from './actions.d';
 
-const initialState: Defs.I${pascalName}State = {
+const initialState: Defs.${pascalName}State = {
 };
 
-export function reducer (state: Defs.I${pascalName}State = initialState,
-  action: I${pascalName}Action): Defs.I${pascalName}State {
+export function reducer (state: Defs.${pascalName}State = initialState,
+  action: ${pascalName}Action): Defs.${pascalName}State {
   switch (action.type) {
   }
   return state;
@@ -96,13 +96,13 @@ export const actions = {
 
   writeTemplate(`import {IArtist, IAlbum} from 'definitions';
 
-interface I${pascalName}ActionBase {
+interface ${pascalName}ActionBase {
   type: string;
 };
 
-export type I${pascalName}Action = {};
+export type ${pascalName}Action = {};
 
-export type I${pascalName}Actions = {
+export type ${pascalName}Actions = {
   action1: (<params>) => void;
 }
 `, base, folder, `actions.d.tsx`);
@@ -114,20 +114,20 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import {actions} from '../${folder}';
-import {I${pascalName}Actions, I${pascalName}Action} from '../actions.d';
-import {I${pascalName}State, ICompactdState} from 'definitions';
+import {${pascalName}Actions, ${pascalName}Action} from '../actions.d';
+import {${pascalName}State, CompactdState} from 'definitions';
 
-interface I${pascalName}ViewProps {
-  actions: I${pascalName}Actions;
-  ${folder}: I${pascalName}State;
+interface ${pascalName}ViewProps {
+  actions: ${pascalName}Actions;
+  ${folder}: ${pascalName}State;
 }
 
 @(connect as any)(createStructuredSelector({
-  ${folder}: (state: ICompactdState) => state.${folder}
-}), (dispatch: Dispatch<I${pascalName}Action>) => ({
+  ${folder}: (state: CompactdState) => state.${folder}
+}), (dispatch: Dispatch<${pascalName}Action>) => ({
   actions: bindActionCreators(actions, dispatch)
 }))
-class ${pascalName}View extends React.Component<I${pascalName}ViewProps, {}> {
+class ${pascalName}View extends React.Component<${pascalName}ViewProps, {}> {
   render (): JSX.Element {
     return <div className="${changeCase.paramCase(`${name}View`)}"></div>;
   }
