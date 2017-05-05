@@ -1,16 +1,23 @@
-div.login-view{
+div.login-view {
   .login-container {
     position: absolute;
     top: 0;
-    bottom: 0;
     left: 0;
     right: 0;
     width: 300px;
-    height: 233px;
-    padding: 25px;
+    height: 260px;
+    padding: 30px;
+    bottom: 0;
     margin: auto;
     box-shadow: 0 0 9px rgba(0, 0, 0, 0.28);
     background-color: rgba(246, 247, 249, 0.85);
+    opacity: 0;
+    transform: translateY(-100px) scale(0.98);
+    &.active {
+      transition: all 0.15s ease;
+      transform: translateY(0px);
+      opacity: 1;
+    }
   }
 
   .login-header {

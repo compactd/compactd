@@ -16,6 +16,8 @@ export default function(app: Express.Application) {
         response: 'Scan started'
       });
     }).catch((err) => {
+      console.log(err);
+      
       res.status(400).send({
         status: 400,
         response: 'Couldnt start scan'

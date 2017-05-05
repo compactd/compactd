@@ -2,12 +2,15 @@ import * as Defs from 'definitions';
 import { AppAction } from './actions.d';
 import * as PouchDB from 'pouchdb';
 import * as thunk from 'redux-thunk';
+import * as jwt from 'jwt-decode';
+import {getDatabase} from 'app/database';
 
 const RESOLVE_STATE = 'compactd/app/RESOLVE_STATE';
 const SET_USER = 'compactd/app/SET_USER';
 const START_SYNC = 'compactd/app/START_SYNC';
 const UPDATE_SYNC = 'compactd/app/UPDATE_SYNC';
 const END_SYNC = 'compactd/app/END_SYNC';
+const SHOW_ERROR = 'compactd/app/SHOW_ERROR';
 
 const initialState: Defs.AppState = {
   loading: true,
@@ -24,7 +27,8 @@ export function reducer (state: Defs.AppState = initialState,
     case RESOLVE_STATE:
       return Object.assign({}, state, {
         loading: false,
-        configured: action.configured
+        configured: action.configured,
+        user: action.user
       });
     case START_SYNC:
       return Object.assign({}, state, {
@@ -45,10 +49,34 @@ export function reducer (state: Defs.AppState = initialState,
   return state;
 }
 
+function login (username: string, password: string) {
+  return fetch('/api/sessions',
+    {method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username, password})})
+    .then((res) => res.json()).then((res) => {
+    sessionStorage.setItem('session_token',res.token);
+    return {type: SET_USER, user: jwt(res.token)};
+  }).catch(() => {
+    return {type: SHOW_ERROR};
+  });
+}
+
 function fetchState () {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, 400);
   }).then(() => {
+    const token = sessionStorage.getItem('session_token');
+    try {
+      const user = jwt(token || '');
+      return {
+        type: RESOLVE_STATE,
+        configured: true,
+        user: user
+      }
+    } catch (err) {
+
+    }
     return {
       type: RESOLVE_STATE,
       configured: true
@@ -60,12 +88,8 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
   return (dispatch, getState) => {
     const dbName = dbs[0];
     const db = new PouchDB(dbName);
-    const remote = new PouchDB(`${window.location.origin}/database/${dbName}`, {
-      auth: {
-        username: 'admin',
-        password: 'password'
-      }
-    });
+    const remote = getDatabase(dbName);
+
     db.sync(remote).on('complete', (info) => {
       dispatch({
         type: UPDATE_SYNC,
@@ -87,12 +111,12 @@ function sync (): thunk.ThunkAction<void, Defs.CompactdState, void>  {
     if (getState().app.syncing) {
       return;
     }
-    const dbs = ['config', 'artists', 'albums', 'tracks', 'files', 'trackers'];
+    const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers'];
 
     (syncDB(dbs, dbs.length) as any)(dispatch, getState);
   }
 }
 
 export const actions = {
-  sync, fetchState
+  sync, fetchState, login
 }

@@ -13,6 +13,7 @@ export interface LibraryState {
 }
 
 export interface AppState {
+  loggingIn?: boolean;
   /**
    * Whether the app is loading the state
    */

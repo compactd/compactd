@@ -263,21 +263,22 @@ export default class Authenticator {
 
   proxyRequestDecorator () {
     return (proxyReqOpts: any, srcReq: any) => {
+      
       if (process.env.ADMIN_PARTY) {
         const auth = new Buffer(PouchDB.credentials).toString('base64');
-        proxyReqOpts.headers['Authorization'] = `Basic ${auth}`;
+        proxyReqOpts.headers.authorization = `Basic ${auth}`;
         return proxyReqOpts;
       }
 
-      if (!proxyReqOpts.headers['Authorization']) {
+      if (!proxyReqOpts.headers.authorization) {
         throw new Error('Please provide a token');
       }
 
-      const [bearer, token] = proxyReqOpts.headers['Authorization'].split(' ');
+      const [bearer, token] = proxyReqOpts.headers.authorization.split(' ');
       const user = this.verifySession(token);
       const auth = new Buffer(`${user}:${this.passwords[user]}`)
         .toString('base64')
-      proxyReqOpts.headers['Authorization'] = `Basic ${auth}`;
+      proxyReqOpts.headers.authorization = `Basic ${auth}`;
 
       return proxyReqOpts;
     }
