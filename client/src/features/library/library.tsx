@@ -1,6 +1,6 @@
 import * as Defs from 'definitions';
 import { LibraryAction } from './actions.d';
-import {getDatabase} from 'app/database';
+import * as PouchDB from 'pouchdb';
 // import * as IFetch from '@types/whatwg-fetch';
 // import "whatwg-fetch";
 
@@ -58,7 +58,7 @@ export function reducer (state: Defs.LibraryState = initialState,
 
 function fetchAllArtists () {
   return Promise.resolve().then(() => {
-    const artists = getDatabase<Defs.Artist>('artists');
+    const artists = new PouchDB<Defs.Artist>('artists');
     return artists.allDocs({include_docs: true});
   }).then((docs) => {
     return {

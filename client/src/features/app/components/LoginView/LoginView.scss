@@ -1,3 +1,35 @@
 div.login-view{
+  .login-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 300px;
+    height: 233px;
+    padding: 25px;
+    margin: auto;
+    box-shadow: 0 0 9px rgba(0, 0, 0, 0.28);
+    background-color: rgba(246, 247, 249, 0.85);
+  }
 
+  .login-header {
+      font-size: 20px;
+      margin-bottom: 1em;
+      span {
+        font-size: 12px;
+        display: block;
+      }
+  }
+
+  .login-content input {
+      margin: 0.5em;
+      width: 225px;
+  }
+
+  .login-footer {
+      text-align: right;
+      margin-right: 18px;
+      margin-top: 0.5em;
+  }
 }

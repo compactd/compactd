@@ -88,7 +88,7 @@ export class Scanner {
     const exts = ['.mp4', '.mp3', '.m4a', '.flac', '.ogg', '.wav', '.wmv', '.alac'];
     return new Promise((resolve, reject) => {
       if (!exts.includes(path.extname(file))) {
-        return resolve(); 
+        return resolve();
       }
       const ffmpeg = Ffmpeg();
       ffmpeg.input(file).ffprobe((err: Error, data: any) => {
@@ -119,14 +119,15 @@ export class Scanner {
       case 'mkdir':
         console.log(`Scanning ${file}`);
         return;
-      case 'create': 
+      case 'create':
         const source = path.join(this.path, file);
-        
+
         const probed: any = await this.ffprobe(source);
-        if (!probed || !probed.format || !probed.format.tags) {
-          return; 
+        if (!probed || !probed.format ||
+          !probed.format.tags || !probed.format.tags.title) {
+          return;
         }
-        
+
         const ext = path.extname(file);
         const tags = probed.format.tags;
 
@@ -145,7 +146,7 @@ export class Scanner {
         const trackNumber = (tags.track || tags.TRACK) ?
           (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
         const trackID = Models.trackURI(Models.mapTrackToParams({
-          name: albumName,
+          name: trackName,
           artist: artistID,
           album: albumID,
           number: trackNumber
@@ -190,7 +191,7 @@ export class Scanner {
 
         const databaseOperations = Object.keys(docs).map((model: string) => {
           const props = (docs as any)[model] as any;
-          
+
           const db = new pouchDB(model);
           return db.put(props).catch((err) => {
             if (err.status === 409) return;
@@ -199,7 +200,7 @@ export class Scanner {
         });
 
         await Promise.all(databaseOperations);
-        
+
     }
   }
 }

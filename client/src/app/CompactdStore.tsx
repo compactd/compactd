@@ -3,6 +3,7 @@ import {CompactdState} from 'definitions';
 import {reducers} from './reducers';
 import createHistory from 'history/createBrowserHistory'
 import * as reduxPromise from 'redux-promise';
+import reduxThunk from 'redux-thunk';
 import { routerMiddleware } from 'react-router-redux'
 // Create a history of your choosing (we're using a browser history in this case)
 export const history = createHistory()
@@ -17,7 +18,7 @@ export class CompactdStore {
   }
   configureStore (): Store<CompactdState> {
     const enhancer = this.compose(
-      applyMiddleware(middleware, reduxPromise)
+      applyMiddleware(middleware, reduxThunk, reduxPromise)
     )(createStore);
     return enhancer(reducers);
   }

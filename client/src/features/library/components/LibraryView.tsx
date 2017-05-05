@@ -10,6 +10,7 @@ import {ArtistsView} from './ArtistsView';
 interface LibraryViewProps {
   actions: LibraryActions;
   library: LibraryState;
+  component: any;
 }
 
 @(connect as any)(createStructuredSelector({
@@ -20,7 +21,7 @@ interface LibraryViewProps {
 class LibraryView extends React.Component<LibraryViewProps, {}> {
   render (): JSX.Element {
     const {library, actions} = this.props;
-    const content = <ArtistsView artists={library.artists} actions={actions} />;
+    const content =  <this.props.component library={library} actions={actions} />;
     return <div>{content}</div>;
   }
 }

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {LibraryActions} from '../../actions.d';
-import {Artist} from 'definitions';
+import {LibraryState} from 'definitions';
 
 require('./ArtistsView.scss');
 
 interface ArtistViewProps {
   actions: LibraryActions;
-  artists: Artist[];
+  library: LibraryState;
 }
 
 export class ArtistsView extends React.Component<ArtistViewProps, {}>{
@@ -14,8 +14,9 @@ export class ArtistsView extends React.Component<ArtistViewProps, {}>{
     this.props.actions.fetchAllArtists();
   }
   render (): JSX.Element {
-    const {actions, artists} = this.props;
-    const content = artists.map((artist) => {
+    const {actions, library} = this.props;
+    console.log(this)
+    const content = library.artists.map((artist) => {
       return <div className="artist">{artist.name}</div>;
     });
     return <div className="artists-view">

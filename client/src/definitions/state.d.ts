@@ -12,6 +12,29 @@ export interface LibraryState {
   tracks: Compactd.Track[];
 }
 
+export interface AppState {
+  /**
+   * Whether the app is loading the state
+   */
+  loading: boolean;
+  /**
+   * Whether app has been configured, and server is ready to be used
+   */
+  configured: boolean;
+  /**
+   * Is the app loading, syncing the databases?
+   */
+  syncing: boolean;
+  /**
+   * Syncing progress between  0 and 1
+   */
+  syncingProgress?: number;
+  synced: boolean;
+  /**
+   * Logged in user
+   */
+  user?: string;
+}
 export interface PlayerState {
   /**
    * An array containing a list of the next tracks
@@ -34,4 +57,5 @@ export interface PlayerState {
 export interface CompactdState {
   library: LibraryState;
   player: PlayerState;
+  app: AppState;
 }

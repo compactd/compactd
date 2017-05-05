@@ -50,14 +50,14 @@ export class ${pascalName} extends React.Component<${pascalName}Props, {}>{
     return <div className="${changeCase.paramCase(pascalName)}">
     </div>
   }
-}`, base, feature, `${pascalName}.tsx`)
+}`, base, feature, `components/${pascalName}/${pascalName}.tsx`)
 
-  writeTemplate(`export * from './${pascalName}';`, base, feature, 'index.tsx');
+  writeTemplate(`export * from './${pascalName}';`, base, feature, `components/${pascalName}/index.tsx`);
 
   writeTemplate(`div.${changeCase.paramCase(pascalName)}{
 
 }
-`, base, feature, `${pascalName}.scss`);
+`, base, feature, `components/${pascalName}/${pascalName}.scss`);
   console.log();
   console.log(chalk.green('  ✔ Done'))
 }

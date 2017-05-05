@@ -21,3 +21,7 @@ implement all of this myself :D
 ## Stack
 
 I plan to use React, Redux, Reselect, PouchDB (ofc!)...
+
+
+_cluster_setup {"action":"enable_cluster","username":"admin","password":"password","bind_address":"0.0.0.0","port":5984}
+{action: "finish_cluster"}
