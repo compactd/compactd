@@ -11,4 +11,18 @@ div.albums-list-view{
   div.albums-container {
 
   }
+  div.artist-header {
+    img {
+      border-radius: 16px;
+    }
+    div {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    div.artist-name {
+      margin: 0 1em;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  }
 }
