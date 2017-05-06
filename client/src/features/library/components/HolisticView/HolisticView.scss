@@ -1,3 +1,13 @@
 div.holistic-view{
-
+  div.artists-list {
+    background-color: #343944;
+    div.list-header {
+      span {
+        // display: block;
+      }
+      div.pt-input-group {
+        margin: 1em 1em;
+      }
+    }
+  }
 }

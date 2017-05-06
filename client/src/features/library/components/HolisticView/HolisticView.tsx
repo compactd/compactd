@@ -24,7 +24,14 @@ export class HolisticView extends React.Component<HolisticViewProps, {}>{
     })
     return <div className="holistic-view">
       <Flex>
-        <Box col={2}>
+        <Box col={2} className="pt-dark artists-list">
+          <div className="list-header">
+            <div className="pt-input-group">
+              <span className="pt-icon pt-icon-search"></span>
+              <input className="pt-input" type="search"
+                placeholder="Filter artists" dir="auto" />
+            </div>
+          </div>
           <ScrollableDiv>
           {artists}
           </ScrollableDiv>
