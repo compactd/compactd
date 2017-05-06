@@ -81,7 +81,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
             placeholder="Filter albums" dir="auto" />
         </div>
 
-    return <div className="albums-list-view">
+    return <div className="albums-list-view pt-dark">
       <div className="list-header">
         {header}
       </div>

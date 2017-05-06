@@ -24,18 +24,18 @@ div.album-list-item{
       margin: 0.3em;
     }
     span.album-name {
-      color: #201b29;
+      color: #e4e0ec;
       font-size: 16px;
       text-overflow: ellipsis;
       .match {
         // color: #fff;
       }
       .not-match {
-        color: #535c6f;
+        color: #7986a1;
       }
     }
     span.album-track-count {
-      color: #474662;
+      color: #7d7b9a;
       font-size: 12px;
     }
   }
