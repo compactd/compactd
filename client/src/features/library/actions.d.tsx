@@ -9,6 +9,11 @@ interface ActionResolveAllArtists {
   artists: Artist[];
 }
 
+interface ActionResolveAllAlbums {
+  type: 'compactd/library/RESOLVE_ALL_ALBUMS';
+  albums: Album[];
+}
+
 interface ActionResolveArtist {
   type: 'compactd/library/RESOLVE_ARTIST';
   artist: Artist;
@@ -19,9 +24,13 @@ interface ActionResolveAlbum {
   album: Album;
 }
 
-export type LibraryAction = ActionResolveArtist | ActionResolveAlbum | ActionResolveAllArtists;
+export type LibraryAction = ActionResolveAllAlbums |
+                            ActionResolveArtist |
+                            ActionResolveAlbum |
+                            ActionResolveAllArtists;
 
 export type LibraryActions = {
-  fetchArtist: (artist: Artist) => void;
+  fetchArtist: (artist: string) => void;
   fetchAllArtists: () => void;
+  fetchAllAlbums: () => void;
 }

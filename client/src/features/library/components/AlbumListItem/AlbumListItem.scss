@@ -1,3 +1,42 @@
 div.album-list-item{
+  cursor: pointer;
+  a > div {
+    vertical-align: top;
+  }
+  div.album-image {
+    display: inline-block;
+    margin: 0.5em 0.8em;
+    img {
+      height: 64px;
+      width: 64px;
 
+    }
+  }
+  div.album-description {
+    display: inline-block;
+    margin-top: 1.2em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 360px;
+    &> span {
+      display: block;
+      margin: 0.3em;
+    }
+    span.album-name {
+      color: #201b29;
+      font-size: 16px;
+      text-overflow: ellipsis;
+      .match {
+        // color: #fff;
+      }
+      .not-match {
+        color: #535c6f;
+      }
+    }
+    span.album-track-count {
+      color: #474662;
+      font-size: 12px;
+    }
+  }
 }

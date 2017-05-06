@@ -1,6 +1,9 @@
 div.artist-list-item{
   cursor: pointer;
-  a > div {
+  &.active {
+    background-color: rgba(220, 229, 241, 0.19);
+  }
+  & > div {
     vertical-align: top;
   }
   div.artist-image {

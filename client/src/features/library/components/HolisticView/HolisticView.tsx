@@ -2,10 +2,11 @@ import * as React from 'react';
 import {LibraryActions} from '../../actions.d';
 import {LibraryState, Artist} from 'definitions';
 import {ArtistListItem} from '../ArtistListItem';
+import {AlbumsListView} from '../AlbumsListView';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {match} from 'react-router';
 import * as fuzzy from 'fuzzy';
-
+import {artistURI} from 'compactd-models';
 const {Flex, Box} = require('reflexbox');
 
 require('./HolisticView.scss');
@@ -58,7 +59,9 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
       return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
     }).map(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
       return <ArtistListItem key={artist._id} actions={actions}
-              artist={artist} filterMatch={matched}/>
+              artist={artist} filterMatch={matched} active={
+                artistURI(artist._id).name === this.props.match.params.artist
+              }/>
     })
     return <div className="holistic-view">
       <Flex>
@@ -76,8 +79,9 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
           {artists}
           </ScrollableDiv>
         </Box>
-        <Box col={2}>
-          {(this.props).match.params.artist}
+        <Box col={3}>
+          <AlbumsListView actions={actions}
+            artist={this.props.match.params.artist} library={library} />
         </Box>
       </Flex>
     </div>
