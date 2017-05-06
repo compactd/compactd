@@ -47,16 +47,16 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     };
     const albums = artist.albums
     .map(album => {
-      if (this.state.albumsFilter) {
+      if (this.state.albumsFilter && !this.props.artist) {
         return [
           fuzzy.match(this.state.albumsFilter, album.name, options), album
         ]
       }
       return [undefined, album];
     }).filter(([matched, album]: [fuzzy.MatchResult, Album]) => {
-      return this.state.albumsFilter ? matched : true;
+      return this.state.albumsFilter && !this.props.artist ? matched : true;
     }).sort((a, b) => {
-      if (!this.state.albumsFilter) {
+      if (!this.state.albumsFilter || this.props.artist) {
         if ((a[1] as Album).name > (b[1] as Album).name) return 1;
         if ((a[1] as Album).name < (b[1] as Album).name) return -1;
         return 0;
