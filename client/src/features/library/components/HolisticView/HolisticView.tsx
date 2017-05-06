@@ -13,16 +13,52 @@ require('./HolisticView.scss');
 interface HolisticViewProps {
   actions: LibraryActions;
   library: LibraryState;
+  match: match<{artist: string}>;
+}
+interface HolisticViewState {
+  artistsFilter: string;
 }
 
-export class HolisticView extends React.Component<HolisticViewProps, {}>{
+export class HolisticView extends React.Component<HolisticViewProps, HolisticViewState> {
+  constructor () {
+    super();
+    this.state = {artistsFilter: ''};
+  }
   componentDidMount () {
     this.props.actions.fetchAllArtists();
   }
+  handleArtistsFilterChange (evt: Event) {
+    const target = evt.target as HTMLInputElement;
+    this.setState({artistsFilter: target.value});
+  }
   render (): JSX.Element {
     const {actions, library} = this.props;
-    const artists = library.artists.map((artist) => {
-      return <ArtistListItem actions={actions} artist={artist} />
+
+    const options = {
+      pre: '$', post: '',
+      extract: (el: Artist) => el.name
+    };
+
+    const artists = library.artists
+    .map(artist => {
+      if (this.state.artistsFilter) {
+        return [
+          fuzzy.match(this.state.artistsFilter, artist.name, options), artist
+        ]
+      }
+      return [undefined, artist];
+    }).filter(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
+      return this.state.artistsFilter ? matched : true;
+    }).sort((a, b) => {
+      if (!this.state.artistsFilter) {
+        if ((a[1] as Artist).name > (b[1] as Artist).name) return 1;
+        if ((a[1] as Artist).name < (b[1] as Artist).name) return -1;
+        return 0;
+      }
+      return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
+    }).map(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
+      return <ArtistListItem key={artist._id} actions={actions}
+              artist={artist} filterMatch={matched}/>
     })
     return <div className="holistic-view">
       <Flex>
@@ -31,6 +67,8 @@ export class HolisticView extends React.Component<HolisticViewProps, {}>{
             <div className="pt-input-group">
               <span className="pt-icon pt-icon-search"></span>
               <input className="pt-input" type="search"
+                value={this.state.artistsFilter}
+                onChange={this.handleArtistsFilterChange.bind(this)}
                 placeholder="Filter artists" dir="auto" />
             </div>
           </div>

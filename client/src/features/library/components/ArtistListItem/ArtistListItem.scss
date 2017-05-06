@@ -1,6 +1,6 @@
 div.artist-list-item{
   cursor: pointer;
-  &> div {
+  a > div {
     vertical-align: top;
   }
   div.artist-image {
@@ -16,13 +16,19 @@ div.artist-list-item{
   div.artist-description {
     display: inline-block;
     margin-top: 1.2em;
-    span {
+    &> span {
       display: block;
       margin: 0.3em;
     }
     span.artist-name {
       color: #e7e0f4;
       font-size: 16px;
+      .match {
+        // color: #fff;
+      }
+      .not-match {
+        color: #79808f;
+      }
     }
     span.artist-album-count {
       color: #706f8c;
