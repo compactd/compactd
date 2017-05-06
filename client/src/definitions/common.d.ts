@@ -1,38 +1,11 @@
-export type DatabaseID = number;
+export type DatabaseID = string;
+import * as M from 'compactd-models';
 
-export interface Artist {
-  name: string;
-  _id: DatabaseID;
-}
+export type Artist = M.Artist
 
-export interface Album {
-  name: string;
-  artist: Artist;
-  _id: DatabaseID;
-}
+export type Album = M.Album;
 
-export interface UAlbum {
-  name: string;
-  artist: DatabaseID;
-  _id: DatabaseID;
-}
 /**
  * Represents an album track
  */
-export interface Track {
-  name: string;
-  number?: number;
-  _id: DatabaseID;
-  artist: Artist;
-  track_artist?: string;
-  album: Album;
-}
-
-export interface UTrack {
-  name: string;
-  number?: number;
-  _id: DatabaseID;
-  artist: DatabaseID;
-  track_artist?: string;
-  album: DatabaseID;
-}
+export type Track = M.Track;

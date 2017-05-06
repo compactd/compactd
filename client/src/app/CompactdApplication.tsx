@@ -7,6 +7,7 @@ import { Route, Router } from 'react-router';
 import { history } from './CompactdStore';
 import AppView from 'features/app/components/AppView';
 import {ArtistsView} from 'features/library/components/ArtistsView';
+import {HolisticView} from 'features/library/components/HolisticView';
 import LibraryView from 'features/library/components/LibraryView';
 
 interface CompactdApplicationProps {
@@ -21,7 +22,7 @@ export class CompactdApplication extends
         <div>
           <AppView {...this.props}>
             <Route path="/library/artists" children={(props: any) =>
-              <LibraryView component={ArtistsView} {...props}/>} />
+              <LibraryView component={HolisticView} {...props}/>} />
           </AppView>
         </div>
       </Router>
