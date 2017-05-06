@@ -3,7 +3,8 @@ import { render } from "react-dom";
 import { Provider } from 'react-redux';
 import * as Redux from 'redux';
 import { CompactdState } from 'definitions';
-import { Route, Router } from 'react-router';
+import { Route } from 'react-router-dom';
+import { ConnectedRouter } from 'react-router-redux';
 import { history } from './CompactdStore';
 import AppView from 'features/app/components/AppView';
 import {ArtistsView} from 'features/library/components/ArtistsView';
@@ -17,15 +18,16 @@ export class CompactdApplication extends
   React.Component<CompactdApplicationProps, {}> {
 
   render (): JSX.Element {
+    console.log(Route, LibraryView, HolisticView);
     return <Provider store={this.props.store}>
-      <Router history={history}>
+      <ConnectedRouter history={history}>
         <div>
-          <AppView {...this.props}>
-            <Route path="/library/artists" children={(props: any) =>
+          <AppView {...this.props as any}>
+            <Route path="/library/:artist?" children={(props: any) =>
               <LibraryView component={HolisticView} {...props}/>} />
           </AppView>
         </div>
-      </Router>
+      </ConnectedRouter>
     </Provider>;
   }
 }

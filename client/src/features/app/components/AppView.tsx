@@ -8,6 +8,7 @@ import {AppState, CompactdState} from 'definitions';
 import {LoadingView} from './LoadingView';
 import {LoginView} from './LoginView';
 import {SyncView} from './SyncView';
+import { withRouter } from 'react-router-dom';
 
 interface AppViewProps {
   actions: AppActions;
@@ -43,4 +44,4 @@ class AppView extends React.Component<AppViewProps, {}> {
   }
 }
 
-export default AppView as any;
+export default withRouter<AppViewProps>(AppView as any);

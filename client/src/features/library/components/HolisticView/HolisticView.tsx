@@ -1,8 +1,10 @@
 import * as React from 'react';
 import {LibraryActions} from '../../actions.d';
-import {LibraryState} from 'definitions';
+import {LibraryState, Artist} from 'definitions';
 import {ArtistListItem} from '../ArtistListItem';
 import ScrollableDiv from 'components/ScrollableDiv';
+import {match} from 'react-router';
+import * as fuzzy from 'fuzzy';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -37,8 +39,7 @@ export class HolisticView extends React.Component<HolisticViewProps, {}>{
           </ScrollableDiv>
         </Box>
         <Box col={2}>
-
-        yoooo
+          {(this.props).match.params.artist}
         </Box>
       </Flex>
     </div>

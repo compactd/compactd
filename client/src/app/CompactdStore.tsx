@@ -4,7 +4,8 @@ import {reducers} from './reducers';
 import createHistory from 'history/createBrowserHistory'
 import * as reduxPromise from 'redux-promise';
 import reduxThunk from 'redux-thunk';
-import { routerMiddleware } from 'react-router-redux'
+import { routerMiddleware } from 'react-router-redux';
+import { withRouter } from 'react-router-dom';
 // Create a history of your choosing (we're using a browser history in this case)
 export const history = createHistory()
 
