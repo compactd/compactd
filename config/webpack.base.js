@@ -17,7 +17,8 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js", ".json", ".scss"],
     alias: {
       features: path.join(__dirname, '../client/src/features'),
-      app: path.join(__dirname, '../client/src/app')
+      app: path.join(__dirname, '../client/src/app'),
+      components: path.join(__dirname, '../client/src/components'),
     }
   },
   plugins: [
