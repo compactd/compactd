@@ -250,7 +250,7 @@ export default class Authenticator {
           ok: true,
           message: 'User created'
         });
-      }).catch((err) {
+      }).catch((err) => {
         if (err.isBoom) {
           return res
             .status((err as Boom.BoomError).output.statusCode)
