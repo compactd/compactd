@@ -4,6 +4,10 @@ interface LibraryActionBase {
   type: string;
 };
 
+interface ActionToggleExpandArtist {
+  type: 'compactd/library/TOGGLE_EXPAND_ARTIST';
+}
+
 interface ActionResolveAllArtists {
   type: 'compactd/library/RESOLVE_ALL_ARTISTS';
   artists: Artist[];
@@ -27,10 +31,12 @@ interface ActionResolveAlbum {
 export type LibraryAction = ActionResolveAllAlbums |
                             ActionResolveArtist |
                             ActionResolveAlbum |
-                            ActionResolveAllArtists;
+                            ActionResolveAllArtists |
+                            ActionToggleExpandArtist;
 
 export type LibraryActions = {
   fetchArtist: (artist: string) => void;
   fetchAllArtists: () => void;
   fetchAllAlbums: () => void;
+  toggleExpandArtist: () => void;
 }

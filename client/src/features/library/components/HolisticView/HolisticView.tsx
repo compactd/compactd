@@ -7,6 +7,8 @@ import ScrollableDiv from 'components/ScrollableDiv';
 import {match} from 'react-router';
 import * as fuzzy from 'fuzzy';
 import {artistURI} from 'compactd-models';
+import * as classnames from "classnames";
+
 const {Flex, Box} = require('reflexbox');
 
 require('./HolisticView.scss');
@@ -65,18 +67,24 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     })
     return <div className="holistic-view">
       <Flex>
-        <Box col={2} className="pt-dark artists-list">
+        <Box col={2} className={classnames("pt-dark artists-list", {
+          minimal: !library.expandArtists
+        })}>
           <div className="list-header">
             <div className="pt-input-group">
               <span className="pt-icon pt-icon-search"></span>
               <input className="pt-input" type="search"
                 value={this.state.artistsFilter}
                 onChange={this.handleArtistsFilterChange.bind(this)}
+                onFocus={() => library.expandArtists || actions.toggleExpandArtist()}
                 placeholder="Filter artists" dir="auto" />
+              <span onClick={actions.toggleExpandArtist}
+              className={classnames('pt-icon toggle-expand-artist',
+              library.expandArtists ? 'pt-icon-caret-left' : 'pt-icon-caret-right')}></span>
             </div>
           </div>
           <ScrollableDiv>
-          {artists}
+            {artists}
           </ScrollableDiv>
         </Box>
         <Box col={3}>

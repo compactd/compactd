@@ -10,6 +10,7 @@ export interface LibraryState {
   albums: Compactd.Album[];
   artists: Compactd.Artist[];
   tracks: Compactd.Track[];
+  expandArtists: boolean;
 }
 
 export interface AppState {

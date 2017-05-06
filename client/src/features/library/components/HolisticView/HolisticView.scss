@@ -1,5 +1,14 @@
 div.holistic-view{
+  .toggle-expand-artist {
+    cursor: pointer;
+  }
   div.artists-list {
+    white-space: nowrap;
+    transition: all ease 0.2s;
+    &.minimal {
+      width: 90px !important;
+      transition: all ease 0.2s;
+    }
     background-color: #343944;
     div.list-header {
       span {

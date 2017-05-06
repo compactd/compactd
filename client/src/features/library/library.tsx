@@ -10,6 +10,7 @@ const RESOLVE_ARTIST = 'compactd/library/RESOLVE_ARTIST';
 const RESOLVE_ALL_ARTISTS = 'compactd/library/RESOLVE_ALL_ARTISTS';
 const RESOLVE_ALL_ALBUMS = 'compactd/library/RESOLVE_ALL_ALBUMS';
 const RESOLVE_ALBUM  = 'compactd/library/RESOLVE_ALBUM';
+const TOGGLE_EXPAND_ARTIST  = 'compactd/library/TOGGLE_EXPAND_ARTIST';
 
 const initialState: Defs.LibraryState = {
   albumsById: {
@@ -18,12 +19,15 @@ const initialState: Defs.LibraryState = {
   },
   albums: [],
   artists: [],
-  tracks: []
+  tracks: [],
+  expandArtists: true
 };
 
 export function reducer (state: Defs.LibraryState = initialState,
   action: LibraryAction): Defs.LibraryState {
   switch (action.type) {
+    case TOGGLE_EXPAND_ARTIST:
+      return Object.assign({}, state, {expandArtists: !state.expandArtists});
     case RESOLVE_ARTIST:
       return Object.assign({}, state, {
         artistsById: {...state.artistsById,
@@ -46,6 +50,10 @@ export function reducer (state: Defs.LibraryState = initialState,
       });
   }
   return state;
+}
+
+function toggleExpandArtist () {
+  return {type: TOGGLE_EXPAND_ARTIST};
 }
 
 function fetchAllArtists () {
@@ -97,5 +105,5 @@ function fetchArtist (slug: string) {
 }
 
 export const actions = {
-  fetchArtist, fetchAllArtists, fetchAllAlbums
+  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist
 };
