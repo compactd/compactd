@@ -3,8 +3,9 @@ import {LibraryActions} from '../../actions.d';
 import {LibraryState} from 'definitions';
 import {AlbumListItem} from '../AlbumListItem';
 import ScrollableDiv from 'components/ScrollableDiv';
-import {Album} from 'compactd-models';
+import {Album, albumURI} from 'compactd-models';
 import * as fuzzy from 'fuzzy';
+import {match} from 'react-router';
 
 require('./AlbumsListView.scss');
 
@@ -13,6 +14,7 @@ interface AlbumsListViewProps {
   artist: string;
   library: LibraryState;
   all: boolean;
+  match: match<{artist?: string, album?: string}>;
 }
 
 export class AlbumsListView extends React.Component<AlbumsListViewProps, {
@@ -65,6 +67,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
     }).map(([matched, album]: [fuzzy.MatchResult, Album]) => {
       return  <AlbumListItem key={album._id} filterMatch={matched}
+                active={this.props.match.params.album === albumURI(album._id).name}
                 album={album} actions={actions} all={this.props.all}/>
     })
 

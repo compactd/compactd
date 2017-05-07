@@ -4,6 +4,7 @@ import {Album, albumURI} from 'compactd-models';
 import {Link} from 'react-router-dom';
 import * as PropTypes from 'prop-types';
 import {MatchResult} from 'fuzzy';
+import * as classnames from 'classnames';
 require('./AlbumListItem.scss');
 
 interface AlbumListItemProps {
@@ -11,6 +12,7 @@ interface AlbumListItemProps {
   album: Album;
   filterMatch?: MatchResult;
   all: boolean;
+  active?: boolean;
 }
 
 export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
@@ -34,7 +36,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
 
       const { history } = this.context.router
       const props = albumURI(this.props.album._id);
-      history.push(false ? '/library' : `/library/${
+      history.push(this.props.active ? '/library' : `/library/${
         this.props.all ? 'all/':  ''}${
         props.artist
       }/${props.name}`);
@@ -42,7 +44,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
 
   }
   render (): JSX.Element {
-    const {actions, album, filterMatch} = this.props;
+    const {actions, album, filterMatch, active} = this.props;
     let name: JSX.Element = <span className="not-filtered">{album.name}</span>;
 
     if (filterMatch) {
@@ -55,7 +57,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
       name = <span className="filtered">{match}</span>;
     }
 
-    return <div className="album-list-item" onClick={this.handleClick.bind(this)}>
+    return <div className={classnames("album-list-item", {active})} onClick={this.handleClick.bind(this)}>
       <div className="album-image">
         <img src="http://placehold.it/64x64" />
       </div>

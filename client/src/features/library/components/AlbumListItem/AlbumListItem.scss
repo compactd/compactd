@@ -1,5 +1,8 @@
 div.album-list-item{
   cursor: pointer;
+  &.active {
+    background-color: rgba(204, 210, 221, 0.14);
+  }
   & > div {
     vertical-align: top;
   }
