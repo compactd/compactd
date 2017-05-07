@@ -1,3 +1,22 @@
 div.album-details-view{
 
+  div.album-header > div {
+    display:  inline-block;
+    vertical-align: top;
+  }
+
+  div.album-title {
+    margin: .2em 0.6em;
+    font-weight: 500;
+    font-size: 24px;
+  }
+
+  div.album-header {
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+    padding: 1.6em;
+  }
+
+  .album-content {
+    padding: 1.6em 1.6em 0 1.6em;
+  }
 }

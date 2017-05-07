@@ -5,6 +5,7 @@ import * as classnames from 'classnames';
 class ScrollableDiv extends React.Component<{
   offset?: number;
   className?: string;
+  binding?: any;
 },{}> {
   private div: HTMLDivElement;
   componentDidMount () {
@@ -14,6 +15,9 @@ class ScrollableDiv extends React.Component<{
       })
     });
     this.updateHeight();
+    setTimeout(() => {
+      this.updateHeight()
+    }, 200);
   }
   updateHeight () {
     this.div.style.height =

@@ -37,9 +37,14 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
       <TrackListItem track={track} actions={actions} library={library} />)
     return <div className="album-details-view">
       <div className="album-header">
+        <div className="album-image"><img src="http://placehold.it/128x128" /></div>
         <div className="album-title">{album.name}</div>
       </div>
-      <div className="album-content">{content}</div>
+      <div className="album-content">
+        <ScrollableDiv offset={0} binding={album}>
+          {content}
+        </ScrollableDiv>
+      </div>
     </div>
   }
 }
