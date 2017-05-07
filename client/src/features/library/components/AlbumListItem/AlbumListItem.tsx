@@ -10,6 +10,7 @@ interface AlbumListItemProps {
   actions: LibraryActions;
   album: Album;
   filterMatch?: MatchResult;
+  all: boolean;
 }
 
 export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
@@ -34,6 +35,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
       const { history } = this.context.router
       const props = albumURI(this.props.album._id);
       history.push(false ? '/library' : `/library/${
+        this.props.all ? 'all/':  ''}${
         props.artist
       }/${props.name}`);
     }

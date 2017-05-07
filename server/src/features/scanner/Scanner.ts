@@ -177,7 +177,7 @@ export class Scanner {
           },
           tracks: {
             _id: trackID,
-            name: albumName,
+            name: trackName,
             artist: artistID,
             track_artist: tags.artist | tags.ARTIST,
             album: albumID,

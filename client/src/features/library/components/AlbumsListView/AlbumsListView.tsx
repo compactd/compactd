@@ -12,6 +12,7 @@ interface AlbumsListViewProps {
   actions: LibraryActions;
   artist: string;
   library: LibraryState;
+  all: boolean;
 }
 
 export class AlbumsListView extends React.Component<AlbumsListViewProps, {
@@ -64,7 +65,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
     }).map(([matched, album]: [fuzzy.MatchResult, Album]) => {
       return  <AlbumListItem key={album._id} filterMatch={matched}
-                album={album} actions={actions} />
+                album={album} actions={actions} all={this.props.all}/>
     })
 
     const header = this.props.artist ?

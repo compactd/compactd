@@ -33,8 +33,13 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     if (!album) {
       return <div className="suggestions">Suggestions</div>;
     }
+    const content = album.tracks.map((track) =>
+      <TrackListItem track={track} actions={actions} library={library} />)
     return <div className="album-details-view">
-    {album.name} - {id}
+      <div className="album-header">
+        <div className="album-title">{album.name}</div>
+      </div>
+      <div className="album-content">{content}</div>
     </div>
   }
 }

@@ -14,6 +14,7 @@ interface LibraryViewProps {
   library: LibraryState;
   component: any;
   match: match<{artist: string}>;
+  all: boolean;
 }
 
 const mapStateProps = createStructuredSelector({
@@ -31,7 +32,7 @@ class LibraryView extends React.Component<LibraryViewProps, {}> {
   render (): JSX.Element {
     const {library, actions} = this.props;
     const content =  <this.props.component library={library} actions={actions}
-        match={(this.props as any).match}/>;
+        match={(this.props as any).match} all={this.props.all}/>;
     return <div>{content}</div>;
   }
 }

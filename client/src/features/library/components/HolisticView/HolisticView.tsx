@@ -18,6 +18,7 @@ interface HolisticViewProps {
   actions: LibraryActions;
   library: LibraryState;
   match: match<{artist?: string, album?: string}>;
+  all: boolean;
 }
 interface HolisticViewState {
   artistsFilter: string;
@@ -89,8 +90,9 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
           </ScrollableDiv>
         </Box>
         <Box col={3}>
-          <AlbumsListView actions={actions}
-            artist={this.props.match.params.artist} library={library} />
+          <AlbumsListView actions={actions} all={
+            this.props.all || !this.props.match.params.artist}
+            artist={!this.props.all ? this.props.match.params.artist: undefined} library={library} />
         </Box>
         <Box col={4}>
           <AlbumDetailsView actions={actions}
