@@ -3,6 +3,7 @@ import {LibraryActions} from '../../actions.d';
 import {LibraryState, Artist} from 'definitions';
 import {ArtistListItem} from '../ArtistListItem';
 import {AlbumsListView} from '../AlbumsListView';
+import {AlbumDetailsView} from '../AlbumDetailsView';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {match} from 'react-router';
 import * as fuzzy from 'fuzzy';
@@ -16,7 +17,7 @@ require('./HolisticView.scss');
 interface HolisticViewProps {
   actions: LibraryActions;
   library: LibraryState;
-  match: match<{artist: string}>;
+  match: match<{artist?: string, album?: string}>;
 }
 interface HolisticViewState {
   artistsFilter: string;
@@ -90,6 +91,11 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
         <Box col={3}>
           <AlbumsListView actions={actions}
             artist={this.props.match.params.artist} library={library} />
+        </Box>
+        <Box col={4}>
+          <AlbumDetailsView actions={actions}
+            artist={this.props.match.params.artist}
+            album={this.props.match.params.album} library={library} />
         </Box>
       </Flex>
     </div>

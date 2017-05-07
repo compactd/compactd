@@ -36,6 +36,7 @@ export type LibraryAction = ActionResolveAllAlbums |
 
 export type LibraryActions = {
   fetchArtist: (artist: string) => void;
+  fetchAlbum: (album: string) => void;
   fetchAllArtists: () => void;
   fetchAllAlbums: () => void;
   toggleExpandArtist: () => void;

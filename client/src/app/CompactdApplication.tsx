@@ -23,7 +23,7 @@ export class CompactdApplication extends
       <ConnectedRouter history={history}>
         <div>
           <AppView {...this.props as any}>
-            <Route path="/library/:artist?" children={(props: any) =>
+            <Route path="/library/:artist?/:album?" children={(props: any) =>
               <LibraryView component={HolisticView} {...props}/>} />
           </AppView>
         </div>

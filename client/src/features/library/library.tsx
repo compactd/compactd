@@ -52,6 +52,26 @@ export function reducer (state: Defs.LibraryState = initialState,
   return state;
 }
 
+function fetchAlbum (album: string) {
+  return Promise.resolve().then(() => {
+    const albums = new PouchDB<Defs.Album>('albums');
+    return albums.get(album);
+  }).then((doc) => {
+    const tracks = new PouchDB<Defs.Track>('tracks');
+    return tracks.allDocs({
+      include_docs: true,
+      startkey: album,
+      endkey: album + '\uffff'
+    }).then((docs) => [doc, docs]);
+  }).then(([album, tracks]:
+    [Defs.Album, PouchDB.Core.AllDocsResponse<Defs.Track>]) => {
+    return {
+      type: RESOLVE_ALBUM,
+      album: Object.assign({}, album, {tracks: tracks.rows.map(el => el.doc)})
+    };
+  });
+}
+
 function toggleExpandArtist () {
   return {type: TOGGLE_EXPAND_ARTIST};
 }
@@ -105,5 +125,5 @@ function fetchArtist (slug: string) {
 }
 
 export const actions = {
-  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist
+  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum
 };
