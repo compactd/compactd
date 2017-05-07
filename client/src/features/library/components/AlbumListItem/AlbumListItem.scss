@@ -1,6 +1,6 @@
 div.album-list-item{
   cursor: pointer;
-  a > div {
+  & > div {
     vertical-align: top;
   }
   div.album-image {

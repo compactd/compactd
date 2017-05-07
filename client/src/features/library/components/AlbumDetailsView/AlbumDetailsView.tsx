@@ -20,7 +20,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
   }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
     if (this.getAlbumId() !== this.getAlbumId(nextProps)) {
-      this.props.actions.fetchAlbum(this.getAlbumId());
+      this.props.actions.fetchAlbum(this.getAlbumId(nextProps));
     }
   }
   componentDidMount () {
