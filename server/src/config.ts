@@ -86,7 +86,7 @@ var env = conf.get('env');
 let paths = [
 ];
 
-let localConfig = path.join(os.homedir(), '/.cassette/config.json');
+let localConfig = path.join(os.homedir(), '/.compactd/config.json');
 if (fs.existsSync(localConfig)) {
   // story.info('config', `loading configuration from '${localConfig}'...`);
   paths.push(localConfig);

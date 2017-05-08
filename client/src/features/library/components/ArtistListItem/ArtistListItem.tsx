@@ -2,6 +2,7 @@ import * as React from 'react';
 import {LibraryActions} from '../../actions.d';
 import {Link} from 'react-router-dom';
 import {Artist, artistURI} from 'compactd-models';
+import BetterImage from 'components/BetterImage';
 import {MatchResult} from 'fuzzy';
 import * as classnames from 'classnames';
 import * as PropTypes from 'prop-types';
@@ -45,6 +46,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
   }
   render (): JSX.Element {
     const {actions, artist, filterMatch, active} = this.props;
+    const slug = artistURI(artist._id).name;
     let name: JSX.Element = <span className="not-filtered">{artist.name}</span>;
 
     if (filterMatch) {
@@ -60,7 +62,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
     return <div className={classnames("artist-list-item", {active})}
       onClick={this.handleClick.bind(this)}>
       <div className="artist-image">
-        <img src="http://placehold.it/64x64" />
+        <BetterImage src={`/api/aquarelle/${slug}?s=64`} size={64} />
       </div>
       <div className="artist-description">
         <span className="artist-name">

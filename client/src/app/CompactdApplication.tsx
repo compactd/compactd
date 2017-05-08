@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { Provider } from 'react-redux';
 import * as Redux from 'redux';
 import { CompactdState } from 'definitions';
-import { Route } from 'react-router-dom';
+import { Route, Switch} from 'react-router-dom';
 import { ConnectedRouter } from 'react-router-redux';
 import { history } from './CompactdStore';
 import AppView from 'features/app/components/AppView';
@@ -23,10 +23,12 @@ export class CompactdApplication extends
       <ConnectedRouter history={history}>
         <div>
           <AppView {...this.props as any}>
-            <Route path="/library/all/:artist?/:album?" children={(props: any) =>
-              <LibraryView component={HolisticView} all={true} {...props}/>} />
-            <Route path="/library/:artist?/:album?" children={(props: any) =>
-              <LibraryView component={HolisticView} {...props}/>} />
+            <Switch>
+              <Route path="/library/all/:artist?/:album?" children={(props: any) =>
+                <LibraryView component={HolisticView} all={true} {...props}/>} />
+              <Route path="/library/:artist?/:album?" children={(props: any) =>
+                <LibraryView component={HolisticView} {...props}/>} />
+            </Switch>
           </AppView>
         </div>
       </ConnectedRouter>

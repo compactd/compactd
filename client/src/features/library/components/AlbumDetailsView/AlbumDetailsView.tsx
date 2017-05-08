@@ -4,6 +4,7 @@ import {LibraryState} from 'definitions';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {TrackListItem} from '../TrackListItem';
 import {albumURI} from 'compactd-models';
+import BetterImage from 'components/BetterImage';
 
 require('./AlbumDetailsView.scss');
 
@@ -33,11 +34,15 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     if (!album) {
       return <div className="suggestions">Suggestions</div>;
     }
+    const p = albumURI(album._id);
+
     const content = album.tracks.map((track) =>
       <TrackListItem track={track} actions={actions} library={library} />)
     return <div className="album-details-view">
       <div className="album-header">
-        <div className="album-image"><img src="http://placehold.it/128x128" /></div>
+        <div className="album-image">
+          <BetterImage src={`/api/aquarelle/${p.artist}/${p.name}?s=128`} size={128} />
+        </div>
         <div className="album-title">{album.name}</div>
       </div>
       <div className="album-content">

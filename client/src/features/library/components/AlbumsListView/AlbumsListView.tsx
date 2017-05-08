@@ -3,9 +3,10 @@ import {LibraryActions} from '../../actions.d';
 import {LibraryState} from 'definitions';
 import {AlbumListItem} from '../AlbumListItem';
 import ScrollableDiv from 'components/ScrollableDiv';
-import {Album, albumURI} from 'compactd-models';
+import {Album, albumURI, artistURI} from 'compactd-models';
 import * as fuzzy from 'fuzzy';
 import {match} from 'react-router';
+import BetterImage from 'components/BetterImage';
 
 require('./AlbumsListView.scss');
 
@@ -42,7 +43,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     const {actions, library} = this.props;
     const artist = this.props.artist ?
       (library.artistsById[`library/${this.props.artist}`]
-        || {name: '', albums: []}) : {name: '', albums: library.albums};
+        || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
 
     const options = {
       pre: '$', post: '',
@@ -74,7 +75,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     const header = this.props.artist ?
     <div className="artist-header">
       <div className="artist-image">
-        <img src="http://placehold.it/32x32" />
+        <BetterImage size={32} src={`/api/aquarelle/${artistURI(artist._id).name}?s=32`} />
       </div>
       <div className="artist-name">Albums by {(artist || {name: ''}).name}</div>
     </div>  : <div className="pt-input-group">

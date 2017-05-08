@@ -3,8 +3,10 @@ import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
 import * as path from 'path';
 import * as PouchDB from 'pouchdb';
+import * as shortid from 'shortid';
 import Authenticator from './features/authenticator';
 import endpoints from './endpoints';
+import config from './config';
 
 const expressProxy: any = require('express-http-proxy');
 const expressPouchDB: any = require('express-pouchdb');
@@ -18,12 +20,13 @@ export class CompactdApplication {
   constructor(host: string = 'localhost', port: number = 9000) {
     this.app = express();
     this.port = port;
-    this.auth = new Authenticator('foo', 'superSecret');
+    this.auth = new Authenticator(shortid.generate(), config.get('secret'));
     this.host = host;
   }
 
   protected setupCouchDB () {
-    this.app.use('/database', expressProxy('localhost:5984', {
+    this.app.use('/database', expressProxy(
+      config.get('couchHost') + ':' + config.get('couchPort'), {
       proxyReqOptDecorator: this.auth.proxyRequestDecorator()
     }));
 

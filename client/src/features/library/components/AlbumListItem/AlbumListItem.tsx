@@ -5,6 +5,8 @@ import {Link} from 'react-router-dom';
 import * as PropTypes from 'prop-types';
 import {MatchResult} from 'fuzzy';
 import * as classnames from 'classnames';
+import BetterImage from 'components/BetterImage';
+
 require('./AlbumListItem.scss');
 
 interface AlbumListItemProps {
@@ -56,10 +58,11 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
         });
       name = <span className="filtered">{match}</span>;
     }
+    const p = albumURI(album._id);
 
     return <div className={classnames("album-list-item", {active})} onClick={this.handleClick.bind(this)}>
       <div className="album-image">
-        <img src="http://placehold.it/64x64" />
+        <BetterImage src={`/api/aquarelle/${p.artist}/${p.name}?s=64`} size={64} />
       </div>
       <div className="album-description">
         <span className="album-name">
