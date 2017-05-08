@@ -18,7 +18,8 @@ export default function(app: Express.Application) {
     const {artist} = req.params;
     const file = Agent.getCacheEntry(artistURI({name: artist}));
     
-    if (!fs.existsSync(file)) return res.status(404).send({error: 'File not found'});
+    if (!fs.existsSync(file) || fs.lstatSync(file).size < 10) 
+      return res.status(404).send({error: 'File not found'});
 
     res.contentType('image/png');
 
@@ -39,7 +40,8 @@ export default function(app: Express.Application) {
     const {artist, album} = req.params;
     const file = Agent.getCacheEntry(albumURI({name: album, artist}));
     
-    if (!fs.existsSync(file)) return res.status(404).send({error: 'File not found'});
+    if (!fs.existsSync(file) || fs.lstatSync(file).size < 10) 
+      return res.status(404).send({error: 'File not found'});
 
     res.contentType('image/png');
 
