@@ -65,7 +65,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
       return <ArtistListItem key={artist._id} actions={actions}
               artist={artist} filterMatch={matched} active={
                 artistURI(artist._id).name === this.props.match.params.artist
-              }/>
+              } counter={library.counters[artist._id]}/>
     })
     return <div className="holistic-view">
       <Flex>

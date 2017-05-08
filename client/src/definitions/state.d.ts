@@ -11,6 +11,12 @@ export interface LibraryState {
   artists: Compactd.Artist[];
   tracks: Compactd.Track[];
   expandArtists: boolean;
+  counters: {
+    [id: string]: {
+      tracks: number;
+      albums?: number;
+    }
+  }
 }
 
 export interface AppState {

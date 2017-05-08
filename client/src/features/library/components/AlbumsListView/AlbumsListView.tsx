@@ -68,6 +68,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
     }).map(([matched, album]: [fuzzy.MatchResult, Album]) => {
       return  <AlbumListItem key={album._id} filterMatch={matched}
+                counter={library.counters[album._id]}
                 active={this.props.match.params.album === albumURI(album._id).name}
                 album={album} actions={actions} all={this.props.all}/>
     })

@@ -6,6 +6,7 @@ import * as PropTypes from 'prop-types';
 import {MatchResult} from 'fuzzy';
 import * as classnames from 'classnames';
 import BetterImage from 'components/BetterImage';
+import * as pluralize from 'pluralize';
 
 require('./AlbumListItem.scss');
 
@@ -15,6 +16,7 @@ interface AlbumListItemProps {
   filterMatch?: MatchResult;
   all: boolean;
   active?: boolean;
+  counter: {tracks: number};
 }
 
 export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
@@ -45,8 +47,13 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
     }
 
   }
+  componentDidMount () {
+    setTimeout(() => {
+      this.props.actions.fetchAlbumCounter(this.props.album._id);
+    }, 250 + Math.random() * 750);
+  }
   render (): JSX.Element {
-    const {actions, album, filterMatch, active} = this.props;
+    const {actions, album, filterMatch, active, counter = {tracks: 0}} = this.props;
     let name: JSX.Element = <span className="not-filtered">{album.name}</span>;
 
     if (filterMatch) {
@@ -68,7 +75,11 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
         <span className="album-name">
           {name}
         </span>
-        <span className="album-track-count">15 albums</span>
+        <span className={classnames("album-track-count", {
+          'pt-skeleton': !this.props.counter
+        })}>
+          {counter.tracks} {pluralize('track', counter.tracks)}
+        </span>
       </div>
     </div>
   }

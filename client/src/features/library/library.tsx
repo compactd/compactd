@@ -11,6 +11,7 @@ const RESOLVE_ALL_ARTISTS = 'compactd/library/RESOLVE_ALL_ARTISTS';
 const RESOLVE_ALL_ALBUMS = 'compactd/library/RESOLVE_ALL_ALBUMS';
 const RESOLVE_ALBUM  = 'compactd/library/RESOLVE_ALBUM';
 const TOGGLE_EXPAND_ARTIST  = 'compactd/library/TOGGLE_EXPAND_ARTIST';
+const RESOLVE_COUNTER = 'compactd/library/RESOLVE_COUNTER';
 
 const initialState: Defs.LibraryState = {
   albumsById: {
@@ -20,12 +21,20 @@ const initialState: Defs.LibraryState = {
   albums: [],
   artists: [],
   tracks: [],
-  expandArtists: true
+  expandArtists: true,
+  counters: {}
 };
 
 export function reducer (state: Defs.LibraryState = initialState,
   action: LibraryAction): Defs.LibraryState {
   switch (action.type) {
+    case RESOLVE_COUNTER:
+      return Object.assign({}, state, {
+        counters: Object.assign({}, state.counters, {[action.id]: {
+          albums: action.albums,
+          tracks: action.tracks
+        }})
+      })
     case TOGGLE_EXPAND_ARTIST:
       return Object.assign({}, state, {expandArtists: !state.expandArtists});
     case RESOLVE_ARTIST:
@@ -69,6 +78,41 @@ function fetchAlbum (album: string) {
       type: RESOLVE_ALBUM,
       album: Object.assign({}, album, {tracks: tracks.rows.map(el => el.doc)})
     };
+  });
+}
+
+function fetchArtistCounter (id: string) {
+  return Promise.resolve().then(() => {
+    const albums = new PouchDB<Defs.Artist>('albums');
+    const tracks = new PouchDB<Defs.Artist>('tracks');
+    const opts = {
+      startkey: id,
+      endkey: id + '\uffff'
+    };
+    return Promise.all([albums.allDocs(opts), tracks.allDocs(opts)]);
+  }).then(([albums, tracks]) => {
+    return {
+      type: RESOLVE_COUNTER,
+      id,
+      albums: albums.rows.length,
+      tracks: tracks.rows.length
+    }
+  });
+}
+function fetchAlbumCounter (id: string) {
+  return Promise.resolve().then(() => {
+    const tracks = new PouchDB<Defs.Artist>('tracks');
+    const opts = {
+      startkey: id,
+      endkey: id + '\uffff'
+    };
+    return tracks.allDocs(opts);
+  }).then((tracks) => {
+    return {
+      type: RESOLVE_COUNTER,
+      id,
+      tracks: tracks.rows.length
+    }
   });
 }
 
@@ -125,5 +169,6 @@ function fetchArtist (slug: string) {
 }
 
 export const actions = {
+  fetchArtistCounter, fetchAlbumCounter,
   fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum
 };
