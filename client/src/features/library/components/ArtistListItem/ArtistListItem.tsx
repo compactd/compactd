@@ -49,7 +49,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
   componentDidMount () {
     setTimeout(() => {
       this.props.actions.fetchArtistCounter(this.props.artist._id);
-    }, 500 + (Math.random() * 500));
+    }, 100 + (Math.random() * 600));
   }
   render (): JSX.Element {
     const {

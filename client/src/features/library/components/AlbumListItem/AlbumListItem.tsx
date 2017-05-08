@@ -50,7 +50,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
   componentDidMount () {
     setTimeout(() => {
       this.props.actions.fetchAlbumCounter(this.props.album._id);
-    }, 250 + Math.random() * 750);
+    }, 100 + Math.random() * 750);
   }
   render (): JSX.Element {
     const {actions, album, filterMatch, active, counter = {tracks: 0}} = this.props;

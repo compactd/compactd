@@ -67,8 +67,8 @@ export default class BetterImage extends React.Component<BetterImageProps, {}> {
   }
   componentWillReceiveProps (nextProps: BetterImageProps) {
     if (nextProps.src && this.props.src !== nextProps.src) {
-      this.image.src && URL.revokeObjectURL(this.image.src);
-      this.image.src = '';
+      this.image.src = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
+      // this.image.src && URL.revokeObjectURL(this.image.src);
       this.fetchImage(nextProps.src);
     }
   }
@@ -85,7 +85,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {}> {
             display: 'block',
             height: `${this.props.height || this.props.size || 128}px`,
             width: `${this.props.width || this.props.size || 128}px`,
-          }}/>
+          }} src="data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw=="/>
       </div>
     );
   }
