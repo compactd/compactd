@@ -14,6 +14,9 @@ div.album-details-view{
   div.album-header {
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
     padding: 1.6em;
+    img {
+      border-radius: 3px;
+    }
   }
 
   .album-content {

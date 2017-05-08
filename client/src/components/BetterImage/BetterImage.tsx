@@ -26,16 +26,15 @@ function fetchLoader (): Promise<string> {
   });
 }
 
-export default class BetterImage extends React.Component<BetterImageProps, {}> {
+export default class BetterImage extends React.Component<BetterImageProps, {loading: boolean}> {
   private image: HTMLImageElement;
-
+  constructor () {
+    super();
+    this.state = {loading: true};
+  }
   fetchImage (current = this.props.src, check = true) {
-    // if (!window.sessionStorage.getItem('session_token'))
-    //   setTimeout(() => this.fetchImage(), 500);
-
-    // if (blobs[this.props.src]) {
-    //   this.image.src = blobs[this.props.src];
-    // }
+    this.setState({loading: true});
+    
     fetch(current, {
       headers: {
         'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
@@ -48,13 +47,17 @@ export default class BetterImage extends React.Component<BetterImageProps, {}> {
       let url = URL.createObjectURL(blob);
       // blobs[this.props.src] = url;
       this.image.src = url;
+
+      this.setState({loading: false});
     }).catch((err) => {
       const fallback = this.props.fallback || '/api/assets/no-album.jpg';
       this.fetchImage(fallback, false);
+      this.setState({loading: false});
     });
   }
   componentDidMount () {
     this.image.onerror = () => {
+      this.image.src = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
       const fallback = this.props.fallback || '/api/assets/no-album.jpg';
       this.fetchImage(fallback, false);
     }
@@ -62,7 +65,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {}> {
       this.fetchImage();
     }
     fetchLoader().then((svg) => {
-      this.image.style.backgroundImage = `url('${svg}')`;
+      // this.image.style.backgroundImage = `url('${svg}')`;
     })
   }
   componentWillReceiveProps (nextProps: BetterImageProps) {
@@ -74,14 +77,14 @@ export default class BetterImage extends React.Component<BetterImageProps, {}> {
   }
   render() {
     return (
-      <div className={classnames('image-container', this.props.divClassName)}
-        key={this.props.key}>
-        <img className={classnames('better-image', this.props.className)} ref={
+      <div className={classnames('image-container', this.props.divClassName)} key={this.props.key}>
+        <img className={classnames('better-image', this.props.className, {
+          'pt-skeleton': this.state.loading
+        })} ref={
             (ref) => this.image = ref
           } style={{
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center center',
-            backgroundColor: `#484d5c`,
             display: 'block',
             height: `${this.props.height || this.props.size || 128}px`,
             width: `${this.props.width || this.props.size || 128}px`,

@@ -49,7 +49,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
   componentDidMount () {
     setTimeout(() => {
       this.props.actions.fetchArtistCounter(this.props.artist._id);
-    }, 100 + (Math.random() * 600));
+    }, 50);
   }
   render (): JSX.Element {
     const {
@@ -77,9 +77,14 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       onClick={this.handleClick.bind(this)}>
       <div className="artist-image">
         <BetterImage src={`/api/aquarelle/${slug}?s=64`} size={64} />
+        <div className={classnames("image-overlay", {
+          hidden: !!counter.albums
+        })}></div>
       </div>
       <div className="artist-description">
-        <span className="artist-name">
+        <span className={classnames("artist-name", {
+          'pt-skeleton': !counter.albums
+        })}>
           {name}
         </span>
         <span className={classnames("artist-album-count", {

@@ -50,7 +50,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
   componentDidMount () {
     setTimeout(() => {
       this.props.actions.fetchAlbumCounter(this.props.album._id);
-    }, 100 + Math.random() * 750);
+    }, 50);
   }
   render (): JSX.Element {
     const {actions, album, filterMatch, active, counter = {tracks: 0}} = this.props;
@@ -69,10 +69,14 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
 
     return <div className={classnames("album-list-item", {active})} onClick={this.handleClick.bind(this)}>
       <div className="album-image">
-        <BetterImage src={`/api/aquarelle/${p.artist}/${p.name}?s=64`} size={64} />
+        <BetterImage className={classnames({
+          'pt-skeleton': !this.props.counter
+        })} src={`/api/aquarelle/${p.artist}/${p.name}?s=64`} size={64} />
       </div>
       <div className="album-description">
-        <span className="album-name">
+        <span className={classnames("album-name", {
+          'pt-skeleton': !this.props.counter
+        })}>
           {name}
         </span>
         <span className={classnames("album-track-count", {

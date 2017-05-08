@@ -2,6 +2,7 @@ import * as Defs from 'definitions';
 import { LibraryAction } from './actions.d';
 import * as PouchDB from 'pouchdb';
 import {artistURI} from 'compactd-models';
+const trickle = require('timetrickle');
 // import * as IFetch from '@types/whatwg-fetch';
 // import "whatwg-fetch";
 
@@ -61,7 +62,7 @@ export function reducer (state: Defs.LibraryState = initialState,
   return state;
 }
 
-function fetchAlbum (album: string) {
+const fetchAlbum = (album: string) => {
   return Promise.resolve().then(() => {
     const albums = new PouchDB<Defs.Album>('albums');
     return albums.get(album);
@@ -79,10 +80,18 @@ function fetchAlbum (album: string) {
       album: Object.assign({}, album, {tracks: tracks.rows.map(el => el.doc)})
     };
   });
+};
+
+function waitLimit (limit: any) {
+  return new Promise((resolve) => {
+    limit(() => resolve());
+  });
 }
 
-function fetchArtistCounter (id: string) {
-  return Promise.resolve().then(() => {
+const arlimit = trickle(2, 200);
+
+const fetchArtistCounter = (id: string) => {
+  return waitLimit(arlimit).then(() => {
     const albums = new PouchDB<Defs.Artist>('albums');
     const tracks = new PouchDB<Defs.Artist>('tracks');
     const opts = {
@@ -98,9 +107,12 @@ function fetchArtistCounter (id: string) {
       tracks: tracks.rows.length
     }
   });
-}
+};
+
+const allimit = trickle(3, 180);
+
 function fetchAlbumCounter (id: string) {
-  return Promise.resolve().then(() => {
+  return waitLimit(allimit).then(() => {
     const tracks = new PouchDB<Defs.Artist>('tracks');
     const opts = {
       startkey: id,

@@ -3,7 +3,7 @@ export interface Library extends Document {
     _id: string;
     name: string;
     path: string;
-    last_scan: number;
+    last_scan?: number;
 }
 export interface LibraryParams extends RouteParams {
     name: string;
@@ -43,6 +43,7 @@ export interface Track extends Document {
     album: string;
     number: number;
     duration: number;
+    disc: string;
 }
 export interface TrackParams extends RouteParams {
     name: string;

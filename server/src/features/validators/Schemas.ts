@@ -38,6 +38,8 @@ export const TrackSchema: ISchema = {
   artist: types.string.required,
   album: types.string.required,
   number: types.number,
+  disc: types.string,
+  duration: types.number,
   track_artist: types.string
 }
 

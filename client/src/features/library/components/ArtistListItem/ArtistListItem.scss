@@ -9,12 +9,29 @@ div.artist-list-item{
   div.artist-image {
     display: inline-block;
     margin: 0.5em 0.8em;
+    position: relative;
+    .image-container {
+    }
+    .image-overlay {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      top: 0;
+      background-color: #373f4a;
+      border-radius: 30px;
+      &.hidden {
+        opacity: 0;
+        transition: all 0.2s ease;
+      }
+    }
+
     img {
       height: 64px;
       width: 64px;
       border-radius: 32px;
 
     }
+
   }
   div.artist-description {
     display: inline-block;

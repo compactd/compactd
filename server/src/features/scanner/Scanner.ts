@@ -145,6 +145,8 @@ export class Scanner {
         const trackName = tags.title || tags.TITLE;
         const trackNumber = (tags.track || tags.TRACK) ?
           (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
+        const disc = (tags.disc || tags.DISC) ?
+          (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
         const trackID = Models.trackURI(Models.mapTrackToParams({
           name: trackName,
           artist: artistID,
@@ -179,9 +181,11 @@ export class Scanner {
             _id: trackID,
             name: trackName,
             artist: artistID,
-            track_artist: tags.artist | tags.ARTIST,
+            track_artist: `${tags.artist | tags.ARTIST}`,
             album: albumID,
-            number: trackNumber
+            number: +trackNumber,
+            disc: disc,
+            duration: +probed.format.duration
           },
           files: Object.assign({}, fileProps, {
             _id: fileID,

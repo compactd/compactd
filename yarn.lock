@@ -138,6 +138,22 @@
   version "1.4.28"
   resolved "https://registry.yarnpkg.com/@types/jwt-decode/-/jwt-decode-1.4.28.tgz#daf8f3af29d7ac8d9208057d3eec414f8a9825fc"
 
+"@types/lodash.debounce@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/lodash.debounce/-/lodash.debounce-4.0.2.tgz#67971d60867dd2ceea80483b30f8ad38548800e2"
+  dependencies:
+    "@types/lodash" "*"
+
+"@types/lodash.throttle@^4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@types/lodash.throttle/-/lodash.throttle-4.1.2.tgz#52356fa3fa52b0327e73e92763d607f76f9ced5b"
+  dependencies:
+    "@types/lodash" "*"
+
+"@types/lodash@*", "@types/lodash@^4.14.64":
+  version "4.14.64"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.64.tgz#979cf3a3d4a368670840bf9b3e448dc33ffe84ee"
+
 "@types/mime@*":
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-0.0.29.tgz#fbcfd330573b912ef59eeee14602bface630754b"
@@ -1708,9 +1724,9 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
-compactd-models@^1.3.3:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.3.3.tgz#f39ab32b2b8e5702769dd996626dee8f1875d0f6"
+compactd-models@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.4.0.tgz#7891b75c7893af18d24a742c3a0f39ae55d252c6"
   dependencies:
     docuri "^4.2.2"
     fs-tree-diff "^0.5.6"
@@ -2164,6 +2180,10 @@ dateformat@^2.0.0:
 death@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/death/-/death-1.1.0.tgz#01aa9c401edd92750514470b8266390c66c67318"
+
+debounce-promise@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/debounce-promise/-/debounce-promise-3.0.1.tgz#051b18aad87d54998c1393ddbd109c92b9c2306a"
 
 debug@2.6.1:
   version "2.6.1"
@@ -4589,7 +4609,7 @@ lodash.clonedeepwith@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clonedeepwith/-/lodash.clonedeepwith-4.5.0.tgz#6ee30573a03a1a60d670a62ef33c10cf1afdbdd4"
 
-lodash.debounce@^4.0.3:
+lodash.debounce@^4.0.3, lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
 
@@ -4733,6 +4753,10 @@ lodash.templatesettings@^3.0.0:
   dependencies:
     lodash._reinterpolate "^3.0.0"
     lodash.escape "^3.0.0"
+
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
 
 lodash.uniq@^4.5.0:
   version "4.5.0"
@@ -8033,6 +8057,10 @@ timers-browserify@^2.0.2:
   resolved "https://registry.yarnpkg.com/timers-browserify/-/timers-browserify-2.0.2.tgz#ab4883cf597dcd50af211349a00fbca56ac86b86"
   dependencies:
     setimmediate "^1.0.4"
+
+timetrickle@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/timetrickle/-/timetrickle-0.1.1.tgz#f089e9619ce327f01e1ccac0d1a69bb31123cce8"
 
 tiny-queue@^0.2.0, tiny-queue@^0.2.1:
   version "0.2.1"

@@ -12,7 +12,7 @@ div.album-list-item{
     img {
       height: 64px;
       width: 64px;
-
+      border-radius: 3px;
     }
   }
   div.album-description {
@@ -21,7 +21,7 @@ div.album-list-item{
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: 360px;
+    max-width: 360px;
     &> span {
       display: block;
       margin: 0.3em;

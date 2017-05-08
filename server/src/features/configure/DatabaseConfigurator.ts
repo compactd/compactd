@@ -56,6 +56,7 @@ export class DatabaseConfigurator {
     await this.endAdminParty();
     await this.configureDatabases();
     await this.createConfig();
+    await this.setupNode();
     return;
   }
 
@@ -78,6 +79,41 @@ export class DatabaseConfigurator {
         validate_doc_update: createValidator(schema, perms)
       } as any);
     })).then(() => {});
+  }
+
+  async setupNode () {
+    const res: any = await fetch(`http://${
+        this.opts.couchHost
+      }:${this.opts.couchPort}/_cluster_setup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Basic ' + new Buffer(
+            this.opts.adminUsername + ':' + this.opts.adminPassword).toString('base64')
+        },
+        body: JSON.stringify({
+          action: "enable_cluster",
+          username: this.opts.adminUsername,
+          password: this.opts.adminPassword,
+          bind_address: "0.0.0.0",
+          port: 5984})
+      }).then((res) => res.json());
+    console.log(res);
+
+    const fres: any = await fetch(`http://${
+        this.opts.couchHost
+      }:${this.opts.couchPort}/_cluster_setup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + new Buffer(
+          this.opts.adminUsername + ':' + this.opts.adminPassword).toString('base64')
+      },
+      body: JSON.stringify({
+        action: "finish_cluster"
+      })
+    }).then((res) => res.json());
+    console.log(fres)
   }
 
   async endAdminParty () {
