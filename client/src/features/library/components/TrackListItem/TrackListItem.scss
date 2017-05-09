@@ -1,4 +1,7 @@
-div.track-list-item{
+div.track-list-item {
+  transition: all 0.1s ease;
+  border-radius: 3px;
+  display: flex;
   & > div {
       display: inline-block;
       margin: 0.5em;
@@ -8,25 +11,39 @@ div.track-list-item{
       /* color: #7a7594; */
   }
   &:hover {
+    transition: all 0.1s ease;
     background-color: rgba(233, 234, 241, 0.78);
-    border-radius: 3px;
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.06);
   }
-
   .track-number {
-      color: #7a7594;
-      width: 1em;
-      text-align: right;
+    margin-right: 0.2em;
+    color: #7a7594;
+    width: 1em;
+    text-align: right;
   }
 
   .track-name {
-      width: 76%;
-      // font-weight: bold;
-      color: #393546;
+    flex-grow: 100;
+    // font-weight: bold;
+    color: #393546;
   }
 
   .track-duration {
       color: #7a7594;
+  }
+
+  &.playing {
+    transition: all 0.1s ease;
+    background-color: #535898;
+    color: #fff;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.27);
+
+    .track-name {
+      color: rgba(255, 255, 255, 1);
+    }
+    .track-number, .track-duration {
+        color: rgba(255, 255, 255, 0.7);
+    }
   }
 
   cursor: pointer;

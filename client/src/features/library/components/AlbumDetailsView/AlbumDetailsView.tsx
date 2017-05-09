@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Actions} from 'definitions/actions';
-import {LibraryState} from 'definitions';
+import {LibraryState, PlayerState} from 'definitions';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {TrackListItem} from '../TrackListItem';
 import {albumURI} from 'compactd-models';
@@ -13,6 +13,7 @@ interface AlbumDetailsViewProps {
   album: string;
   artist: string;
   library: LibraryState;
+  player: PlayerState;
 }
 
 export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>{
@@ -28,7 +29,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     this.props.actions.fetchAlbum(this.getAlbumId());
   }
   render (): JSX.Element {
-    const {actions, library, artist} = this.props;
+    const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
     const album = library.albumsById[id];
     if (!album) {
@@ -37,7 +38,8 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     const p = albumURI(album._id);
 
     const content = album.tracks.map((track) =>
-      <TrackListItem track={track} actions={actions} library={library} />)
+      <TrackListItem track={track} actions={actions} library={library}
+        playing={player.stack.length && player.stack[0]._id === track._id} />)
     return <div className="album-details-view">
       <div className="album-header">
         <div className="album-image">

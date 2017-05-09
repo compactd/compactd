@@ -24,7 +24,7 @@ export class CompactdApplication extends
   render (): JSX.Element {
     // Inexplicable bug where i need to log these avoid undefined errors
     console.log(Route, LibraryView, HolisticView, PlayerView, PlaylistView);
-    
+
     return (<Provider store={this.props.store}>
       <ConnectedRouter history={history}>
         <AppView {...this.props as any}>
@@ -37,7 +37,12 @@ export class CompactdApplication extends
                     <LibraryView component={HolisticView} {...props}/>} />
                 </Switch>
               </Box>
-              <Box col={2}>
+              <Box col={2} style={{
+                zIndex: 25,
+                backgroundColor: '#fff',
+                boxShadow: '0 0 4px rgba(0, 0, 0, 0.2)',
+                padding: '0.4em'
+              }}>
                 <PlayerView component={PlaylistView} />
               </Box>
             </Flex>
