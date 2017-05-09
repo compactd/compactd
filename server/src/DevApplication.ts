@@ -28,6 +28,11 @@ export class DevApplication extends CompactdApplication {
   }
   route () {
     super.route();
+
+    this.app.all('/api/*', function (req, res) {
+      res.status(404).send({error: 'This is not the endpoint you are looking for'});
+    });
+
     this.app.get('*', function (req: express.Request, res: express.Response) {
       res.sendFile(path.join(__dirname, '../../client/index.html'));
     });

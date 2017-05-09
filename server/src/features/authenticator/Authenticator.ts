@@ -200,6 +200,9 @@ export default class Authenticator {
   requireAuthentication (): Express.RequestHandler {
     return (req, res, next) => {
       if (process.env.WALTZ_AUTH) return next();
+      if (!req.header('Authorization')) {
+        return res.status(401).send({error: 'You shall not pass'});
+      }
       const [bearer, token] = req.header('Authorization').split(' ');
       if (bearer !== 'Bearer' || !token) {
         return res.status(401).send({

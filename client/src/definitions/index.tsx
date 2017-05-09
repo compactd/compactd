@@ -9,3 +9,5 @@ export type LibraryState = LibraryState;
 export type AppState = AppState;
 export type PlayerState = PlayerState;
 export type CompactdState = CompactdState;
+
+export type AudioSource = string;

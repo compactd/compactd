@@ -3,6 +3,7 @@ import {PlayerActions} from '../../actions.d';
 import {Track} from 'compactd-models';
 import {PlaylistItem} from '../PlaylistItem';
 import {PlayerState} from 'definitions';
+import {PlayerAudio} from '../PlayerAudio';
 
 require('./PlaylistView.scss');
 
@@ -10,6 +11,8 @@ interface PlaylistViewProps {
   actions: PlayerActions;
   player: PlayerState;
 }
+
+const tokens = {};
 
 export class PlaylistView extends React.Component<PlaylistViewProps, {}>{
   render (): JSX.Element {
@@ -19,6 +22,7 @@ export class PlaylistView extends React.Component<PlaylistViewProps, {}>{
         player={player} index={index} />
     });
     return <div className="playlist-view">
+      <PlayerAudio source={(player.stack[0] || {_id: ''})._id} playing={true} />
       {playlist}
     </div>
   }

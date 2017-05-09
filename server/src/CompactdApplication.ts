@@ -4,6 +4,7 @@ import * as morgan from 'morgan';
 import * as path from 'path';
 import * as PouchDB from 'pouchdb';
 import * as shortid from 'shortid';
+import {player} from './endpoints/boombox';
 import Authenticator from './features/authenticator';
 import endpoints from './endpoints';
 import config from './config';
@@ -42,6 +43,9 @@ export class CompactdApplication {
       });
     });
   }
+  protected unprotectedEndpoints () {
+    player(this.app);
+  }
   /**
    * Configure express app by adding middlewares
    */
@@ -51,9 +55,10 @@ export class CompactdApplication {
     ));
     this.app.use(bodyParser.urlencoded({extended: true}));
     this.app.use(bodyParser.json());
-
     this.app.post('/api/sessions', this.auth.signinUser());
     this.app.post('/api/users', this.auth.signupUser());
+
+    this.unprotectedEndpoints();
 
     this.app.use('/api*', this.auth.requireAuthentication());
   }
