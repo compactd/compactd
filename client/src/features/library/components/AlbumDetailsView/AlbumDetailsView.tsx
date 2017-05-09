@@ -28,6 +28,12 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
   componentDidMount () {
     this.props.actions.fetchAlbum(this.getAlbumId());
   }
+  handleClick () {
+    const {actions, library, artist, player} = this.props;
+    const id = this.getAlbumId();
+    const album = library.albumsById[id];
+    this.props.actions.replacePlayerStack(album);
+  }
   render (): JSX.Element {
     const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
@@ -42,8 +48,10 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
         playing={player.stack.length && player.stack[0]._id === track._id} />)
     return <div className="album-details-view">
       <div className="album-header">
-        <div className="album-image">
+        <div className="album-image" onClick={this.handleClick.bind(this)}>
           <BetterImage src={`/api/aquarelle/${p.artist}/${p.name}?s=128`} size={128} />
+          <span className="dark-overlay"></span>
+          <span className="play-overlay pt-icon pt-icon-play"></span>
         </div>
         <div className="album-title">{album.name}</div>
       </div>

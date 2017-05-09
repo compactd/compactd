@@ -17,6 +17,48 @@ div.album-details-view{
     img {
       border-radius: 3px;
     }
+    .album-image {
+
+      position: relative;
+    }
+    // span.dark-overlay {
+    //   top: 0;
+    //   bottom: 0;
+    //   left: 0;
+    //   right: 0;
+    //   position: absolute;
+    //   background-color: rgba(0, 0, 0, 0.45);
+    //   opacity: 0;
+    //   transition: all 0.3s ease;
+    // }
+    // span.dark-overlay:hover {
+    //   opacity: 1;
+    //   transition: all 0.3s ease;
+    // }
+    span.play-overlay.pt-icon.pt-icon-play {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      font-size: 32px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.47);
+      // width: 48px;
+      // height: 48px;
+      margin: auto;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 128px;
+      // padding-left: 2px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      &:hover {
+        opacity: 1;
+        transition: all 0.3s ease;
+      }
+    }
   }
 
   .album-content {
