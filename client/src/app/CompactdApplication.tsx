@@ -10,6 +10,10 @@ import AppView from 'features/app/components/AppView';
 import {ArtistsView} from 'features/library/components/ArtistsView';
 import {HolisticView} from 'features/library/components/HolisticView';
 import LibraryView from 'features/library/components/LibraryView';
+import PlayerView from 'features/player/components/PlayerView';
+import {PlaylistView} from 'features/player/components/PlaylistView';
+
+const {Flex, Box} = require('reflexbox');
 
 interface CompactdApplicationProps {
   store: Redux.Store<CompactdState>;
@@ -18,20 +22,27 @@ export class CompactdApplication extends
   React.Component<CompactdApplicationProps, {}> {
 
   render (): JSX.Element {
-    console.log(Route, LibraryView, HolisticView);
-    return <Provider store={this.props.store}>
+    // Inexplicable bug where i need to log these avoid undefined errors
+    console.log(Route, LibraryView, HolisticView, PlayerView, PlaylistView);
+    
+    return (<Provider store={this.props.store}>
       <ConnectedRouter history={history}>
-        <div>
-          <AppView {...this.props as any}>
-            <Switch>
-              <Route path="/library/all/:artist?/:album?" children={(props: any) =>
-                <LibraryView component={HolisticView} all={true} {...props}/>} />
-              <Route path="/library/:artist?/:album?" children={(props: any) =>
-                <LibraryView component={HolisticView} {...props}/>} />
-            </Switch>
+        <AppView {...this.props as any}>
+            <Flex>
+              <Box col={10}>
+                <Switch>
+                  <Route path="/library/all/:artist?/:album?" children={(props: any) =>
+                    <LibraryView component={HolisticView} all={true} {...props}/>} />
+                  <Route path="/library/:artist?/:album?" children={(props: any) =>
+                    <LibraryView component={HolisticView} {...props}/>} />
+                </Switch>
+              </Box>
+              <Box col={2}>
+                <PlayerView component={PlaylistView} />
+              </Box>
+            </Flex>
           </AppView>
-        </div>
       </ConnectedRouter>
-    </Provider>;
+    </Provider>);
   }
 }

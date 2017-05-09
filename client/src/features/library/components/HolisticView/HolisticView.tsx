@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {LibraryActions} from '../../actions.d';
+import {Actions} from 'definitions/actions';
 import {LibraryState, Artist} from 'definitions';
 import {ArtistListItem} from '../ArtistListItem';
 import {AlbumsListView} from '../AlbumsListView';
@@ -15,7 +15,7 @@ const {Flex, Box} = require('reflexbox');
 require('./HolisticView.scss');
 
 interface HolisticViewProps {
-  actions: LibraryActions;
+  actions: Actions;
   library: LibraryState;
   match: match<{artist?: string, album?: string}>;
   all: boolean;
@@ -69,7 +69,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     })
     return <div className="holistic-view">
       <Flex>
-        <Box col={2} className={classnames("pt-dark artists-list", {
+        <Box col={3} className={classnames("pt-dark artists-list", {
           minimal: !library.expandArtists
         })}>
           <div className="list-header">
@@ -89,12 +89,12 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
             {artists}
           </ScrollableDiv>
         </Box>
-        <Box col={3}>
+        <Box col={4}>
           <AlbumsListView actions={actions} match={this.props.match}
             all={this.props.all || !this.props.match.params.artist}
             artist={!this.props.all ? this.props.match.params.artist: undefined} library={library} />
         </Box>
-        <Box col={4}>
+        <Box col={5}>
           <AlbumDetailsView actions={actions}
             artist={this.props.match.params.artist}
             album={this.props.match.params.album} library={library} />

@@ -47,15 +47,11 @@ export interface PlayerState {
   /**
    * An array containing a list of the next tracks
    */
-  nextTracks: [Compactd.Track];
+  stack: Compactd.Track[];
   /**
    * Previously-player tracks
    */
-  prevTracks: [Compactd.Track];
-  /**
-   *  Currently playing track
-   */
-  current:    Compactd.Track;
+  prevStack: Compactd.Track[];
   /**
    * Is it playing right now?
    */

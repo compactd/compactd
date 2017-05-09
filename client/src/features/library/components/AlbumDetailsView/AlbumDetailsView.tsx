@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {LibraryActions} from '../../actions.d';
+import {Actions} from 'definitions/actions';
 import {LibraryState} from 'definitions';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {TrackListItem} from '../TrackListItem';
@@ -9,7 +9,7 @@ import BetterImage from 'components/BetterImage';
 require('./AlbumDetailsView.scss');
 
 interface AlbumDetailsViewProps {
-  actions: LibraryActions;
+  actions: Actions;
   album: string;
   artist: string;
   library: LibraryState;

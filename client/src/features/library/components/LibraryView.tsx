@@ -4,13 +4,15 @@ import { bindActionCreators, Dispatch } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import {actions} from '../library';
 import {LibraryActions, LibraryAction} from '../actions.d';
+import {PlayerActions} from '../../player/actions.d';
+import {actions as playerActions} from '../../player';
 import {LibraryState, CompactdState} from 'definitions';
 import {ArtistsView} from './ArtistsView';
 import {match} from 'react-router';
 import { withRouter } from 'react-router-dom';
 
 interface LibraryViewProps {
-  actions: LibraryActions;
+  actions: LibraryActions & PlayerActions;
   library: LibraryState;
   component: any;
   match: match<{artist: string}>;
@@ -23,7 +25,8 @@ const mapStateProps = createStructuredSelector({
 });
 
 const mapActions = (dispatch: Dispatch<LibraryAction>) => ({
-  actions: bindActionCreators(actions, dispatch)
+  actions: bindActionCreators(
+    Object.assign({}, actions, playerActions), dispatch)
 });
 
 class LibraryView extends React.Component<LibraryViewProps, {}> {
