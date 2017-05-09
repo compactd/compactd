@@ -53,7 +53,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     .map(album => {
       if (this.state.albumsFilter && !this.props.artist) {
         return [
-          fuzzy.match(this.state.albumsFilter, album.name, options), album
+          fuzzy.match(this.state.albumsFilter, album.name || '', options), album
         ]
       }
       return [undefined, album];

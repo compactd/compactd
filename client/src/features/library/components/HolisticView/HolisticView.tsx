@@ -49,7 +49,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     .map(artist => {
       if (this.state.artistsFilter) {
         return [
-          fuzzy.match(this.state.artistsFilter, artist.name, options), artist
+          fuzzy.match(this.state.artistsFilter, artist.name || '', options), artist
         ]
       }
       return [undefined, artist];
