@@ -135,7 +135,8 @@ function toggleExpandArtist () {
 function fetchAllArtists () {
   return Promise.resolve().then(() => {
     const artists = new PouchDB<Defs.Artist>('artists');
-    return artists.allDocs({include_docs: true});
+    return artists.allDocs({include_docs: true,
+      startkey: 'library/', endkey: 'library/\uffff'});
   }).then((docs) => {
     return {
       type: RESOLVE_ALL_ARTISTS,
@@ -147,7 +148,8 @@ function fetchAllArtists () {
 function fetchAllAlbums () {
   return Promise.resolve().then(() => {
     const albums = new PouchDB<Defs.Artist>('albums');
-    return albums.allDocs({include_docs: true});
+    return albums.allDocs({include_docs: true,
+      startkey: 'library/', endkey: 'library/\uffff'});
   }).then((docs) => {
     return {
       type: RESOLVE_ALL_ALBUMS,

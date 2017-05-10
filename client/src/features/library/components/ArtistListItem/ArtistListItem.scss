@@ -1,7 +1,7 @@
 div.artist-list-item{
   cursor: pointer;
   &.active {
-    background-color: rgba(220, 229, 241, 0.19);
+    background-color: rgba(220, 229, 241, 0.1);
   }
   & > div {
     vertical-align: top;

@@ -1,3 +1,56 @@
 div.player-status{
+  background-color: #1e1c2b;
+  color: #fff;
+  height: 4em;
+  display: flex;
+  div.player-track {
+    // height: 3em;
+    display: inline-block;
+    flex-grow: 100;
+    margin-left: 2em;
+  }
+  div.player-controls  {
+    height: 4em;
+    display: inline-block;
+    /* vertical-align: middle; */
+    line-height: 4em;
+    margin: 0 1em;
+    padding-left: 1em;
+  }
 
+  div.player-controls > span {
+    vertical-align: middle;
+    color: #8188a1;
+    &.enabled {
+      color: #f5f7fb;
+      cursor: pointer;
+    }
+  }
+
+  span.pt-icon-step-backward.play-previous {
+      font-size: 20px;
+  }
+
+  span.toggle-playback {
+    font-size: 32px;
+    margin-left: 3px;
+  }
+
+  span.pt-icon-step-forward.play-previous {
+      font-size: 20px;
+  }
+
+  .player-name {
+      margin-top: 0.8em;
+  }
+
+  .player-audio {
+      margin-top: 0.5em;
+      margin-right: 10em;
+  }
+
+  span.artist-name::before {
+      content: "–";
+      margin: 0 0.5em;
+  }
 }

@@ -22,7 +22,6 @@ export class PlaylistView extends React.Component<PlaylistViewProps, {}>{
         player={player} index={index} />
     });
     return <div className="playlist-view">
-      <PlayerAudio source={(player.stack[0] || {_id: ''})._id} playing={true} />
       {playlist}
     </div>
   }

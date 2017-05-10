@@ -21,24 +21,48 @@ export function reducer (state: Defs.PlayerState = initialState,
   action: PlayerAction): Defs.PlayerState {
   switch (action.type) {
     case PLAY_NEXT_ACTION:
-    return Object.assign({}, state, {});
+      return Object.assign({}, state, {
+        playing: true,
+        prevStack: [].concat(state.prevStack, state.stack[0]),
+        stack: state.stack.slice(1)
+      });
     case PLAY_PREVIOUS_ACTION:
-      return Object.assign({}, state, {});
+      return Object.assign({}, state, {
+        prevStack: state.prevStack.slice(1),
+        playing: true,
+        stack: [].concat(state.prevStack[0], state.stack)
+      });
     case REPLACE_PLAYER_STACK_ACTION:
       return Object.assign({}, state, {
         stack: action.stack,
-        prevStack: state.prevStack.concat(state.stack[0])
+        playing: true,
+        prevStack: state.stack[0] ? state.prevStack.concat(state.stack[0]) : state.prevStack
       });
     case CLEAR_PLAYLIST_ACTION:
       return Object.assign({}, state, {});
     case TOGGLE_PLAYBACK_ACTION:
-      return Object.assign({}, state, {});
+      return Object.assign({}, state, {
+        playing: !state.playing
+      });
     case PLAY_AFTER_ACTION:
       return Object.assign({}, state, {});
   }
   return state;
 }
 
+function togglePlayback () {
+  return {
+    type: TOGGLE_PLAYBACK_ACTION
+  }
+}
+
+function playPrevious () {
+  return {type: PLAY_PREVIOUS_ACTION}
+}
+
+function playNext () {
+  return {type: PLAY_NEXT_ACTION}
+}
 
 async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
   await Promise.resolve();
@@ -88,5 +112,5 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
 }
 
 export const actions = {
-  replacePlayerStack
+  replacePlayerStack, playNext, playPrevious, togglePlayback
 }
