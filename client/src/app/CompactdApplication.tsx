@@ -15,6 +15,7 @@ import {PlaylistView} from 'features/player/components/PlaylistView';
 import {PlayerStatus} from 'features/player/components/PlayerStatus';
 
 const {Flex, Box} = require('reflexbox');
+require('../styles/base.scss');
 
 interface CompactdApplicationProps {
   store: Redux.Store<CompactdState>;

@@ -4,6 +4,14 @@ interface PlayerActionBase {
   type: string;
 };
 
+interface PrepareTrackAction {
+  type: 'cassette/player/PREPARE_TRACK_ACTION',
+  token: string,
+  track: string,
+  artist: Artist,
+  album: Album
+}
+
 interface PlayNextAction {
   type: 'cassette/player/PLAY_NEXT_ACTION';
 }
