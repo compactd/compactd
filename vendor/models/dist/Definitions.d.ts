@@ -3,7 +3,7 @@ export interface RouteParams {
     [key: string]: (string | number | boolean);
 }
 export interface Document {
-    [key: string]: (string | number | boolean);
+    [key: string]: (string | number | boolean | Document[]);
 }
 /**
  * Create a URI from a document properties

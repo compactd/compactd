@@ -5,7 +5,7 @@ export interface RouteParams {
 }
 
 export interface Document {
-  [key: string]: (string | number | boolean)
+  [key: string]: (string | number | boolean | Document[])
 }
 
 /**

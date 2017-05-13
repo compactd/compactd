@@ -16,6 +16,37 @@ export interface Tracker extends Document {
     type: string;
     boost: number;
 }
+export interface UnscoredRelease extends Document {
+    _id: string;
+    tracker: string;
+    seeders: number;
+    leechers: number;
+    torrent_id: string;
+    bitrate: number;
+    name: string;
+    wanted: string;
+    format: 'flac' | 'mp3' | 'm4a' | 'wma' | 'wav' | 'alac';
+}
+export interface Release extends UnscoredRelease {
+    score: number;
+}
+export interface ReleaseParams extends RouteParams {
+    wanted: string;
+    format: string;
+    tracker: string;
+    torrent_id: string;
+}
+export interface WantedAlbum extends Document {
+    _id: string;
+    artist: string;
+    album: string;
+    strict?: boolean;
+    status: 'wanted' | 'searching' | 'searched' | 'downloading' | 'done';
+}
+export interface WantedAlbumParams extends RouteParams {
+    artist: string;
+    album: string;
+}
 export interface TrackerParams extends Document {
     type: string;
     name: string;
@@ -74,7 +105,11 @@ export declare const albumURI: (param: string | AlbumParams) => any;
 export declare const trackURI: (param: string | TrackParams) => any;
 export declare const fileURI: (param: string | FileParams) => any;
 export declare const trackerURI: (param: string | FileParams) => any;
-export declare const libraryURI: (param: string | FileParams) => any;
+export declare const libraryURI: (param: string | LibraryParams) => any;
+export declare const wantedAlbumURI: (param: string | WantedAlbumParams) => any;
+export declare const releaseURI: (param: string | ReleaseParams) => any;
+export declare function mapReleaseToParams(rel: Release | ReleaseParams): ReleaseParams;
+export declare function mapWantedAlbumToParams(album: WantedAlbum | WantedAlbumParams): WantedAlbumParams;
 export declare function mapArtistToParams(artist: Artist | ArtistParams): ArtistParams;
 export declare function mapAlbumToParams(album: Album | AlbumParams): AlbumParams;
 export declare function mapTrackToParams(track: Track | TrackParams): TrackParams;

@@ -12,7 +12,9 @@ const routes = {
     track: 'library/:artist/:album/:number/:name',
     file: 'library/:artist/:album/:number/:track/:bitrate/:hash',
     tracker: 'trackers/:type/:name',
-    library: 'config/library/:name'
+    library: 'config/library/:name',
+    wantedAlbum: 'store/wanted/:artist/:album',
+    release: ':wanted/:format/:tracker/:torrent_id'
 };
 exports.artistURI = getRoute().route(routes.artist);
 exports.albumURI = getRoute().route(routes.album);
@@ -20,6 +22,24 @@ exports.trackURI = getRoute().route(routes.track);
 exports.fileURI = getRoute().route(routes.file);
 exports.trackerURI = getRoute().route(routes.tracker);
 exports.libraryURI = getRoute().route(routes.library);
+exports.wantedAlbumURI = getRoute().route(routes.wantedAlbum);
+exports.releaseURI = getRoute().route(routes.release);
+function mapReleaseToParams(rel) {
+    return {
+        wanted: rel.wanted,
+        format: rel.format,
+        tracker: rel.tracker,
+        torrent_id: rel.torrent_id
+    };
+}
+exports.mapReleaseToParams = mapReleaseToParams;
+function mapWantedAlbumToParams(album) {
+    return {
+        artist: slug(album.artist),
+        album: slug(album.album)
+    };
+}
+exports.mapWantedAlbumToParams = mapWantedAlbumToParams;
 function mapArtistToParams(artist) {
     return {
         name: slug(artist.name).toLowerCase()

@@ -1,6 +1,6 @@
 {
   "name": "compactd-models",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Models for compactd using PouchDB",
   "main": "index.js",
   "repository": "http://github.com/compactd/compactd",
@@ -15,6 +15,7 @@
     "typescript": "^2.3.2"
   },
   "dependencies": {
+    "compactd-models": "^1.5.0",
     "docuri": "^4.2.2",
     "fs-tree-diff": "^0.5.6",
     "sha1": "^1.1.1"

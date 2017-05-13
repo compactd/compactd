@@ -4,7 +4,7 @@ import sha1 = require('sha1');
 const docuri = require('docuri');
 const slug = require('slug') as (str: string) => string;
 
-function getRoute <T extends Document> (): DocURI<T> {
+function getRoute <T extends RouteParams> (): DocURI<T> {
   return (docuri as DocURI<T>);
 }
 
@@ -14,7 +14,9 @@ const routes = {
   track: 'library/:artist/:album/:number/:name',
   file: 'library/:artist/:album/:number/:track/:bitrate/:hash',
   tracker: 'trackers/:type/:name',
-  library: 'config/library/:name'
+  library: 'config/library/:name',
+  wantedAlbum: 'store/wanted/:artist/:album',
+  release: ':wanted/:format/:tracker/:torrent_id'
 }
 
 export interface Library extends Document {
@@ -35,6 +37,42 @@ export interface Tracker extends Document {
   username: string;
   type: string;
   boost: number;
+}
+
+export interface UnscoredRelease extends Document {
+  _id: string
+  tracker: string;
+  seeders: number;
+  leechers: number;
+  torrent_id: string;
+  bitrate: number;
+  name: string;
+  wanted: string;
+  format: 'flac' | 'mp3' | 'm4a' | 'wma' | 'wav' | 'alac';
+} 
+
+export interface Release extends UnscoredRelease {
+  score: number;
+}
+
+export interface ReleaseParams extends RouteParams {
+  wanted: string;
+  format: string;
+  tracker: string;
+  torrent_id: string;
+}
+
+export interface WantedAlbum extends Document {
+  _id: string;
+  artist: string;
+  album: string;
+  strict?: boolean;
+  status: 'wanted' | 'searching' | 'searched' | 'downloading' | 'done';
+}
+
+export interface WantedAlbumParams extends RouteParams {
+  artist: string;
+  album: string;
 }
 
 export interface TrackerParams extends Document {
@@ -105,7 +143,25 @@ export const albumURI = getRoute<AlbumParams>().route(routes.album);
 export const trackURI = getRoute<TrackParams>().route(routes.track);
 export const fileURI = getRoute<FileParams>().route(routes.file);
 export const trackerURI = getRoute<FileParams>().route(routes.tracker);
-export const libraryURI = getRoute<FileParams>().route(routes.library);
+export const libraryURI = getRoute<LibraryParams>().route(routes.library);
+export const wantedAlbumURI = getRoute<WantedAlbumParams>().route(routes.wantedAlbum);
+export const releaseURI = getRoute<ReleaseParams>().route(routes.release);
+
+export function mapReleaseToParams (rel: Release | ReleaseParams): ReleaseParams {
+  return {
+    wanted: rel.wanted,
+    format: rel.format,
+    tracker: rel.tracker,
+    torrent_id: rel.torrent_id
+  }
+}
+
+export function mapWantedAlbumToParams (album: WantedAlbum | WantedAlbumParams): WantedAlbumParams {
+  return {
+    artist: slug(album.artist),
+    album: slug(album.album)
+  }
+}
 
 export function mapArtistToParams (artist: Artist | ArtistParams): ArtistParams {
   return {
