@@ -15,9 +15,9 @@ export class LastfmDataSource extends DataSource {
    * size is the first element of sizes. If the image is almost a square
    * that is to say the difference between its height and width is inferior
    * to about 5% of its height then it will return the image as a buffer;
-   * Otherwise, or if the image cannot be fetched, this will either return 
+   * Otherwise, or if the image cannot be fetched, this will either return
    * the result of fetchLargestImage called with images and sizes minus the first element
-   * or an empty buffer (new Buffer('')) if sizes doesn't have an element left 
+   * or an empty buffer (new Buffer('')) if sizes doesn't have an element left
    * @param images an array of the image object returned by LastFM
    * @param sizes an array of LastFM sizes, sorted by size
    * @return a buffer containing the image if found
@@ -53,7 +53,7 @@ export class LastfmDataSource extends DataSource {
     });
     const res = await fetch(`http://ws.audioscrobbler.com/2.0/?${q}`);
     const data = await res.json();
-
+    if (!data.artist) return;
     const images = data.artist.image;
     return this.fetchLargestImage(images);
   }
@@ -65,10 +65,11 @@ export class LastfmDataSource extends DataSource {
       format: 'json',
       artist, album
     });
-    console.log(`http://ws.audioscrobbler.com/2.0/?${q}`)
+    // console.log(`http://ws.audioscrobbler.com/2.0/?${q}`)
     const res = await fetch(`http://ws.audioscrobbler.com/2.0/?${q}`);
     const data = await res.json();
 
+    if (!data.album) return;
     const images = data.album.image;
     return this.fetchLargestImage(images);
   }

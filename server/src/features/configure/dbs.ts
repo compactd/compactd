@@ -24,5 +24,17 @@ export const dbs: IDB[] = [
     name: 'config',
     schema: Schemas.ConfigSchema,
     perms: Perms.ConfigPermissions
+  }, {
+    name: 'trackers',
+    schema: Schemas.TrackerSchema,
+    perms: Perms.TrackerPermissions
+  }, {
+    name: 'releases',
+    schema: Schemas.ReleaseSchema,
+    perms: Perms.ReleasePermissions
+  }, {
+    name: 'wanted_albums',
+    schema: Schemas.WantedAlbumSchema,
+    perms: Perms.WantedAlbumPermission
   }
 ];

@@ -12,5 +12,3 @@ export async function configure () {
   await configurator.configure();
 
 }
-
-configure().then(console.log).catch(console.log);

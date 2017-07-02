@@ -43,6 +43,32 @@ export const TrackSchema: ISchema = {
   track_artist: types.string
 }
 
+export const TrackerSchema: ISchema = {
+  name: types.string.required,
+  host: types.string,
+  username: types.string,
+  type: types.string.required,
+  boost: types.number
+}
+
+export const ReleaseSchema: ISchema = {
+  tracker: types.string.required,
+  seeders: types.number.required,
+  leechers: types.number.required,
+  torrent_id: types.string.required,
+  bitrate: types.number.required,
+  name: types.string.required,
+  wanted: types.string.required,
+  format: types.string.required
+}
+
+export const WantedAlbumSchema: ISchema = {
+  artist: types.string.required,
+  album: types.string.required,
+  strict: types.any,
+  status: types.string.required
+}
+
 export const ConfigSchema: ISchema = {
   value: types.any
 }

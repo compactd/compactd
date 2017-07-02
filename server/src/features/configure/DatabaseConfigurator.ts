@@ -98,7 +98,6 @@ export class DatabaseConfigurator {
           bind_address: "0.0.0.0",
           port: 5984})
       }).then((res) => res.json());
-    console.log(res);
 
     const fres: any = await fetch(`http://${
         this.opts.couchHost
@@ -113,7 +112,6 @@ export class DatabaseConfigurator {
         action: "finish_cluster"
       })
     }).then((res) => res.json());
-    console.log(fres)
   }
 
   async endAdminParty () {

@@ -94,7 +94,7 @@ if (fs.existsSync(localConfig)) {
 conf.loadFile(paths);
 
 // Perform validation
-conf.validate({strict: true});
+conf.validate({allowed: 'strict'} as any);
 
 let props = conf.getProperties();
 // story.debug('config', 'resolved configuration is', {

@@ -43,7 +43,11 @@ async function processArtists (replace: boolean = false) {
   await Promise.all((await artists.allDocs({include_docs: true}))
     .rows.map(async ({doc}) => {
     if (fs.existsSync(getCacheEntry(doc._id)) && !replace) return;
-    await saveToFile(source.getArtistArtwork(doc.name), doc._id);
+    try {
+      await saveToFile(source.getArtistArtwork(doc.name), doc._id);
+    } catch (err) {
+      return;
+    }
   }));
 }
 

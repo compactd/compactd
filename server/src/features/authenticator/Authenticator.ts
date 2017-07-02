@@ -67,7 +67,7 @@ export default class Authenticator {
     return new Promise((resolve, reject) => {
       crypto.randomBytes(length, (err, data) => {
         if (err) return reject(err);
-        resolve(data.toString('hex')); 
+        resolve(data.toString('hex'));
       });
     })
   }
@@ -87,7 +87,7 @@ export default class Authenticator {
   }
 
   /**
-   * Create a database _user directly by PUT the CouchDB instance 
+   * Create a database _user directly by PUT the CouchDB instance
    * @param user the DatabaseUser to create
    */
   async createDatabaseUser (user: DatabaseUser) {
@@ -168,7 +168,7 @@ export default class Authenticator {
    */
   async registerUser (props: UserProps) {
     await Promise.resolve();
-    
+
     if (!/^[a-z0-9_]{4,16}$/i.test(props.username)) {
       throw Boom.create(400,
         'Username may only contain between 4 and 16 alphanumeric characters');
@@ -178,9 +178,9 @@ export default class Authenticator {
       throw Boom.create(400,
         'Password needs to be at least 4 characters long');
     }
-    try {      
+    try {
       const pass = await this.hashPassword(props.password) as string;
-      
+
       const appUsers = new PouchDB<UserProps & {_id: string}>('app_users');
       await appUsers.put({
         _id: URI(props) as string,
@@ -245,7 +245,7 @@ export default class Authenticator {
   }
   signupUser (): Express.RequestHandler {
     return (req, res, next) => {
-      
+
       assert.equal(req.method.toLowerCase(), 'post');
       this.registerUser(Object.assign({}, req.body, {
         role: 'end_user'
@@ -267,7 +267,7 @@ export default class Authenticator {
 
   proxyRequestDecorator () {
     return (proxyReqOpts: any, srcReq: any) => {
-      
+
       if (process.env.ADMIN_PARTY) {
         const auth = new Buffer(PouchDB.credentials).toString('base64');
         proxyReqOpts.headers.authorization = `Basic ${auth}`;

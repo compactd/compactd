@@ -35,11 +35,32 @@ export const AlbumPermissions: IPermissions = {
   upd_fd: ['name']
 }
 
+export const TrackerPermissions: IPermissions = {
+  read: any,
+  update: any,
+  create: any,
+  upd_fd: ['name', 'host', 'username', 'type', 'boost']
+}
+
 export const TrackPermissions: IPermissions = {
   read: any,
   update: any,
   create: none,
   upd_fd: ['name', 'track_artist', 'number']
+}
+
+export const ReleasePermissions: IPermissions = {
+  read: any,
+  update: none,
+  create: none,
+  upd_fd: []
+}
+
+export const WantedAlbumPermission: IPermissions = {
+  read: any,
+  update: none,
+  create: none,
+  upd_fd: []
 }
 
 export const ConfigPermissions: IPermissions = {

@@ -8,7 +8,7 @@ const trickle = require('timetrickle');
 
 export default function(app: Express.Application) {
 
-  const limit = trickle(5, 2500);
+  const limit = trickle(10, 2500);
 
   app.post('/api/aquarelle', (req, res) => {
     Agent.processAlbums().catch((err) => {
@@ -23,8 +23,8 @@ export default function(app: Express.Application) {
     limit(() => {
       const {artist} = req.params;
       const file = Agent.getCacheEntry(artistURI({name: artist}));
-      
-      if (!fs.existsSync(file) || fs.lstatSync(file).size < 10) 
+
+      if (!fs.existsSync(file) || fs.lstatSync(file).size < 10)
         return res.status(404).send({error: 'File not found'});''
 
       res.contentType('image/png');
@@ -49,8 +49,8 @@ export default function(app: Express.Application) {
 
       const {artist, album} = req.params;
       const file = Agent.getCacheEntry(albumURI({name: album, artist}));
-      
-      if (!fs.existsSync(file) || fs.lstatSync(file).size < 10) 
+
+      if (!fs.existsSync(file) || fs.lstatSync(file).size < 10)
         return res.status(404).send({error: 'File not found'});
 
       res.contentType('image/png');
