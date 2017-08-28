@@ -99,6 +99,7 @@ export default class Authenticator {
     } catch (err) {
     }
     const doc = await _users.put(user);
+    
   }
 
   /**
@@ -280,6 +281,7 @@ export default class Authenticator {
 
       const [bearer, token] = proxyReqOpts.headers.authorization.split(' ');
       const user = this.verifySession(token);
+      
       const auth = new Buffer(`${user}:${this.passwords[user]}`)
         .toString('base64')
       proxyReqOpts.headers.authorization = `Basic ${auth}`;

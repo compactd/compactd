@@ -5,6 +5,9 @@ import * as path from "path";
 import { readFile, writeFile, existsSync } from "fs";
 import * as mkdirp from 'mkdirp';
 import * as events from 'events';
+
+import {mainStory} from 'storyboard';
+
 import config from '../../config';
 
 import Models = require('compactd-models');
@@ -22,13 +25,24 @@ export class Scanner extends events.EventEmitter {
     this.library = library;
   }
   async updateLibrary (pouchDB: typeof PouchDB, props: any) {
+
     const libraries = new pouchDB<Models.Library>('libraries');
     const lib = await libraries.get(this.library);
     await libraries.put(Object.assign({}, lib, props));
+
+    mainStory.debug('scanner', 'Updated library record', {
+      attach: { lib, props },
+      attachLevel: 'debug'
+    });
   }
   async scan (pouchDB: typeof PouchDB) {
+
     const libraries = new pouchDB<Models.Library>('libraries');
     const lib = await libraries.get(this.library);
+
+    mainStory.debug('scanner', 'Starting scan', {
+      attach: {lib}
+    });
 
     await this.updateLibrary(pouchDB, {status: 'scanning'});
 
@@ -50,6 +64,7 @@ export class Scanner extends events.EventEmitter {
 
   walkDirectory () {
     this.entries = walkSync.entries(this.path);
+    mainStory.debug('scanner', `Loaded ${this.entries.length} files to be potentially processed`);
   }
 
   getSerializedEntries (dir: string): Promise<FSTree.FSEntries> {
@@ -59,8 +74,9 @@ export class Scanner extends events.EventEmitter {
       if (!existsSync(file)) return resolve([]);
       readFile(file, 'utf8', function (err, content) {
         if (err) return reject (err);
-
-        resolve((JSON.parse(content) as any).entries.map((el: Defs.SerializedFSEntry) => {
+        const entries = (JSON.parse(content) as any).entries;
+        mainStory.debug('scanner', `Not processing ${entries.length} entries`);
+        resolve(entries.map((el: Defs.SerializedFSEntry) => {
           return Object.assign({}, el, {isDirectory: () => el.dir})
         }));
       });
@@ -94,8 +110,10 @@ export class Scanner extends events.EventEmitter {
     const exts = ['.mp4', '.mp3', '.m4a', '.flac', '.ogg', '.wav', '.wmv', '.alac'];
     return new Promise((resolve, reject) => {
       if (!exts.includes(path.extname(file))) {
+        mainStory.debug('scanner', `Skipping ${file} (unsupported format)`);
         return resolve();
       }
+      mainStory.debug('scanner', `Scanning file ${file}`);
       const ffmpeg = Ffmpeg();
       ffmpeg.input(file).ffprobe((err: Error, data: any) => {
         if (err) return reject(err);
@@ -125,6 +143,7 @@ export class Scanner extends events.EventEmitter {
       case 'mkdir':
         // console.log(`Scanning ${file}`);
         this.emit('open_folder', file);
+        mainStory.debug('scanner', `Entering folder ${file}`);
         return;
       case 'create':
         this.emit('open_file', file);
@@ -132,8 +151,14 @@ export class Scanner extends events.EventEmitter {
         try {
 
           const probed: any = await this.ffprobe(source);
+
+          mainStory.debug('scanner', `Probed ${file}`, {
+            attach: probed, attachLevel: 'trace'
+          })
+
           if (!probed || !probed.format ||
-            !probed.format.tags || !probed.format.tags.title) {
+            !probed.format.tags || (!probed.format.tags.title && !probed.format.tags.TITLE)) {
+            mainStory.debug('scanner', `Invalid probed data skipping`);
             return;
           }
 
@@ -202,6 +227,10 @@ export class Scanner extends events.EventEmitter {
             })
           };
 
+          mainStory.trace('scanner', `Creating databse documents`, {
+            attach: docs, attachLevel: 'trace'
+          });
+
           const databaseOperations = Object.keys(docs).map((model: string) => {
             const props = (docs as any)[model] as any;
 
@@ -215,7 +244,7 @@ export class Scanner extends events.EventEmitter {
           await Promise.all(databaseOperations);
 
         } catch (err) {
-          console.log(err);
+          mainStory.error('scanner', err.message);
         }
     }
   }

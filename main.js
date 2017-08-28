@@ -1,3 +1,14 @@
+
+const sbConfig = require('storyboard').config;
+
+
+if(process.argv.includes('--verbose')  || process.env.STORYBOARD) {
+  require('storyboard-preset-console');
+  if (!process.env.STORYBOARD) {
+    sbConfig({filter: process.argv.includes('--verbose') ? '*:*' : '*:INFO'});
+  }
+}
+
 const CLI      = require('clui');
 const chalk    = require('chalk');
 const config   = require('./server/dist/config').default;
@@ -18,6 +29,7 @@ const {Scanner}     = require('./server/dist/features/scanner/Scanner');
 
 const capabilities = require('fluent-ffmpeg/lib/capabilities');
 const Agent        = require('./server/dist/features/aquarelle/AquarelleAgent');
+
 
 const AVAILABLE_MODES = ['serve', 'configure', 'recover', 'reset', 'clean'];
 
@@ -129,7 +141,7 @@ switch (mode) {
         console.log('\n' + chalk.grey('You may start it using '+ chalk.yellow('compactd --serve')));
       }).catch((err) => {
         if (verbose) console.log('\n  ' + chalk.grey(err) + '\n');
-        console.log('\n  ' + chalk.bgRed(' Couldn\'t finish configuration '))
+        console.log('\n  ' + chalk.bgRed(' Couldn\'t finish configuration \n'))
       });
 }
 
@@ -281,7 +293,6 @@ function checkForFFmpeg (spin) {
     capabilities(caps);
     caps._getFfmpegPath.call(caps, function (err1, ffmpegPath) {
       caps._getFfprobePath.call(caps, function (err2, ffprobePath) {
-        if (err1 || err2) {
           spin.stop();
           console.log(chalk.red(`  ✘ FFmpeg not found in the Path`));
           console.log(chalk.grey(`    Please install ffmpeg and ffprobe and make sure it's in the path`));
