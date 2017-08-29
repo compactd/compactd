@@ -38,11 +38,17 @@ interface PlayAfterAction {
   stack: Track[];
 }
 
+interface JumpToAction {
+  type: 'cassette/player/JUMP_TO',
+  target: number;
+}
+
 export type PlayerAction =  PlayNextAction |
                             PlayPreviousAction |
                             ReplacePlayerStackAction |
                             ClearPlaylistAction |
                             TogglePlaybackAction |
+                            JumpToAction |
                             PlayAfterAction;
 
 // Album | [Album, number] | Track[] | Track
@@ -56,4 +62,5 @@ export type PlayerActions = {
   clearPlaylist: () => void;
   togglePlayback: () => void;
   playAfter: (stack: PlayerStack) => void;
+  jumpTo: (target: Track | number | string) => void;
 }

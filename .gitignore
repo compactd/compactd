@@ -2,3 +2,4 @@ node_modules
 client/dist
 server/dist
 .git
+*.log

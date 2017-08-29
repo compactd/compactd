@@ -10,6 +10,7 @@ const REPLACE_PLAYER_STACK_ACTION = 'cassette/player/REPLACE_PLAYER_STACK_ACTION
 const CLEAR_PLAYLIST_ACTION = 'cassette/player/CLEAR_PLAYLIST_ACTION';
 const TOGGLE_PLAYBACK_ACTION = 'cassette/player/TOGGLE_PLAYBACK_ACTION';
 const PLAY_AFTER_ACTION = 'cassette/player/PLAY_AFTER_ACTION';
+const JUMP_TO = 'cassette/player/JUMP_TO';
 
 const initialState: Defs.PlayerState = {
   playing: false,
@@ -20,6 +21,13 @@ const initialState: Defs.PlayerState = {
 export function reducer (state: Defs.PlayerState = initialState,
   action: PlayerAction): Defs.PlayerState {
   switch (action.type) {
+    case JUMP_TO:
+      const index = action.target;
+      return Object.assign({}, state, {
+        playing: true,
+        prevStack: [].concat(state.prevStack, state.stack[0]),
+        stack: state.stack.slice(index)
+      });
     case PLAY_NEXT_ACTION:
       return Object.assign({}, state, {
         playing: true,
@@ -62,6 +70,30 @@ function playPrevious () {
 
 function playNext () {
   return {type: PLAY_NEXT_ACTION}
+}
+
+function jumpTo (target: string | number | Defs.Track) {
+  return (dispatch: (action: PlayerAction) => void, getState: () => Defs.CompactdState) => {
+    const {player} = getState();
+    if (typeof target === 'string') {
+      return dispatch({
+        type: JUMP_TO,
+        target: player.stack.findIndex((track) => track._id === target)
+      });
+    }
+    if (typeof target === 'number') {
+      return dispatch({
+        type: JUMP_TO, target
+      })
+    }
+    if (target._id) {
+      return dispatch({
+        type: JUMP_TO,
+        target: player.stack.findIndex((track) => track._id === target._id)
+      });
+    }
+    return;
+  }
 }
 
 async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
@@ -112,5 +144,5 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
 }
 
 export const actions = {
-  replacePlayerStack, playNext, playPrevious, togglePlayback
+  replacePlayerStack, playNext, playPrevious, togglePlayback, jumpTo
 }
