@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {PlayerActions} from '../../actions.d';
 import {PlayerAudio} from '../PlayerAudio';
-import {PlayerState} from 'definitions';
+import {PlayerState, LibraryState} from 'definitions';
 import * as classnames from 'classnames';
 
 require('./PlayerStatus.scss');
@@ -9,6 +9,7 @@ require('./PlayerStatus.scss');
 interface PlayerStatusProps {
   actions: PlayerActions;
   player: PlayerState;
+  library: LibraryState;
 }
 
 export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
@@ -24,7 +25,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
     const content = player.stack.length > 0 ?
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
-        <span className="artist-name">{player.stack[0].artist}</span>
+        <span className="artist-name">{this.props.library.artistsById[player.stack[0].artist].name}</span>
       </div> : <div className="player-name">
       </div>
     return <div className="player-status">

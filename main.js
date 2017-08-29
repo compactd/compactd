@@ -293,6 +293,7 @@ function checkForFFmpeg (spin) {
     capabilities(caps);
     caps._getFfmpegPath.call(caps, function (err1, ffmpegPath) {
       caps._getFfprobePath.call(caps, function (err2, ffprobePath) {
+        if (err1 || err2 || ffmpegPath === '') {
           spin.stop();
           console.log(chalk.red(`  ✘ FFmpeg not found in the Path`));
           console.log(chalk.grey(`    Please install ffmpeg and ffprobe and make sure it's in the path`));
