@@ -1,4 +1,5 @@
 import * as Compactd from './common.d';
+import {DSAlbum, DSArtist, DSTrack, DSEntity} from 'compactd-models';
 
 export interface LibraryState {
   albumsById: {
@@ -43,6 +44,7 @@ export interface AppState {
    */
   user?: string;
 }
+
 export interface PlayerState {
   /**
    * An array containing a list of the next tracks
@@ -58,8 +60,22 @@ export interface PlayerState {
   playing:    boolean;
 }
 
+export interface StoreState {
+  search: string;
+  showSearchDialog: boolean;
+  showDowloadPopup: boolean;
+  searchResultsByQuery: {
+    [q: string]: {
+      artist?: DSArtist[],
+      album?: DSAlbum[],
+      track?: DSTrack[] 
+    }
+  };
+}
+
 export interface CompactdState {
   library: LibraryState;
   player: PlayerState;
   app: AppState;
+  store: StoreState;
 }
