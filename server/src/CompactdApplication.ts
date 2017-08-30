@@ -1,3 +1,5 @@
+import 'storyboard-preset-console';
+
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';

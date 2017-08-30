@@ -1,7 +1,10 @@
-import {DataSource} from './DataSource';
+import {DataSource, DSAlbum, DSArtist, DSTrack} from './DataSource';
 import fetch from 'node-fetch';
 import * as qs from 'qs';
 import * as imageSize from 'image-size';
+import * as config from '../../config';
+import * as jwt from 'jsonwebtoken';
+import {mainStory} from 'storyboard';
 
 const LAST_FM_SIZES = ['mega', 'extralarge', 'large', 'medium', 'small', ''];
 
@@ -72,5 +75,63 @@ export class LastfmDataSource extends DataSource {
     if (!data.album) return;
     const images = data.album.image;
     return this.fetchLargestImage(images);
+  }
+  search(query: string, types: ("artist" | "album" | "track")[] = ['artist', 'album', 'track']): Promise<(DSArtist | DSAlbum | DSTrack)[]> {
+    if (!types.every((t) => ['artist', 'album', 'track'].includes(t))) {
+      throw new Error('Trying to search for unknown type');
+    }
+
+    mainStory.info('datasource', `Performing search for '${query}'`);
+
+    return Promise.all(types.map(async (type) => {
+      const q = qs.stringify({
+        method: type + '.search',
+        api_key: this.apiKey,
+        format: 'json',
+        [type]: query
+      });
+      const time = Date.now();
+
+      const res = await fetch(`http://ws.audioscrobbler.com/2.0/?${q}`);
+    
+      const data = await res.json();
+
+      mainStory.debug('datasource', `GET http://ws.audioscrobbler.com/2.0/?${q} ${Date.now() - time} ms`, {
+        attach: data, attachLevel: 'trace'
+      });
+      const results: (DSArtist | DSAlbum | DSTrack)[] = data.results[`${type}matches`][type].map((item: any) => {
+    
+        const cover = (item.image || []).reduce((acc: any, val: any) => {
+          return Object.assign({}, acc, {[val.size]: val['#text']});
+        }, {});
+
+        
+
+        // const coverURI = `/api/datasource/cover/${new Buffer(JSON.stringify(cover)).toString('base64')}`;
+
+        return Object.assign({}, {
+          type,
+          name: item.name,
+          id: item.name,
+          cover: cover.extralarge
+        }, item.artist ? {artist: item.artist} : {});
+      });
+      return results;
+      
+    })).then((values) => {
+      return [].concat(...values);
+    });
+  }
+  autocomplete(query: string, type?: ("artist" | "album" | "track")[]): Promise<(DSArtist | DSAlbum | DSTrack)[]> {
+    throw new Error("Method not implemented.");
+  }
+  getArtistById(id: string): Promise<DSArtist> {
+    throw new Error("Method not implemented.");
+  }
+  getAlbumById(id: string): Promise<DSAlbum> {
+    throw new Error("Method not implemented.");
+  }
+  getTrackById(id: string): Promise<DSTrack> {
+    throw new Error("Method not implemented.");
   }
 }
