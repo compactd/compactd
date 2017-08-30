@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add storyboard-preset-console
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @blueprintjs/core
 
 PATH: 
   C:\Python27\;C:\Python27\Scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin;C:\Program Files\PuTTY\;C:\Users\Vincent\AppData\Local\Microsoft\WindowsApps;C:\Users\Vincent\AppData\Local\atom\bin;C:\Users\Vincent\AppData\Roaming\npm;C:\Users\Vincent\AppData\Local\Yarn\bin;C:\Program Files\Microsoft VS Code\bin;C:\Users\Vincent\AppData\Local\GitHubDesktop\bin
@@ -37,7 +37,7 @@ npm manifest:
       "chalk": "^1.1.3",
       "change-case": "^3.0.1",
       "clui": "^0.3.6",
-      "compactd-models": "^1.4.0",
+      "compactd-models": "^1.6.0",
       "convict": "^3.0.0",
       "cookie-parser": "^1.4.3",
       "errorhandler": "^1.5.0",
@@ -1932,10 +1932,18 @@ Lockfile:
       q "^1.1.2"
       recast "^0.11.17"
   
-  compactd-models@^1.4.0:
-    version "1.4.0"
-    resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.4.0.tgz#7891b75c7893af18d24a742c3a0f39ae55d252c6"
+  compactd-models@^1.5.0:
+    version "1.9.0"
+    resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.9.0.tgz#3f8c948d3df3a9c0f27a318a5398bb02c1c97f6f"
     dependencies:
+      docuri "^4.2.2"
+      sha1 "^1.1.1"
+  
+  compactd-models@^1.6.0:
+    version "1.6.0"
+    resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.6.0.tgz#91b89d153f6e116c8021059a5e65915766091221"
+    dependencies:
+      compactd-models "^1.5.0"
       docuri "^4.2.2"
       fs-tree-diff "^0.5.6"
       sha1 "^1.1.1"
@@ -9306,14 +9314,4 @@ Lockfile:
       validate-npm-package-license "^3.0.1"
 
 Trace: 
-  TypeError: https://registry.yarnpkg.com/storyboard-preset-console: Request path contains unescaped characters
-      at new ClientRequest (_http_client.js:125:13)
-      at Object.request (http.js:39:10)
-      at Object.request (https.js:233:15)
-      at Request.start (C:\Program Files (x86)\Yarn\lib\yarn-cli.js:114809:32)
-      at Request.end (C:\Program Files (x86)\Yarn\lib\yarn-cli.js:115579:10)
-      at end (C:\Program Files (x86)\Yarn\lib\yarn-cli.js:114621:14)
-      at Immediate._onImmediate (C:\Program Files (x86)\Yarn\lib\yarn-cli.js:114635:7)
-      at runCallback (timers.js:800:20)
-      at tryOnImmediate (timers.js:762:5)
-      at processImmediate [as _immediateCallback] (timers.js:733:5)
+  Error: EPERM: operation not permitted, unlink 'C:\Users\Vincent\Documents\GitHub\compactd\node_modules\node-sass\vendor\win32-x64-57\binding.node'

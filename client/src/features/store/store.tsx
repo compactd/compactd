@@ -53,5 +53,13 @@ function searchDatasource (q: string) {
   }
 }
 
+function toggleSearch () {
+  return {
+    type: TOGGLE_SEARCH
+  }
+}
+
 export const actions = {
+  searchDatasource, toggleSearch
+
 }

@@ -108,13 +108,13 @@ export class LastfmDataSource extends DataSource {
 
         
 
-        // const coverURI = `/api/datasource/cover/${new Buffer(JSON.stringify(cover)).toString('base64')}`;
+        // const coverURI = `/api/d atasource/cover/${new Buffer(JSON.stringify(cover)).toString('base64')}`;
 
         return Object.assign({}, {
           type,
           name: item.name,
           id: item.name,
-          cover: cover.extralarge
+          cover: cover.medium
         }, item.artist ? {artist: item.artist} : {});
       });
       return results;

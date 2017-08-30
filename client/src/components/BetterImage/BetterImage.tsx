@@ -36,7 +36,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     this.setState({loading: true});
     
     fetch(current, {
-      headers: {
+      headers: current.startsWith('http') ? {} : {
         'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
     }}).then((res) => {
       return res.blob();

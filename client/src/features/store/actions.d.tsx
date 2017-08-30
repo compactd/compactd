@@ -22,6 +22,6 @@ export interface SetSearchResultsAction {
 export type StoreAction = ToggleDownloadsAction | ToggleSearchAction | SetSearchResultsAction;
 export type StoreActions = {
   toggleDownloads: () => void;
-  toggleSearchAction: () => void;
+  toggleSearch: () => void;
   searchDatasource: (q: string) => void;
 }

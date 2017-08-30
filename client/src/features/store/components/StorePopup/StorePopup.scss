@@ -1,3 +1,35 @@
 div.store-popup{
+  .popup-content {
+    width: 420px;
+    height: 250px;
+    padding: 1em;
+  }
 
+  .popup-header {
+      font-size: 18px;
+      /* margin: 0 1em; */
+  }
+
+  span.popup-button.pt-icon-add {
+      float: right;
+      cursor: pointer;
+  }
+
+  .pt-progress-bar.pt-intent-success {
+      display: inline-block;
+  }
+
+  span.item-album {
+      display: inline-block;
+      color: #6d6f8c;
+  }
+
+  span.item-name {
+      display: inline-block;
+      margin-right: 0.3em;
+  }
+
+  .popup-main {
+      margin: 0.5em;
+  }
 }

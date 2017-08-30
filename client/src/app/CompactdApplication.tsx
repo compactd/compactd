@@ -46,7 +46,7 @@ export class CompactdApplication extends
               </Switch>
             </Box>
             <Box col={2} style={{
-              zIndex: 25,
+              /* zIndex: 25, */
               backgroundColor: '#fff',
               boxShadow: '0 0 4px rgba(0, 0, 0, 0.2)',
               padding: '0.4em'

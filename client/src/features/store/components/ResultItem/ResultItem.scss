@@ -1,0 +1,48 @@
+div.result-item {
+  width: 320px;
+  margin: 2px 9px;
+  text-align: left;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  span.artist-name, span.album-name, span.track-name {
+    // font-weight: bold;
+    margin-left: 12px;
+    /* line-height: 0em; */
+    display: inline-block;
+    vertical-align: top;
+    margin: 7px 0 0 12px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  span.album-artist, span.track-artist {
+
+    /* line-height: 0em; */
+    display: inline-block;
+    vertical-align: top;
+    margin: 7px 0 0 4px;
+    font-size: 16px;
+    cursor: pointer;
+
+    color: #544865;
+  }
+  span.track-name {
+    margin-left: 44px;
+  }
+  .image-container {
+    display: inline-block;
+    .artist-cover {
+      border-radius: 16px;
+    }
+    
+  }
+  display: none;
+  &:nth-child(-n+4){
+    display:block;
+  }
+  &.item-track {
+    width: 600px;
+  }
+}

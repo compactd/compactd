@@ -10,6 +10,7 @@
     "build:server": "tsc -p ./server"
   },
   "dependencies": {
+    "@blueprintjs/labs": "^0.7.0",
     "@types/fluent-ffmpeg": "^0.0.2",
     "@types/jsonwebtoken": "^7.2.0",
     "@types/pouchdb": "^6.1.0",
@@ -56,7 +57,7 @@
     "yarn": "^0.23.4"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^1.16.0",
+    "@blueprintjs/core": "^1.26.0",
     "@types/bluebird": "^3.5.3",
     "@types/body-parser": "^1.16.3",
     "@types/boom": "^4.3.1",

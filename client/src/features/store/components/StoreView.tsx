@@ -5,6 +5,7 @@ import { createStructuredSelector } from 'reselect';
 import {actions} from '../store';
 import {StoreActions, StoreAction} from '../actions.d';
 import {StoreState, CompactdState} from 'definitions';
+import {StoreButton} from './StoreButton';
 
 interface StoreViewProps {
   actions: StoreActions;
@@ -18,7 +19,9 @@ interface StoreViewProps {
 }))
 class StoreView extends React.Component<StoreViewProps, {}> {
   render (): JSX.Element {
-    return <div className="store-view"></div>;
+    return <div className="store-view">
+      <StoreButton store={this.props.store} actions={this.props.actions} />
+    </div>;
   }
 }
 
