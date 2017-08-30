@@ -1,43 +1,9 @@
 import * as stream from 'stream';
+import {DSAlbum, DSArtist, DSTrack} from 'compactd-models';
 
 type Cover = Buffer;
 type EntityType = 'artist' | 'album' | 'track';
-
-export interface DSArtist {
-  type: 'artist';
-  name: string;
-  id: string;
-  cover?: string;
-  _data?:  {
-    [name: string]: string | number
-  };
-}
-
-export interface DSAlbum {
-  type: 'album';
-  name: string;
-  id: string;
-  artist: string;
-  cover?: string;
-  _data?: {
-    [name: string]: string | number
-  };
-}
-
-export interface DSTrack {
-  type: 'track';
-  name: string;
-  id: string;
-  artist: string;
-  album?: string;
-  number?: number;
-  duration?: number;
-  _data?: {
-    [name: string]: string | number
-  };
-}
-
-export type DSEntity = DSArtist | DSAlbum | DSTrack;
+type DSEntity = DSAlbum | DSArtist | DSTrack;
 
 export abstract class DataSource {
   protected apiKey: string;

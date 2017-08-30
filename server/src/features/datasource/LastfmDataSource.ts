@@ -1,4 +1,5 @@
-import {DataSource, DSAlbum, DSArtist, DSTrack} from './DataSource';
+import {DataSource} from './DataSource';
+import {DSAlbum, DSArtist, DSTrack} from 'compactd-models';
 import fetch from 'node-fetch';
 import * as qs from 'qs';
 import * as imageSize from 'image-size';

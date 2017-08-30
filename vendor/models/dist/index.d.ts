@@ -116,3 +116,35 @@ export declare function mapTrackToParams(track: Track | TrackParams): TrackParam
 export declare function mapFileToParams(file: File): FileParams;
 export declare function mapTrackerToParams(tracker: Tracker | TrackerParams): TrackerParams;
 export declare function mapLibraryToParams(library: Library | LibraryParams): LibraryParams;
+export interface DSArtist {
+    type: 'artist';
+    name: string;
+    id: string;
+    cover?: string;
+    _data?: {
+        [name: string]: string | number;
+    };
+}
+export interface DSAlbum {
+    type: 'album';
+    name: string;
+    id: string;
+    artist: string;
+    cover?: string;
+    _data?: {
+        [name: string]: string | number;
+    };
+}
+export interface DSTrack {
+    type: 'track';
+    name: string;
+    id: string;
+    artist: string;
+    album?: string;
+    number?: number;
+    duration?: number;
+    _data?: {
+        [name: string]: string | number;
+    };
+}
+export declare type DSEntity = DSArtist | DSAlbum | DSTrack;

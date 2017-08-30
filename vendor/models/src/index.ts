@@ -208,3 +208,40 @@ export function mapLibraryToParams (library: Library | LibraryParams) : LibraryP
     name: slug(library.name)
   };
 }
+
+
+export interface DSArtist {
+  type: 'artist';
+  name: string;
+  id: string;
+  cover?: string;
+  _data?:  {
+    [name: string]: string | number
+  };
+}
+
+export interface DSAlbum {
+  type: 'album';
+  name: string;
+  id: string;
+  artist: string;
+  cover?: string;
+  _data?: {
+    [name: string]: string | number
+  };
+}
+
+export interface DSTrack {
+  type: 'track';
+  name: string;
+  id: string;
+  artist: string;
+  album?: string;
+  number?: number;
+  duration?: number;
+  _data?: {
+    [name: string]: string | number
+  };
+}
+
+export type DSEntity = DSArtist | DSAlbum | DSTrack;

@@ -1778,10 +1778,18 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
-compactd-models@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.4.0.tgz#7891b75c7893af18d24a742c3a0f39ae55d252c6"
+compactd-models@^1.5.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.9.0.tgz#3f8c948d3df3a9c0f27a318a5398bb02c1c97f6f"
   dependencies:
+    docuri "^4.2.2"
+    sha1 "^1.1.1"
+
+compactd-models@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.6.0.tgz#91b89d153f6e116c8021059a5e65915766091221"
+  dependencies:
+    compactd-models "^1.5.0"
     docuri "^4.2.2"
     fs-tree-diff "^0.5.6"
     sha1 "^1.1.1"
