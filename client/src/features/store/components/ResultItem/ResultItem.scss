@@ -1,5 +1,5 @@
 div.result-item {
-  width: 320px;
+  width: 462px;
   margin: 2px 9px;
   text-align: left;
 
@@ -26,23 +26,34 @@ div.result-item {
     font-size: 16px;
     cursor: pointer;
 
-    color: #544865;
+    color: #7D7090;
   }
   span.track-name {
     margin-left: 44px;
   }
   .image-container {
     display: inline-block;
+    transition: all 0.2s ease;
+    opacity: 0.62;
+    img {
+      border-radius: 1px;
+    }
     .artist-cover {
       border-radius: 16px;
     }
     
   }
   display: none;
-  &:nth-child(-n+4){
+  &:nth-child(-n+6){
     display:block;
   }
   &.item-track {
     width: 600px;
+  }
+  &:hover {
+    .image-container {
+      transition: all 0.2s ease;
+      opacity: 1;
+    }
   }
 }

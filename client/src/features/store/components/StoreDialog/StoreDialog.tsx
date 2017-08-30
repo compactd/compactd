@@ -37,12 +37,15 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
 
     return <div className="results">
       <div className="artist-results">
+        <span className="result-header">ARTISTS</span>
         {results.artist.map((el) => <ResultItem actions={actions} item={el} />)}
       </div>
       <div className="album-results">
+        <span className="result-header">ALBUMS</span>
         {results.album.map((el) => <ResultItem actions={actions} item={el} />)}
       </div>
-      <div className="track-results">
+      <div className="result-results">
+        <span className="result-header">TRACKS</span>
         {results.track.map((el) => <ResultItem actions={actions} item={el} />)}
       </div>
     </div>

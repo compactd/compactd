@@ -1,6 +1,5 @@
 div.dialog-content {
   margin: 2em auto;
-  text-align: center;
   .artist-results {
       text-align: left;
       vertical-align: middle;
@@ -11,12 +10,19 @@ div.dialog-content {
     display: inline-block;
     vertical-align: top;
   }
-  div.pt-input {
-    width: 420px;
-    margin: 1em auto;
+  .pt-input {
+    width: 420px !important;
+    margin: 1em auto !important;
+  }
+  span.result-header {
+    padding-bottom: 4px;
+    padding-left: 50px;
+    margin: 12px 4px 12px 4px;
+    display: block;
+    font-size: 16px;
   }
 }
 
 .pt-dialog {
-  width: 800px;
+  width: 1000px;
 }
