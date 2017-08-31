@@ -88,7 +88,7 @@ function waitLimit (limit: any) {
   });
 }
 
-const arlimit = trickle(2, 200);
+const arlimit = trickle(5, 200);
 
 const fetchArtistCounter = (id: string) => {
   return waitLimit(arlimit).then(() => {
@@ -109,7 +109,7 @@ const fetchArtistCounter = (id: string) => {
   });
 };
 
-const allimit = trickle(3, 180);
+const allimit = trickle(5, 200);
 
 function fetchAlbumCounter (id: string) {
   return waitLimit(allimit).then(() => {

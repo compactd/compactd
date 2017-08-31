@@ -8,7 +8,6 @@ export default function(app: Express.Application) {
   
   app.get('/api/datasource/search', (req, res) => {
     const {query, type} = req.query;
-    console.log('help');
     
     source.search(query, type).then((results) => {
       const reduced = results.reduce((acc: {[t: string]: any[]}, val) => {
@@ -23,6 +22,18 @@ export default function(app: Express.Application) {
       res.status(500).send({error: 'An internal error happened. Check logs for more details.'})
     });
   });
+
+  app.get('/api/datasource/artists/:id', (req, res) => {
+    const {id} = req.params;
+
+    source.getArtistById(id).then((artist) => {
+      res.status(200).send(artist);
+    }).catch((err) => {
+      mainStory.error('datasource', 'An error happened while trying to fetch artist', {attach: err});
+      res.status(500).send({error: 'An internal error happened. Check logs for more details.'})
+    })
+  });
+
   app.get('/api/datasource/autocomplete', (req, res) => {
     const {query, type} = req.query;
 

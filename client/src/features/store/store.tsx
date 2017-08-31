@@ -4,17 +4,36 @@ import { StoreAction } from './actions.d';
 const TOGGLE_DOWNLOADS   = 'cassette/store/TOGGLE_DOWNLOADS';
 const TOGGLE_SEARCH      = 'cassette/store/TOGGLE_SEARCH';
 const SET_SEARCH_RESULTS = 'cassette/store/SET_SEARCH_RESULTS';
+const SELECT_DS_ARTIST   = 'cassette/store/SELECT_DS_ARTIST';
+const RESOLVE_DS_ARTIST  = 'cassette/store/RESOLVE_DS_ARTIST';
+const SET_STORE_SCOPE    = 'cassette/store/SET_STORE_SCOPE';
 
 const initialState: Defs.StoreState = {
   showDowloadPopup: false,
   showSearchDialog: false,
   search: '',
-  searchResultsByQuery: {}
+  searchResultsByQuery: {},
+  artistsById: {},
+  albumsById: {},
+  scope: 'search',
+  artist: '',
+  album: ''
 };
 
 export function reducer (state: Defs.StoreState = initialState,
   action: StoreAction): Defs.StoreState {
   switch (action.type) {
+    case SELECT_DS_ARTIST:
+      return Object.assign({}, state, {
+        scope: 'artist',
+        artist: action.artist
+      });
+    case RESOLVE_DS_ARTIST:
+      return Object.assign({}, state, {
+        artistsById: Object.assign({}, state.artistsById, {
+          [action.id]: action.artist
+        })
+      });
     case TOGGLE_DOWNLOADS:
       return Object.assign({}, state, {
         showDownloadPopup: !state.showDowloadPopup
@@ -53,13 +72,41 @@ function searchDatasource (q: string) {
   }
 }
 
+function selectDSArtist (artist: string) {
+  return (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
+    dispatch({
+      type: SELECT_DS_ARTIST,
+      artist
+    })
+    const res = fetch('/api/datasource/artists/' + artist, {
+      headers: {
+        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
+    }}).then((res) => res.json())
+      .then((res) => {
+        dispatch({
+          type: RESOLVE_DS_ARTIST,
+          artist: res,
+          id: artist
+        });
+    });
+  }
+}
+
+function goBackToSearch () {
+  return {
+    type: SET_STORE_SCOPE,
+    scope: 'search'
+  };
+}
+
 function toggleSearch () {
   return {
     type: TOGGLE_SEARCH
   }
 }
 
+
 export const actions = {
-  searchDatasource, toggleSearch
+  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch 
 
 }

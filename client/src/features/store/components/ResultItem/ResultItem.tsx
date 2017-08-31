@@ -16,7 +16,7 @@ export class ResultItem extends React.Component<ResultItemProps, {}>{
 
     switch (item.type) {
       case 'artist':
-        return <div className="result-item">
+        return <div className="result-item" onClick={() => {actions.selectDSArtist(item.id)}}>
             <BetterImage src={item.cover} className="artist-cover" size={32} />
             <span className="artist-name">{item.name}</span>
           </div>

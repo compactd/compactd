@@ -71,6 +71,15 @@ export interface StoreState {
       track?: DSTrack[] 
     }
   };
+  scope: 'artist' | 'album' | 'search';
+  artist: string;
+  album: string;
+  artistsById: {
+    [name: string]: DSArtist
+  };
+  albumsById: {
+    [name: string]: DSAlbum
+  }
 }
 
 export interface CompactdState {

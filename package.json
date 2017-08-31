@@ -22,7 +22,7 @@
     "chalk": "^1.1.3",
     "change-case": "^3.0.1",
     "clui": "^0.3.6",
-    "compactd-models": "^1.6.0",
+    "compactd-models": "^1.8.0",
     "convict": "^3.0.0",
     "cookie-parser": "^1.4.3",
     "errorhandler": "^1.5.0",

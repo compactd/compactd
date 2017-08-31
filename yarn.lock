@@ -1796,9 +1796,9 @@ compactd-models@^1.5.0:
     docuri "^4.2.2"
     sha1 "^1.1.1"
 
-compactd-models@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.6.0.tgz#91b89d153f6e116c8021059a5e65915766091221"
+compactd-models@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.8.0.tgz#b2944cd4c9913c9116f2c9d04a16bd3483341345"
   dependencies:
     compactd-models "^1.5.0"
     docuri "^4.2.2"

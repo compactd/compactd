@@ -1,6 +1,6 @@
 {
   "name": "compactd-models",
-  "version": "1.6.0",
+  "version": "1.8.0",
   "description": "Models for compactd using PouchDB",
   "main": "index.js",
   "repository": "http://github.com/compactd/compactd",

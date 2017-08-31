@@ -3,6 +3,7 @@ import {StoreActions} from '../../actions.d';
 import {Dialog, Button, Intent, Spinner} from '@blueprintjs/core';
 import {StoreState} from 'definitions';
 import {ResultItem} from '../ResultItem';
+import BetterImage from 'components/BetterImage';
 
 require('./StoreDialog.scss');
 
@@ -50,24 +51,62 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
       </div>
     </div>
   }
+  renderArtist(): JSX.Element {
+    const {actions, store} = this.props;
+    const artist = store.artistsById[store.artist];
+    if (!artist || !artist.id) {
+      return <div className="loading-ds"><Spinner /></div>
+    }
+    const albums = artist.topAlbums.map((album) => {
+      return <div className="album-item" key={album.id}>
+        <BetterImage src={album.cover} size={32} />
+        <div className="album-title">{album.name}</div>
+      </div>
+    });
+
+    return <div className="ds-artist-view">
+      <div className="artist-image">
+        <BetterImage src={artist.largeCover} size={128} className="artist-cover" />
+        <div className="artist-description">
+          <div className="artist-name">{artist.name}</div>
+          <div className="artist-bio" dangerouslySetInnerHTML={{__html: artist.bio}}></div>
+        </div>
+      </div>
+      <div className="artist-albums">
+        <div className="header">TOP ALBUMS</div>
+        <div className="content">{albums}</div>
+      </div>
+    </div>
+  }
+  renderSearch(): JSX.Element {
+    return <div className="ds-search">
+      <div className="search-box">
+        <div className="pt-input-group main-search-input">
+          <span className="pt-icon pt-icon-search"></span>
+          <input className="pt-input" type="search" placeholder="Search music" dir="auto" value={this.state.query} onChange={
+            (evt) => this.setState({
+              query: evt.target.value
+            })
+          } />
+        </div>
+      </div>
+      <div className="dialog-content">
+        {this.getDialogContent()}
+      </div>
+    </div>
+  }
+  renderContent(): JSX.Element {
+    switch (this.props.store.scope) {
+      case 'artist': return this.renderArtist();
+      case 'search': return this.renderSearch();
+    }
+  }
   render (): JSX.Element {
     const {actions, store} = this.props;
     return <div className="store-dialog">
       <Dialog iconName="geosearch" isOpen={store.showSearchDialog} title="Download" onClose={() => actions.toggleSearch()}>
         <div className="pt-dialog-body">
-          <div className="search-box">
-            <div className="pt-input-group">
-              <span className="pt-icon pt-icon-search"></span>
-              <input className="pt-input" type="search" placeholder="Search msuic" dir="auto" value={this.state.query} onChange={
-                (evt) => this.setState({
-                  query: evt.target.value
-                })
-              } />
-            </div>
-          </div>
-          <div className="dialog-content">
-            {this.getDialogContent()}
-          </div>
+          {this.renderContent()}
         </div>
         <div className="pt-dialog-footer">
           <div className="pt-dialog-footer-actions">

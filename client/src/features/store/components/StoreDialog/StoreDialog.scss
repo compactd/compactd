@@ -10,10 +10,6 @@ div.dialog-content {
     display: inline-block;
     vertical-align: top;
   }
-  .pt-input {
-    width: 420px !important;
-    margin: 1em auto !important;
-  }
   span.result-header {
     padding-bottom: 4px;
     padding-left: 50px;
@@ -25,4 +21,68 @@ div.dialog-content {
 
 .pt-dialog {
   width: 1000px;
+
+  div.pt-input-group.main-search-input {
+    width: 600px !important;
+    margin: 1em auto !important;
+  }
+}
+div.ds-artist-view {
+  .artist-image {
+    height: 128px;
+  }
+  .image-container {
+    float: left;
+    margin-right: 1em;
+  }
+
+  .artist-description {
+      margin: 0 1em;
+  }
+
+  .artist-bio {
+      margin-top: 0.5em;
+      font-size: 0.92em;
+  }
+
+  .artist-name {
+      font-size: 1.2em;
+  }
+
+  img.better-image.artist-cover {
+      border-radius: 4px;
+  }
+  .artist-albums {
+    .content {
+      columns: 3;
+    }
+  }
+  .header {
+    font-size: 16px;
+    margin: 1.4em 0 1em 0.2em;
+  }
+  .album-item {
+    display: none;
+    margin: 0.3em;
+    height: 32px;
+    width: 300px; 
+    img {
+      border-radius: 2px;
+    }
+    div.album-title {
+      margin-top: 8px;
+    }
+    &> div {
+      display: inline-block;
+    }
+    
+    &:nth-child(-n+21){
+      display:block;
+    }
+  }
+}
+.loading-ds {
+  width: 100%;
+  margin: 2em;
+  text-align: center;
 }

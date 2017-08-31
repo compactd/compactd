@@ -215,6 +215,10 @@ export interface DSArtist {
   name: string;
   id: string;
   cover?: string;
+  largeCover?: string;
+  topAlbums?: DSAlbum[];
+  similar?: DSArtist;
+  bio?: string;
   _data?:  {
     [name: string]: string | number
   };
@@ -226,6 +230,9 @@ export interface DSAlbum {
   id: string;
   artist: string;
   cover?: string;
+  largeCover?: string;
+  tracks?: DSTrack[];
+  year?: string;
   _data?: {
     [name: string]: string | number
   };

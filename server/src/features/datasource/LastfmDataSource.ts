@@ -106,10 +106,6 @@ export class LastfmDataSource extends DataSource {
           return Object.assign({}, acc, {[val.size]: val['#text']});
         }, {});
 
-        
-
-        // const coverURI = `/api/d atasource/cover/${new Buffer(JSON.stringify(cover)).toString('base64')}`;
-
         return Object.assign({}, {
           type,
           name: item.name,
@@ -126,8 +122,74 @@ export class LastfmDataSource extends DataSource {
   autocomplete(query: string, type?: ("artist" | "album" | "track")[]): Promise<(DSArtist | DSAlbum | DSTrack)[]> {
     throw new Error("Method not implemented.");
   }
-  getArtistById(id: string): Promise<DSArtist> {
-    throw new Error("Method not implemented.");
+  async getArtistTopAlbums(id: string): Promise<DSAlbum[]> {
+
+    const q = qs.stringify({
+      method: 'artist.gettopalbums',
+      api_key: this.apiKey,
+      format: 'json',
+      artist: id
+    }); 
+
+    const time = Date.now();
+    
+    const res = await fetch(`http://ws.audioscrobbler.com/2.0/?${q}`);
+  
+    const {topalbums} = await res.json();
+
+    mainStory.debug('datasource', `GET http://ws.audioscrobbler.com/2.0/?${q} ${Date.now() - time} ms`, {
+      attach: {topalbums}, attachLevel: 'trace'
+    });
+
+    return topalbums.album.map((album: any): DSAlbum => {
+      const cover = (album.image || []).reduce((acc: any, val: any) => {
+        return Object.assign({}, acc, {[val.size]: val['#text']});
+      }, {});
+      return {
+        type: 'album',
+        name: album.name,
+        id: album.name,
+        artist: album.artist.name,
+        cover: cover.medium,
+      }
+    })
+  }
+
+  async getArtistById(id: string): Promise<DSArtist> {
+    mainStory.info('datasource', `Fetching artist for '${id}'`);  
+
+    const q = qs.stringify({
+      method: 'artist.getinfo',
+      api_key: this.apiKey,
+      format: 'json',
+      artist: id
+    }); 
+
+    const time = Date.now();
+    
+    const res = await fetch(`http://ws.audioscrobbler.com/2.0/?${q}`);
+  
+    const data = await res.json();
+
+    mainStory.debug('datasource', `GET http://ws.audioscrobbler.com/2.0/?${q} ${Date.now() - time} ms`, {
+      attach: data, attachLevel: 'trace'
+    });
+    const ent = data.artist;
+
+    const covers = (ent.image || []).reduce((acc: any, val: any) => {
+      return Object.assign({}, acc, {[val.size]: val['#text']});
+    }, {});
+
+    return {
+      type: 'artist',
+      name: ent.name,
+      id: ent.name,
+      cover: covers.medium,
+      largeCover: covers.mega,
+      bio: (ent.bio || {}).summary,
+      topAlbums: await this.getArtistTopAlbums(id)
+    }
+
   }
   getAlbumById(id: string): Promise<DSAlbum> {
     throw new Error("Method not implemented.");
