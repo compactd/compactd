@@ -109,7 +109,7 @@ export class LastfmDataSource extends DataSource {
         return Object.assign({}, {
           type,
           name: item.name,
-          id: item.name,
+          id: type === 'album' ? `${item.artist}/${item.name}`: item.name,
           cover: cover.medium
         }, item.artist ? {artist: item.artist} : {});
       });
@@ -148,7 +148,7 @@ export class LastfmDataSource extends DataSource {
       return {
         type: 'album',
         name: album.name,
-        id: album.name,
+        id: `${album.artist.name}/${album.name}`,
         artist: album.artist.name,
         cover: cover.medium,
       }
@@ -191,8 +191,48 @@ export class LastfmDataSource extends DataSource {
     }
 
   }
-  getAlbumById(id: string): Promise<DSAlbum> {
-    throw new Error("Method not implemented.");
+  async getAlbumById(id: string): Promise<DSAlbum> {
+    mainStory.info('datasource', `Fetching album for '${id}'`);  
+    const [artist, album] = id.split('/');
+    const q = qs.stringify({
+      method: 'album.getinfo',
+      api_key: this.apiKey,
+      format: 'json',
+      artist, album
+    }); 
+
+    const time = Date.now();
+    
+    const res = await fetch(`http://ws.audioscrobbler.com/2.0/?${q}`);
+  
+    const data = await res.json();
+
+    mainStory.debug('datasource', `GET http://ws.audioscrobbler.com/2.0/?${q} ${Date.now() - time} ms`, {
+      attach: data, attachLevel: 'trace'
+    });
+    const ent = data.album;
+
+    const covers = (ent.image || []).reduce((acc: any, val: any) => {
+      return Object.assign({}, acc, {[val.size]: val['#text']});
+    }, {});
+
+    const tracks: DSTrack[] = ent.tracks.track.map((track: any) => ({
+      name: track.name,
+      duration: track.duration,
+      artist: track.artist.name,
+      id: `${track.artist.name}/${track.name}`,
+      number: +track['@attr'].rank
+    }));
+
+    return {
+      type: 'album',
+      name: ent.name,
+      artist: ent.artist,
+      id: `${ent.artist}/${ent.name}`,
+      cover: covers.medium,
+      largeCover: covers.mega,
+      tracks
+    }
   }
   getTrackById(id: string): Promise<DSTrack> {
     throw new Error("Method not implemented.");

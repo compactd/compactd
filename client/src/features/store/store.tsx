@@ -7,6 +7,8 @@ const SET_SEARCH_RESULTS = 'cassette/store/SET_SEARCH_RESULTS';
 const SELECT_DS_ARTIST   = 'cassette/store/SELECT_DS_ARTIST';
 const RESOLVE_DS_ARTIST  = 'cassette/store/RESOLVE_DS_ARTIST';
 const SET_STORE_SCOPE    = 'cassette/store/SET_STORE_SCOPE';
+const RESOLVE_DS_ALBUM   = 'cassette/store/RESOLVE_DS_ALBUM';
+const SELECT_DS_ALBUM    = 'cassette/store/SELECT_DS_ALBUM';
 
 const initialState: Defs.StoreState = {
   showDowloadPopup: false,
@@ -23,6 +25,17 @@ const initialState: Defs.StoreState = {
 export function reducer (state: Defs.StoreState = initialState,
   action: StoreAction): Defs.StoreState {
   switch (action.type) {
+    case RESOLVE_DS_ALBUM:
+      return Object.assign({}, state, {
+        albumsById: Object.assign({}, state.albumsById, {
+          [action.id]: action.album
+        })
+      });
+    case SELECT_DS_ALBUM:
+      return Object.assign({}, state, {
+        scope: 'album',
+        album: action.album
+      });
     case SELECT_DS_ARTIST:
       return Object.assign({}, state, {
         scope: 'artist',
@@ -91,6 +104,25 @@ function selectDSArtist (artist: string) {
     });
   }
 }
+function selectDSAlbum (album: string) {
+  return (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
+    dispatch({
+      type: SELECT_DS_ALBUM,
+      album
+    })
+    const res = fetch('/api/datasource/albums/' + album, {
+      headers: {
+        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
+    }}).then((res) => res.json())
+      .then((res) => {
+        dispatch({
+          type: RESOLVE_DS_ALBUM,
+          album: res,
+          id: album
+        });
+    });
+  }
+}
 
 function goBackToSearch () {
   return {
@@ -107,6 +139,5 @@ function toggleSearch () {
 
 
 export const actions = {
-  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch 
-
+  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch, selectDSAlbum
 }

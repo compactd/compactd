@@ -34,6 +34,17 @@ export default function(app: Express.Application) {
     })
   });
 
+  app.get('/api/datasource/albums/:id*', (req, res) => {
+    const {id} = req.params;
+    
+    source.getAlbumById(id + req.params['0']).then((album) => {
+      res.status(200).send(album);
+    }).catch((err) => {
+      mainStory.error('datasource', 'An error happened while trying to fetch album', {attach: err});
+      res.status(500).send({error: 'An internal error happened. Check logs for more details.'})
+    })
+  });
+
   app.get('/api/datasource/autocomplete', (req, res) => {
     const {query, type} = req.query;
 

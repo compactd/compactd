@@ -51,6 +51,43 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
       </div>
     </div>
   }
+  renderAlbum(): JSX.Element {
+    const {actions, store} = this.props;
+    const album = store.albumsById[store.album];
+
+    if(!album || !album.id)
+      return <div className="loading-ds"><Spinner /></div>;
+
+    const tracks = album.tracks.map((track) => {
+      const date = new Date(null);
+      date.setSeconds(track.duration || 0);
+  
+      const duration = date.toISOString().substr(14, 5);
+      return <div className="album-track" key={track.id}>
+        <span className="track-number">{track.number || ""}</span>
+        <span className="track-title">{track.name}</span>
+        <span className="track-duration">{duration}</span>
+      </div>
+    });
+    return <div className="ds-album-view">
+      <div className="album-list">
+        <div className="current-album"><BetterImage src={album.largeCover} width={128}/></div>
+      </div>
+      <div className="album-content">
+        <div className="album-info">
+          <div className="album-title">
+            {album.name}
+          </div>
+          <div className="album-artist">
+            by {album.artist}
+          </div>
+        </div>
+        <div className="album-items">
+          {tracks}
+        </div>
+      </div>
+    </div>;
+  }
   renderArtist(): JSX.Element {
     const {actions, store} = this.props;
     const artist = store.artistsById[store.artist];
@@ -99,6 +136,7 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     switch (this.props.store.scope) {
       case 'artist': return this.renderArtist();
       case 'search': return this.renderSearch();
+      case 'album': return this.renderAlbum();
     }
   }
   render (): JSX.Element {
