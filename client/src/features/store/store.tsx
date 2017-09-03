@@ -53,7 +53,9 @@ export function reducer (state: Defs.StoreState = initialState,
       });
     case TOGGLE_SEARCH:
       return Object.assign({}, state, {
-        showSearchDialog: !state.showSearchDialog
+        showSearchDialog: !state.showSearchDialog,
+        search: '',
+        scope: 'search'
       });
     case SET_SEARCH_RESULTS:
       return Object.assign({}, state, {
