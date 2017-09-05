@@ -12,8 +12,8 @@ const routes = {
     track: 'library/:artist/:album/:number/:name',
     file: 'library/:artist/:album/:number/:track/:bitrate/:hash',
     tracker: 'trackers/:type/:name',
+    download: 'downloads/:artist/:album/:torrent_id',
     library: 'config/library/:name',
-    wantedAlbum: 'store/wanted/:artist/:album',
     release: ':wanted/:format/:tracker/:torrent_id'
 };
 exports.artistURI = getRoute().route(routes.artist);
@@ -22,7 +22,6 @@ exports.trackURI = getRoute().route(routes.track);
 exports.fileURI = getRoute().route(routes.file);
 exports.trackerURI = getRoute().route(routes.tracker);
 exports.libraryURI = getRoute().route(routes.library);
-exports.wantedAlbumURI = getRoute().route(routes.wantedAlbum);
 exports.releaseURI = getRoute().route(routes.release);
 function mapReleaseToParams(rel) {
     return {
@@ -33,13 +32,6 @@ function mapReleaseToParams(rel) {
     };
 }
 exports.mapReleaseToParams = mapReleaseToParams;
-function mapWantedAlbumToParams(album) {
-    return {
-        artist: slug(album.artist),
-        album: slug(album.album)
-    };
-}
-exports.mapWantedAlbumToParams = mapWantedAlbumToParams;
 function mapArtistToParams(artist) {
     return {
         name: slug(artist.name).toLowerCase()
@@ -80,6 +72,14 @@ function mapTrackerToParams(tracker) {
     };
 }
 exports.mapTrackerToParams = mapTrackerToParams;
+function mapDownloadToParams(download) {
+    return {
+        album: download.album,
+        artist: download.artist,
+        torrent_id: download.torrent_id
+    };
+}
+exports.mapDownloadToParams = mapDownloadToParams;
 function mapLibraryToParams(library) {
     return {
         name: slug(library.name)

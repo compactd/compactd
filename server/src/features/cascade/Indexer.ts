@@ -53,6 +53,7 @@ export abstract class Indexer implements IndexerConfig{
     if (!this.signedIn) return Promise.reject('Not logged in to use indexer');
     return Promise.resolve();
   }
+  abstract logout (): Promise<void>;
   abstract login (password: string): Promise<void>;
   abstract searchAlbum (album: DSAlbum): Promise<Release[]>;
   abstract downloadRelease (torrent_id: string): Promise<Buffer>;

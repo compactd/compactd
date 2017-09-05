@@ -23,6 +23,11 @@ export class GazelleIndexer extends Indexer {
   constructor (config: PartialIndexerConfig) {
     super(Object.assign({}, defaultOptions, config));
   }
+  logout(): Promise<void> {
+    this.sessionCookie = '';
+    this.signedIn = false;
+    return Promise.resolve();
+  }
   async login(password: string): Promise<void> {
     if (this.signedIn) {
       return Promise.resolve();

@@ -14,9 +14,24 @@ const routes = {
   track: 'library/:artist/:album/:number/:name',
   file: 'library/:artist/:album/:number/:track/:bitrate/:hash',
   tracker: 'trackers/:type/:name',
+  download: 'downloads/:artist/:album/:torrent_id',
   library: 'config/library/:name',
-  wantedAlbum: 'store/wanted/:artist/:album',
   release: ':wanted/:format/:tracker/:torrent_id'
+}
+export interface Download extends Document {
+  _id: string;
+  artist: string;
+  album: string;
+  torrent_id: string | number;
+  tracker: string;
+  progress: number;
+  cover_url?: string;
+}
+
+export interface DownloadParams extends RouteParams {
+  artist: string;
+  album: string;
+  torrent_id: string | number;
 }
 
 export interface Library extends Document {
@@ -33,10 +48,10 @@ export interface LibraryParams extends RouteParams {
 export interface Tracker extends Document {
   _id: string;
   name: string;
-  host: string;
+  host?: string;
   username: string;
   type: string;
-  boost: number;
+  boost?: number;
 }
 
 export interface UnscoredRelease extends Document {
@@ -45,10 +60,10 @@ export interface UnscoredRelease extends Document {
   seeders: number;
   leechers: number;
   torrent_id: string;
-  bitrate: number;
+  bitrate: string;
   name: string;
   wanted: string;
-  format: 'flac' | 'mp3' | 'm4a' | 'wma' | 'wav' | 'alac';
+  format: string;
 } 
 
 export interface Release extends UnscoredRelease {
@@ -62,20 +77,7 @@ export interface ReleaseParams extends RouteParams {
   torrent_id: string;
 }
 
-export interface WantedAlbum extends Document {
-  _id: string;
-  artist: string;
-  album: string;
-  strict?: boolean;
-  status: 'wanted' | 'searching' | 'searched' | 'downloading' | 'done';
-}
-
-export interface WantedAlbumParams extends RouteParams {
-  artist: string;
-  album: string;
-}
-
-export interface TrackerParams extends Document {
+export interface TrackerParams extends RouteParams {
   type: string;
   name: string;
 }
@@ -142,9 +144,8 @@ export const artistURI = getRoute<ArtistParams>().route(routes.artist);
 export const albumURI = getRoute<AlbumParams>().route(routes.album);
 export const trackURI = getRoute<TrackParams>().route(routes.track);
 export const fileURI = getRoute<FileParams>().route(routes.file);
-export const trackerURI = getRoute<FileParams>().route(routes.tracker);
+export const trackerURI = getRoute<TrackerParams>().route(routes.tracker);
 export const libraryURI = getRoute<LibraryParams>().route(routes.library);
-export const wantedAlbumURI = getRoute<WantedAlbumParams>().route(routes.wantedAlbum);
 export const releaseURI = getRoute<ReleaseParams>().route(routes.release);
 
 export function mapReleaseToParams (rel: Release | ReleaseParams): ReleaseParams {
@@ -153,13 +154,6 @@ export function mapReleaseToParams (rel: Release | ReleaseParams): ReleaseParams
     format: rel.format,
     tracker: rel.tracker,
     torrent_id: rel.torrent_id
-  }
-}
-
-export function mapWantedAlbumToParams (album: WantedAlbum | WantedAlbumParams): WantedAlbumParams {
-  return {
-    artist: slug(album.artist),
-    album: slug(album.album)
   }
 }
 
@@ -201,6 +195,14 @@ export function mapTrackerToParams (tracker: Tracker | TrackerParams) : TrackerP
     name: slug(tracker.name),
     type: tracker.type
   };
+}
+
+export function mapDownloadToParams (download: Download | DownloadParams | Partial<Download>): DownloadParams {
+  return {
+    album: download.album,
+    artist: download.artist,
+    torrent_id: download.torrent_id
+  }
 }
 
 export function mapLibraryToParams (library: Library | LibraryParams) : LibraryParams {

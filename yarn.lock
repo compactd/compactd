@@ -149,6 +149,10 @@
   version "1.4.28"
   resolved "https://registry.yarnpkg.com/@types/jwt-decode/-/jwt-decode-1.4.28.tgz#daf8f3af29d7ac8d9208057d3eec414f8a9825fc"
 
+"@types/keytar@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/keytar/-/keytar-4.0.1.tgz#e2cf6405dc33861424e59b67516c66d2cf7bc21b"
+
 "@types/lodash.debounce@^4.0.2":
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/lodash.debounce/-/lodash.debounce-4.0.2.tgz#67971d60867dd2ceea80483b30f8ad38548800e2"
@@ -1789,20 +1793,20 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
+compactd-models@^1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.10.0.tgz#c35361c07dc8df6bec762b631632c1c803e2221e"
+  dependencies:
+    compactd-models "^1.5.0"
+    docuri "^4.2.2"
+    fs-tree-diff "^0.5.6"
+    sha1 "^1.1.1"
+
 compactd-models@^1.5.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.9.0.tgz#3f8c948d3df3a9c0f27a318a5398bb02c1c97f6f"
   dependencies:
     docuri "^4.2.2"
-    sha1 "^1.1.1"
-
-compactd-models@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/compactd-models/-/compactd-models-1.8.0.tgz#b2944cd4c9913c9116f2c9d04a16bd3483341345"
-  dependencies:
-    compactd-models "^1.5.0"
-    docuri "^4.2.2"
-    fs-tree-diff "^0.5.6"
     sha1 "^1.1.1"
 
 compressible@~2.0.8:
@@ -4472,6 +4476,12 @@ jwt-decode@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-2.2.0.tgz#7d86bd56679f58ce6a84704a657dd392bba81a79"
 
+keytar@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/keytar/-/keytar-4.0.4.tgz#59a306f448a1c6a309cd68cb29129095a8c8b1db"
+  dependencies:
+    nan "2.5.1"
+
 killable@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.0.tgz#da8b84bd47de5395878f95d64d02f2449fe05e6b"
@@ -5265,6 +5275,10 @@ mz@^2.6.0:
     any-promise "^1.0.0"
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
+
+nan@2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.5.1.tgz#d5b01691253326a97a2bbee9e61c55d8d60351e2"
 
 nan@^2.3.0, nan@^2.3.2, nan@^2.5.1:
   version "2.6.2"
