@@ -2,16 +2,16 @@ const path = require('path');
 const webpack = require('webpack');
 module.exports = {
   entry: {
-    application: "./client/src/index.tsx",
+    application: ["./client/src/index.tsx"],
     vendor: ['react', 'react-dom', 'react-redux', 'react-router', 'react-router-redux', 'redux']
   },
   output: {
-    filename: "bundle.js",
+    filename: "[name].js",
     path: path.join(__dirname, "../client/dist")
   },
 
   // Enable sourcemaps for debugging webpack's output.
-  devtool: "source-map",
+  devtool: "eval",
 
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".json", ".scss"],

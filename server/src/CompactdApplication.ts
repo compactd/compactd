@@ -9,7 +9,9 @@ import * as shortid from 'shortid';
 import {player} from './endpoints/boombox';
 import Authenticator from './features/authenticator';
 import endpoints from './endpoints';
+import * as Stream from 'stream';
 import config from './config';
+import {mainStory} from 'storyboard';
 
 const expressProxy: any = require('express-http-proxy');
 const expressPouchDB: any = require('express-pouchdb');
@@ -52,8 +54,20 @@ export class CompactdApplication {
    * Configure express app by adding middlewares
    */
   configure () {
+
+    class MorganStream extends Stream.Writable {
+      _write(chunk: string, enc: string, next: Function) {
+        const str = chunk.toString();
+        if (str && str.length) {
+          mainStory.info('http', str.replace('\n', ''));
+        } 
+        next();
+      }
+    }
     this.app.use(morgan(
-      ':method :url :status :res[content-length] - :response-time ms'
+      ':method :url :status - :response-time ms', {
+        stream: new MorganStream()
+      }
     ));
     this.app.use(bodyParser.urlencoded({extended: true}));
     this.app.use(bodyParser.json());

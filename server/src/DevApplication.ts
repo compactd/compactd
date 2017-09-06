@@ -3,6 +3,7 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 import * as express from 'express';
 import * as webpackDevMiddleware from 'webpack-dev-middleware';
+import {mainStory} from 'storyboard';
 
 const conf = path.join(__dirname, '../../config/webpack.development');
 const config = require(conf);
@@ -17,14 +18,21 @@ export class DevApplication extends CompactdApplication {
   }
   configure () {
     super.configure();
-    if (this.compiler)
+    if (this.compiler) {
       this.app.use(webpackDevMiddleware(this.compiler, {
         noInfo: true,
         publicPath: '/',
         stats: {
           colors: true
+        },
+        log: (data) => {
+          mainStory.info('webpack', data);
         }
       }));
+      this.app.use((require("webpack-hot-middleware"))(this.compiler, {
+        log: mainStory.info.bind(mainStory.info.prototype, 'hmr')
+      }));
+    }
   }
   route () {
     super.route();
