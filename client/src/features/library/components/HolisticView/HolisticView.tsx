@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as PropTypes from 'prop-types';
 import {Actions} from 'definitions/actions';
 import {LibraryState, Artist, PlayerState} from 'definitions';
 import {ArtistListItem} from '../ArtistListItem';
@@ -26,6 +27,15 @@ interface HolisticViewState {
 }
 
 export class HolisticView extends React.Component<HolisticViewProps, HolisticViewState> {
+  static contextTypes = {
+    router: PropTypes.shape({
+      history: PropTypes.shape({
+        push: PropTypes.func.isRequired,
+        replace: PropTypes.func.isRequired,
+        createHref: PropTypes.func.isRequired
+      }).isRequired
+    }).isRequired
+  }
   constructor () {
     super();
     this.state = {artistsFilter: ''};
@@ -37,9 +47,9 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     const target = evt.target as HTMLInputElement;
     this.setState({artistsFilter: target.value});
   }
-  render (): JSX.Element {
+  fuzzyResults () {
     const {actions, library, player} = this.props;
-
+    
     const options = {
       pre: '$', post: '',
       extract: (el: Artist) => el.name
@@ -62,7 +72,12 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
         return 0;
       }
       return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
-    }).map(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
+    });
+    return artists;
+  }
+  render (): JSX.Element {
+    const {actions, library, player} = this.props;
+    const artists = this.fuzzyResults().map(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
       return <ArtistListItem key={artist._id} actions={actions}
               artist={artist} filterMatch={matched} active={
                 artistURI(artist._id).name === this.props.match.params.artist
@@ -80,6 +95,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
                 value={this.state.artistsFilter}
                 onChange={this.handleArtistsFilterChange.bind(this)}
                 onFocus={() => library.expandArtists || actions.toggleExpandArtist()}
+                onKeyDown={(evt) => this.handleSearchKeyPress(evt)}
                 placeholder="Filter artists" dir="auto" />
               <span onClick={actions.toggleExpandArtist}
               className={classnames('pt-icon toggle-expand-artist',
@@ -102,5 +118,37 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
         </Box>
       </Flex>
     </div>
+  }
+  handleSearchKeyPress (evt: React.KeyboardEvent<HTMLInputElement>) {
+    const {library} = this.props;
+    
+    const { history } = this.context.router;
+    const id = this.props.match.params.artist;
+    switch(evt.keyCode) {
+      // UP arrow
+      case 38: {
+        
+        event.preventDefault()
+        const items = this.fuzzyResults();
+        const index = items.findIndex(([matched, artist]: [fuzzy.MatchResult, Artist]) =>
+          artistURI(artist._id).name === this.props.match.params.artist);
+
+        history.push(index < 1 ? '/library' : `/${
+          (items[index - 1][1] as Artist)._id
+        }`);
+        return;
+      }
+      case 40: {
+        event.preventDefault()
+        const items = this.fuzzyResults();
+        const index = items.findIndex(([matched, artist]: [fuzzy.MatchResult, Artist]) =>
+          artistURI(artist._id).name === this.props.match.params.artist);
+        if (index >= items.length) return;  
+        history.push(`/${
+          (items[index + 1][1] as Artist)._id
+        }`);
+        return;
+      }
+    }
   }
 }
