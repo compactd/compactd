@@ -21,7 +21,8 @@ export class TrackersView extends React.Component<TrackersViewProps, {editing?: 
     const {actions, settings} = this.props;
     const {editing, password} = this.state;
 
-    actions.editTrackerPassword(editing, password)
+    actions.editTrackerPassword(editing, password);
+    this.setState({editing: undefined});
   }
   editTrackerPassword(editing: string) {
     if (this.passwordInput) {

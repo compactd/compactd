@@ -71,17 +71,21 @@ function editTracker (id: string, props: Partial<Tracker>) {
 function editTrackerPassword (id: string, password: string ) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const {type, username} = trackerURI(id);
-      const res = await fetch(`/api/cascade/trackers/${type}/${username}/password`, {
+      
+      const {type, name} = trackerURI(id);
+      const res = await fetch(`/api/cascade/trackers/${type}/${name}/password`, {
         method: 'post',
-        body: {password},
+        body: JSON.stringify({password}),
         headers: {
-          'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
+          'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token'),
+          'content-type': 'application/json'
         }
       });
-      const data: any = res.json();
+      const data: any = await res.json();
+      if (!res.ok) return Toaster.error(data.error);
   
       if (data.ok) {
+        Toaster.show({icon: 'tick', message: 'Password succesfully updated', intent: 'SUCCESS'});
         return loadTrackers()(dispatch, getState);
       }
     } catch (err) {

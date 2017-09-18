@@ -29,9 +29,10 @@ export default function(app: Express.Application) {
     });
   });
 
-  app.post('/api/cascade/trackers/:type/:name/:username/password', (req, res) => {
-    const {type, username, name} = req.params;
+  app.post('/api/cascade/trackers/:type/:name/password', (req, res) => {
+    const {type, name} = req.params;
     const {password} = req.body;
+    
     Trackers.setPassword(trackerURI({type, name}), password).then(() => {
       res.status(200).send({ok: true});
     }).catch((err) => {
@@ -42,10 +43,10 @@ export default function(app: Express.Application) {
     });
   });
 
-  app.get('/api/cascade/trackers/:type/:username/search', (req, res) => {
-    const {type, username} = req.params;
+  app.get('/api/cascade/trackers/:type/:tname/search', (req, res) => {
+    const {type, tname} = req.params;
     const {name, artist} = req.query;
-    Trackers.searchTracker(trackerURI({type, username} as any), {
+    Trackers.searchTracker(trackerURI({type, name: tname} as any), {
       name, artist, type: 'album', id: `${artist}/${name}`
     }).then((docs) => {
       res.status(200).send(docs);
