@@ -1,11 +1,24 @@
-import {IArtist, IAlbum} from 'definitions';
+import {Artist, Album, Tracker} from 'compactd-models';
 
 interface SettingsActionBase {
   type: string;
 };
 
-export type SettingsAction = {};
+interface ToggleSettingsPage {
+  type: 'cassette/settings/TOGGLE_SETTINGS_PAGE';
+}
+
+interface ResolveTrackers {
+  type: 'cassette/settings/RESOLVE_TRACKERS';
+  trackers: Tracker[];
+}
+
+export type SettingsAction = ToggleSettingsPage | ResolveTrackers;
 
 export type SettingsActions = {
-  action1: (<params>) => void;
+  toggleSettingsPage: (state?: boolean) => void;
+  loadTrackers: () => void;
+  editTracker: (id: string, props: Partial<Tracker>) => void;
+  editTrackerPassword: (id: string, newPassword: string) => void;
+  addTracker: (name: string, type: 'gazelle', username: string, host?: string) => void;
 }

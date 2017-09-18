@@ -48,7 +48,9 @@ div.player-status{
       margin-top: 0.5em;
       margin-right: 10em;
   }
-
+  div.player-actions > div {
+    display: inline-block;
+  }
   span.artist-name::before {
       content: "–";
       margin: 0 0.5em;

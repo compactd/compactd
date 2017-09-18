@@ -1,1 +1,1 @@
-export * from './SettingsLink';
+export {default} from './SettingsLink';

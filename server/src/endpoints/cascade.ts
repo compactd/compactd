@@ -29,10 +29,11 @@ export default function(app: Express.Application) {
     });
   });
 
-  app.post('/api/cascade/trackers/:type/:username/password', (req, res) => {
-    const {type, username, password} = req.params;
-    Trackers.setPassword(trackerURI({type, username} as any), password).then(() => {
-      res.status(200).send({});
+  app.post('/api/cascade/trackers/:type/:name/:username/password', (req, res) => {
+    const {type, username, name} = req.params;
+    const {password} = req.body;
+    Trackers.setPassword(trackerURI({type, name}), password).then(() => {
+      res.status(200).send({ok: true});
     }).catch((err) => {
       res.status(500).send({error: 'An error occured. Please check logs for more details'});
       mainStory.error('cascade', 'An error occured while interacting with db', {

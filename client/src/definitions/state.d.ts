@@ -1,5 +1,5 @@
 import * as Compactd from './common.d';
-import {DSAlbum, DSArtist, DSTrack, DSEntity} from 'compactd-models';
+import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker} from 'compactd-models';
 
 export interface LibraryState {
   albumsById: {
@@ -82,9 +82,16 @@ export interface StoreState {
   }
 }
 
+export interface SettingsState {
+  opened: boolean;
+  libraries?: Library[];
+  trackers?: Tracker[];
+}
+
 export interface CompactdState {
   library: LibraryState;
   player: PlayerState;
   app: AppState;
   store: StoreState;
+  settings: SettingsState;
 }

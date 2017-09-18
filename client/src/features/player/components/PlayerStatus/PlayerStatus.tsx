@@ -3,6 +3,7 @@ import {PlayerActions} from '../../actions.d';
 import {PlayerAudio} from '../PlayerAudio';
 import {PlayerState, LibraryState} from 'definitions';
 import StoreView from '../../../store/components/StoreView';
+import SettingsLink from '../../../settings/components/SettingsLink';
 import * as classnames from 'classnames';
 
 require('./PlayerStatus.scss');
@@ -51,6 +52,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
       </div>
       <div className="player-actions">
         <StoreView />
+        <SettingsLink />
       </div>
     </div>
   }

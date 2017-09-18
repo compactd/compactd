@@ -95,6 +95,13 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
         type: UPDATE_SYNC,
         progress: (max - dbs.length + 1) / max
       });
+      db.sync(remote, {live: true}).on('change', (info) => {
+        console.log(info);
+      }).on('error', (err) => {
+        console.log(dbName, err);
+      }).on('paused', function (info) {
+        console.log(dbName+' pause', info);
+      });
       if (dbs.length > 1) {
         return (syncDB(dbs.slice(1), max) as any)(dispatch, getState);
       } else {
