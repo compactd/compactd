@@ -1,7 +1,7 @@
 import * as Defs from 'definitions';
 import { SettingsAction } from './actions.d';
 import {Artist, Album, Tracker, trackerURI, mapTrackerToParams} from 'compactd-models';
-import * as PouchDB from 'pouchdb';
+import {getDatabase} from 'app/database';
 import Toaster from 'app/toaster';
 
 const initialState: Defs.SettingsState = {
@@ -32,7 +32,7 @@ function toggleSettingsPage (state?: boolean) {
 function loadTrackers () {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = new PouchDB<Tracker>('trackers');
+      const Tracker = getDatabase<Tracker>('trackers');
       const trackers = await Tracker.allDocs({include_docs: true});
       dispatch({
         type: RESOLVE_TRACKERS,
@@ -46,10 +46,19 @@ function loadTrackers () {
 function editTracker (id: string, props: Partial<Tracker>) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = new PouchDB<Tracker>('trackers');
+      const Tracker = getDatabase<Tracker>('trackers');
   
       const doc = Object.assign({}, await Tracker.get(id, {revs: false, attachments: false, revs_info: false}), props);
-      await Tracker.put(doc as any);
+      await Tracker.put({
+        _id: doc._id,
+        _rev: doc._rev,
+        type: doc.type,
+        name: doc.name,
+        host: doc.host,
+        username: doc.username,
+        boost: doc.boost,
+        ...props
+      });
   
       return loadTrackers()(dispatch, getState);
     } catch (err) {
@@ -87,7 +96,7 @@ function addTracker (name: string, type: 'gazelle', username: string, host: stri
       const props = {name, type, username, host};
       const id = trackerURI(mapTrackerToParams(props)) + `-${Math.floor(Math.random() * 2e8).toString(36)}`;
   
-      const Tracker = new PouchDB<Tracker>('trackers');
+      const Tracker = getDatabase<Tracker>('trackers');
       const tracker = await Tracker.put({...props, _id: id});
       return loadTrackers()(dispatch, getState);
     } catch (err) {

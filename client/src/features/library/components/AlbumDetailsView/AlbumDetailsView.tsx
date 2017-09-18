@@ -44,7 +44,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     const p = albumURI(album._id);
 
     const content = album.tracks.map((track) =>
-      <TrackListItem track={track} actions={actions} library={library}
+      <TrackListItem track={track} actions={actions} library={library} key={track._id}
         playing={player.stack.length && player.stack[0]._id === track._id} />)
     return <div className="album-details-view">
       <div className="album-header">
@@ -52,7 +52,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
           <BetterImage src={`/api/aquarelle/${p.artist}/${p.name}?s=128`} size={128} />
           <span className="dark-overlay"></span>
           <span className="play-overlay pt-icon pt-icon-play"></span>
-        </div>
+        </div>  
         <div className="album-title">{album.name}</div>
       </div>
       <div className="album-content">

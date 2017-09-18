@@ -129,6 +129,12 @@
   dependencies:
     "@types/node" "*"
 
+"@types/form-data@*":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@types/form-data/-/form-data-2.2.0.tgz#a98aac91dc99857b6af24caef7ca6df302f31565"
+  dependencies:
+    "@types/node" "*"
+
 "@types/history@*":
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.5.0.tgz#2f5c3aad4fbd00f89e99b83083e354bc5308e307"
@@ -381,6 +387,13 @@
   resolved "https://registry.yarnpkg.com/@types/redux/-/redux-3.6.0.tgz#f1ebe1e5411518072e4fdfca5c76e16e74c1399a"
   dependencies:
     redux "*"
+
+"@types/request@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/request/-/request-2.0.3.tgz#bdf0fba9488c822f77e97de3dd8fe357b2fb8c06"
+  dependencies:
+    "@types/form-data" "*"
+    "@types/node" "*"
 
 "@types/serve-static@*":
   version "1.7.31"

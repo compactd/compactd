@@ -35,38 +35,23 @@ export class CompactdApplication {
     //   config.get('couchHost') + ':' + config.get('couchPort'), {
     //   proxyReqOptDecorator: this.auth.proxyRequestDecorator()
     // }));
-    this.app.all('/database/:db/*', function(req, res) {
-      req.pause();
+    this.app.all('/database/*', bodyParser.urlencoded({extended: true}), bodyParser.json(), (req, res) => {
+      // req.pause();
       
       const headers = this.auth.proxyRequestDecorator()({headers: {...req.headers}}, req);
-      
-      const remoteUrl = req.path.slice(9);
-        
-      const remoteReq = request({
+      const remoteUrl = req.url.slice(10);
+      const opts = Object.assign({
         method: req.method,
-        hostname: config.get('couchHost') + ':' + config.get('couchPort'),
-        path: remoteUrl,
-        headers: headers
-      }, function(remoteRes: request.Response) {
-        // node's HTTP parser has already parsed any chunked encoding
-        delete remoteRes.headers['transfer-encoding'];
-        
-        remoteRes.headers['content-type'] ? null : (remoteRes.headers['content-type'] = 'application/json');    
-        // CouchDB replication fails unless we use a properly-cased header
-        remoteRes.headers['Content-Type'] = remoteRes.headers['content-type'];
-        delete remoteRes.headers['content-type'];
-        
-        res.writeHead(remoteRes.statusCode, remoteRes.headers);
-        remoteRes.pipe(res);
+        url: `http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`,
+        ...headers,
+      }, req.method !== 'GET' ? {body: JSON.stringify(req.body)} : {});
+
+      mainStory.info('http', `${req.method} ${req.url} -> http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`, {
+        attach: opts,
+        attachLevel: 'trace'
       });
-      
-      remoteReq.on('error', function(err: request.err) {
-        res.json(503, {error: 'db_unavailable', reason: err.syscall + ' ' + err.errno});
-      });
-      
-      req.setEncoding('utf8');
-      req.resume();
-      req.pipe(remoteReq);
+
+      const remoteReq = request(opts).pipe(res);
     });
   }
   public start () {

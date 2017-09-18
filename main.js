@@ -141,7 +141,7 @@ switch (mode) {
         console.log('\n' + chalk.grey('You may start it using '+ chalk.yellow('compactd --serve')));
       }).catch((err) => {
         if (verbose) console.log('\n  ' + chalk.grey(err) + '\n');
-        console.log('\n  ' + chalk.bgRed(' Couldn\'t finish configuration \n'))
+        console.log('\n  ' + chalk.bgRed(' Couldn\'t finish configuration ') + '\n')
       });
 }
 

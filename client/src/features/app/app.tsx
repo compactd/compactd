@@ -96,13 +96,13 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
         type: UPDATE_SYNC,
         progress: (max - dbs.length + 1) / max
       });
-      db.sync(remote, {live: true}).on('change', (info) => {
-        console.log(info);
-      }).on('error', (err: any) => {
-        console.log(err);
-        Toaster.error(`An error happened during live database sync for ${dbName}: ${err.code}`);
-      }).on('paused', function (info) {
-      });
+      // db.sync(remote, {live: true}).on('change', (info) => {
+      //   console.log(info);
+      // }).on('error', (err: any) => {
+      //   console.log(err);
+      //   Toaster.error(`An error happened during live database sync for ${dbName}: ${err.code}`);
+      // }).on('paused', function (info) {
+      // });
       if (dbs.length > 1) {
         return (syncDB(dbs.slice(1), max) as any)(dispatch, getState);
       } else {
