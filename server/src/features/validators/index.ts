@@ -2,7 +2,8 @@ import {ISchema} from './Schemas';
 import {IPermission, IPermissions} from './Permissions';
 
 const validate = function (sc: any, pe: any, pr: any, old: any,
-  user: any, assign: any, find: any) {
+  user: any, assign: any, find: any, includes: any) {
+  var base = ['_id', '_rev', '_revisions', '_deleted'];
   var keys = Object.keys;
   var doc = assign({}, old || {}, pr || {});
   var err = find(keys(sc).map(function (k): string {
@@ -15,7 +16,7 @@ const validate = function (sc: any, pe: any, pr: any, old: any,
   }
 
   var ex = keys(pr).filter(function (k) {
-    return k !== '_id';
+    return !includes(base, k);
   }).filter(function (k): boolean {
     return !~keys(sc).indexOf(k);
   });
@@ -46,7 +47,7 @@ const validate = function (sc: any, pe: any, pr: any, old: any,
     var key = keys(pr)[i];
     var val = pr[key];
 
-    if (val !== old[key] && !~pe.upd_fd.indexOf(key))
+    if (val !== old[key] && !~pe.upd_fd.indexOf(key) && !includes(base, key))
       throw({forbidden: 'Not allowed to update ' + key});
   }
 
@@ -66,6 +67,7 @@ export function createValidator (schema: ISchema, perms?: IPermissions): string 
       e++
     }
   }
+  function _i (r,n,e){if(null==r)throw new TypeError('"arr" is null or not defined');var t=Object(r),a=t.length>>>0;if(0===a)return!1;for(var i=0|e,u=Math.max(i>=0?i:a-Math.abs(i),0);u<a;){if(t[u]===n)return!0;u++}return!1}
   function _a (a, b) {
     "use strict";
     if (null == a) throw new TypeError("Cannot convert undefined or null to object");
@@ -78,6 +80,6 @@ export function createValidator (schema: ISchema, perms?: IPermissions): string 
   };
   (${validate.toString()})(${JSON.stringify(schema, (key, val) => {
     return typeof val === 'function' ? val.toString() : val;
-  })}, ${JSON.stringify(perms)}, d, o, u, _a, _f);
+  })}, ${JSON.stringify(perms)}, d, o, u, _a, _f, _i);
 }`.replace(/(\s\s+|\n)/g, ' ')
 }

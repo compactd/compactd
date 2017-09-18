@@ -71,6 +71,23 @@ test('createValidator - should throw for invalid value', t => {
   t.pass();
 });
 
+test('createValidator - should not throw for _rev and _revisions', t => {
+
+  const validator = createValidator(Schemas.TrackSchema);
+  const val: any = {};
+  eval(`val.idate = ${validator}`);
+
+  val.idate({
+    name: 'foo',
+    artist: '42',
+    album: '13370',
+    _rev: 'test',
+    _revisions: 'test'
+  });
+
+  t.pass();
+});
+
 test('createValidator - should throw for invalid value', t => {
 
   const validator = createValidator(Schemas.TrackSchema);
