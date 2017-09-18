@@ -3,6 +3,7 @@ import * as PouchDB from 'pouchdb';
 import * as path from 'path';
 import {albumURI} from 'compactd-models';
 import { PlayerAction, PlayerStack } from './actions.d';
+import Toaster from 'app/toaster';
 
 const PLAY_NEXT_ACTION = 'cassette/player/PLAY_NEXT_ACTION';
 const PLAY_PREVIOUS_ACTION = 'cassette/player/PLAY_PREVIOUS_ACTION';

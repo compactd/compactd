@@ -2,6 +2,7 @@ import * as Defs from 'definitions';
 import { LibraryAction } from './actions.d';
 import * as PouchDB from 'pouchdb';
 import {artistURI} from 'compactd-models';
+import Toaster from 'app/toaster';
 const trickle = require('timetrickle');
 // import * as IFetch from '@types/whatwg-fetch';
 // import "whatwg-fetch";
@@ -106,6 +107,8 @@ const fetchArtistCounter = (id: string) => {
       albums: albums.rows.length,
       tracks: tracks.rows.length
     }
+  }).catch((err) => {
+    Toaster.error(err);
   });
 };
 
@@ -125,7 +128,9 @@ function fetchAlbumCounter (id: string) {
       id,
       tracks: tracks.rows.length
     }
-  });
+  }).catch((err) => {
+    Toaster.error(err);
+  });;
 }
 
 function toggleExpandArtist () {
@@ -142,7 +147,9 @@ function fetchAllArtists () {
       type: RESOLVE_ALL_ARTISTS,
       artists: docs.rows.map(res => res.doc)
     }
-  })
+  }).catch((err) => {
+    Toaster.error(err);
+  });
 }
 
 function fetchAllAlbums () {
@@ -155,7 +162,9 @@ function fetchAllAlbums () {
       type: RESOLVE_ALL_ALBUMS,
       albums: docs.rows.map(res => res.doc)
     }
-  })
+  }).catch((err) => {
+    Toaster.error(err);
+  });
 }
 
 function fetchArtist (slug: string) {
@@ -179,7 +188,9 @@ function fetchArtist (slug: string) {
         albums: docs.rows.map((el) => el.doc)
       }
     }
-  })
+  }).catch((err) => {
+    Toaster.error(err);
+  });
 }
 
 export const actions = {

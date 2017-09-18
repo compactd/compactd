@@ -1,4 +1,5 @@
 import * as Defs from 'definitions';
+import Toaster from 'app/toaster';
 import { StoreAction } from './actions.d';
 
 const TOGGLE_DOWNLOADS   = 'cassette/store/TOGGLE_DOWNLOADS';
@@ -83,6 +84,8 @@ function searchDatasource (q: string) {
           type: SET_SEARCH_RESULTS,
           query: q, results: res
         });
+    }).catch((err) => {
+      Toaster.error(err);
     });
   }
 }
@@ -103,7 +106,9 @@ function selectDSArtist (artist: string) {
           artist: res,
           id: artist
         });
-    });
+    }).catch((err) => {
+      Toaster.error(err);
+    });;
   }
 }
 function selectDSAlbum (album: string) {
@@ -122,6 +127,8 @@ function selectDSAlbum (album: string) {
           album: res,
           id: album
         });
+    }).catch((err) => {
+      Toaster.error(err);
     });
   }
 }

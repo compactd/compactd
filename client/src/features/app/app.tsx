@@ -4,6 +4,7 @@ import * as PouchDB from 'pouchdb';
 import * as thunk from 'redux-thunk';
 import * as jwt from 'jwt-decode';
 import {getDatabase} from 'app/database';
+import Toaster from 'app/toaster';
 
 const RESOLVE_STATE = 'compactd/app/RESOLVE_STATE';
 const SET_USER = 'compactd/app/SET_USER';
@@ -57,8 +58,8 @@ function login (username: string, password: string) {
     .then((res) => res.json()).then((res) => {
     sessionStorage.setItem('session_token',res.token);
     return {type: SET_USER, user: jwt(res.token)};
-  }).catch(() => {
-    return {type: SHOW_ERROR};
+  }).catch((err) => {
+    Toaster.error('Invalid username or password');
   });
 }
 
@@ -75,7 +76,7 @@ function fetchState () {
         user: user
       }
     } catch (err) {
-
+      Toaster.error(err);
     }
     return {
       type: RESOLVE_STATE,
@@ -97,10 +98,10 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
       });
       db.sync(remote, {live: true}).on('change', (info) => {
         console.log(info);
-      }).on('error', (err) => {
-        console.log(dbName, err);
+      }).on('error', (err: any) => {
+        console.log(err);
+        Toaster.error(`An error happened during live database sync for ${dbName}: ${err.code}`);
       }).on('paused', function (info) {
-        console.log(dbName+' pause', info);
       });
       if (dbs.length > 1) {
         return (syncDB(dbs.slice(1), max) as any)(dispatch, getState);
@@ -110,6 +111,9 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
             type: END_SYNC
           }), 250);
       }
+    }).on('error', (err: any) => {
+      console.log(err);
+      Toaster.error(`An error happened during database sync for ${dbName}: ${err.code}`);
     });
   }
 }
