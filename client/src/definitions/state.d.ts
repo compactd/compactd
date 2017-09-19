@@ -1,5 +1,5 @@
 import * as Compactd from './common.d';
-import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker} from 'compactd-models';
+import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker, Release} from 'compactd-models';
 
 export interface LibraryState {
   albumsById: {
@@ -71,9 +71,12 @@ export interface StoreState {
       track?: DSTrack[] 
     }
   };
-  scope: 'artist' | 'album' | 'search';
+  scope: 'artist' | 'album' | 'search' | 'results';
   artist: string;
   album: string;
+  resultsById: {
+    [name: string]: Release[]
+  }
   artistsById: {
     [name: string]: DSArtist
   };

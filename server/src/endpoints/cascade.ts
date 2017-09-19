@@ -49,7 +49,11 @@ export default function(app: Express.Application) {
     Trackers.searchTracker(trackerURI({type, name: tname} as any), {
       name, artist, type: 'album', id: `${artist}/${name}`
     }).then((docs) => {
-      res.status(200).send(docs);
+      res.status(200).send(docs.map((doc) => {
+        return Object.assign({}, doc, {
+          _id: `trackers/${type}/${tname}/results/${doc.torrent_id}`
+        });
+      }));
     }).catch((err) => {
       res.status(500).send({error: 'An error occured. Please check logs for more details'});
       mainStory.error('cascade', 'An error occured while searching', {

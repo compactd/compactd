@@ -1,6 +1,9 @@
 import * as Defs from 'definitions';
 import Toaster from 'app/toaster';
 import { StoreAction } from './actions.d';
+import {Tracker} from 'compactd-models';
+import * as PouchDB from 'pouchdb';
+import * as qs from 'querystring';
 
 const TOGGLE_DOWNLOADS   = 'cassette/store/TOGGLE_DOWNLOADS';
 const TOGGLE_SEARCH      = 'cassette/store/TOGGLE_SEARCH';
@@ -10,6 +13,8 @@ const RESOLVE_DS_ARTIST  = 'cassette/store/RESOLVE_DS_ARTIST';
 const SET_STORE_SCOPE    = 'cassette/store/SET_STORE_SCOPE';
 const RESOLVE_DS_ALBUM   = 'cassette/store/RESOLVE_DS_ALBUM';
 const SELECT_DS_ALBUM    = 'cassette/store/SELECT_DS_ALBUM';
+const SELECT_RESULTS     = 'cassette/store/SELECT_RESULTS';
+const RESOLVE_RESULTS    = 'cassette/store/RESOLVE_RESULTS';
 
 const initialState: Defs.StoreState = {
   showDowloadPopup: false,
@@ -20,12 +25,23 @@ const initialState: Defs.StoreState = {
   albumsById: {},
   scope: 'search',
   artist: '',
-  album: ''
+  album: '',
+  resultsById: {}
 };
 
 export function reducer (state: Defs.StoreState = initialState,
   action: StoreAction): Defs.StoreState {
   switch (action.type) {
+    case SELECT_RESULTS:
+      return Object.assign({}, state, {
+        scope: 'results'
+      });
+    case RESOLVE_RESULTS:
+      return Object.assign({}, state, {
+        resultsById: Object.assign({}, state.resultsById, {
+          [action.id]: action.results
+        })
+      });
     case RESOLVE_DS_ALBUM:
       return Object.assign({}, state, {
         albumsById: Object.assign({}, state.albumsById, {
@@ -132,7 +148,35 @@ function selectDSAlbum (album: string) {
     });
   }
 }
+function loadResults (artist: string, album: string) {
+  
+  return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
+    dispatch({
+      type: SELECT_RESULTS,
+      album: album
+    });
+    
+    const Trackers = new PouchDB<Tracker>('trackers');
+    const trackers = await Trackers.allDocs({include_docs: true});
 
+    const res = await Promise.all(trackers.rows.map(async ({doc}) => {
+      if (doc._id === '_design/validator') return [];
+      const query = qs.stringify({name: album, artist});
+      const res = await fetch(`/api/cascade/${doc._id}/search?${query}`, {
+        headers: {
+          'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
+      }})
+      const data = await res.json();
+      return data;
+    }));
+
+    dispatch({
+      type: RESOLVE_RESULTS,
+      id: `${artist}/${album}`,
+      results: [].concat(...res)
+    });
+  }
+}
 function goBackToSearch () {
   return {
     type: SET_STORE_SCOPE,
@@ -148,5 +192,5 @@ function toggleSearch () {
 
 
 export const actions = {
-  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch, selectDSAlbum
+  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch, selectDSAlbum, loadResults
 }

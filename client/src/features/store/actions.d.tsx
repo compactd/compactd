@@ -1,5 +1,5 @@
 import {Artist, Album} from 'definitions';
-import {DSEntity, DSArtist, DSAlbum} from 'compactd-models';
+import {DSEntity, DSArtist, DSAlbum, Release} from 'compactd-models';
 
 interface StoreActionBase {
   type: string;
@@ -45,7 +45,15 @@ export interface SetStoreScopeAction {
   type: 'cassette/store/SET_STORE_SCOPE';
   scope: 'artist' | 'album' | 'search';
 }
-
+export interface SelectResultsAction {
+  type: 'cassette/store/SELECT_RESULTS';
+  album: string;
+}
+export interface ResolveResultsAction {
+  type: 'cassette/store/RESOLVE_RESULTS';
+  results: Release [];
+  id: string;
+}
 export type StoreAction =
   ToggleDownloadsAction
   | ToggleSearchAction
@@ -53,7 +61,9 @@ export type StoreAction =
   | ResolveDSArtistAction
   | SelectDSArtistAction
   | ResolveDSAlbumAction
-  | SelectDSAlbumAction;
+  | SelectDSAlbumAction
+  | SelectResultsAction
+  | ResolveResultsAction;
 
 export type StoreActions = {
   toggleDownloads: () => void;
@@ -62,4 +72,5 @@ export type StoreActions = {
   selectDSArtist: (artist: string) => void;
   selectDSAlbum: (album: string) => void;
   goBackToSearch: () => void;
+  loadResults: (artist: string, album: string) => void;
 }

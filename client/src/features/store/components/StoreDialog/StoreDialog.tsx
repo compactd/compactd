@@ -132,28 +132,66 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
       </div>
     </div>
   }
+  renderResults(): JSX.Element {
+    const {store, actions} = this.props;
+    
+    const results = store.resultsById[store.album];
+    
+    if (!results) {   
+      return <div className="loading-ds"><Spinner /></div>
+    }
+
+    const content = results.map((res) => {
+      return <div className="cascade-result" key={res._id}>{res.name}</div>;
+    });
+
+    return <div className="ds-results">
+      Results
+      {content}
+    </div>
+  }
   renderContent(): JSX.Element {
     switch (this.props.store.scope) {
       case 'artist': return this.renderArtist();
       case 'search': return this.renderSearch();
       case 'album': return this.renderAlbum();
+      case 'results': return this.renderResults();
+    }
+  }
+  renderFooter(): JSX.Element {
+    const {actions, store} = this.props;
+    const album = store.albumsById[store.album];
+
+    switch (this.props.store.scope) {
+      case 'artist': return this.renderArtist();
+      case 'search': return <div className="footer">
+          <Button text="Cancel" />
+          <Button
+            intent={Intent.PRIMARY}
+            onClick={() => actions.searchDatasource(this.state.query)}
+            text="Search"
+          />
+        </div>;
+      case 'album': return <div className="footer">
+        <Button text="Cancel" />
+        <Button
+          intent={Intent.PRIMARY}
+          onClick={() => actions.loadResults(album.artist, album.name)}
+          text="Download album"
+        />
+      </div>;
     }
   }
   render (): JSX.Element {
     const {actions, store} = this.props;
     return <div className="store-dialog">
-      <Dialog iconName="geosearch" isOpen={store.showSearchDialog} title="Download" onClose={() => actions.toggleSearch()}>
+      <Dialog iconName="search" isOpen={store.showSearchDialog} title="Download" onClose={() => actions.toggleSearch()}>
         <div className="pt-dialog-body">
           {this.renderContent()}
         </div>
         <div className="pt-dialog-footer">
           <div className="pt-dialog-footer-actions">
-            <Button text="Secondary" />
-            <Button
-              intent={Intent.PRIMARY}
-              onClick={() => actions.searchDatasource(this.state.query)}
-              text="Search"
-            />
+            {this.renderFooter()}
           </div>
         </div>
       </Dialog>
