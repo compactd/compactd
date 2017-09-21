@@ -82,6 +82,16 @@ export interface StoreState {
   };
   albumsById: {
     [name: string]: DSAlbum
+  },
+  downloadsById: {
+    [id: string]: {
+      id: string;
+      event: string;
+      token: string;
+      album: DSAlbum;
+      name: string;
+      progress: number;
+    }
   }
 }
 

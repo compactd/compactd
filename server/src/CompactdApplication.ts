@@ -14,6 +14,7 @@ import config from './config';
 import {mainStory} from 'storyboard';
 import * as request from 'request';
 import httpEventEmitter from './http-event';
+import * as http from 'http';
 
 const expressProxy: any = require('express-http-proxy');
 const expressPouchDB: any = require('express-pouchdb');
@@ -57,11 +58,12 @@ export class CompactdApplication {
   }
   public start () {
     return new Promise<void>((resolve, reject) => {
-      httpEventEmitter.attach(this.app);
       this.setupCouchDB();
       this.configure();
       this.route();
-      this.app.listen(this.port, this.host, () => {
+      const server = http.createServer(this.app);
+      httpEventEmitter.attach(server as any);
+      server.listen(this.port, this.host, () => {
         console.log(`  Express listening on ${this.host}:${this.port} `);
         resolve();
       });

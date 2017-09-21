@@ -17,7 +17,7 @@ export class StoreButton extends React.Component<StoreButtonProps, {}>{
     const {actions, store} = this.props;
     return <div className="store-button">
       <StoreDialog actions={actions} store={store} />
-      <Popover autoFocus content={<StorePopup actions={actions} />} position={Position.BOTTOM_RIGHT}>
+      <Popover autoFocus content={<StorePopup actions={actions} store={store} />} position={Position.BOTTOM_RIGHT}>
         <span className="pt-icon pt-icon-download"></span>
       </Popover>  
     </div>

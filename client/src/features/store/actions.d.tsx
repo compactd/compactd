@@ -54,6 +54,22 @@ export interface ResolveResultsAction {
   results: Release [];
   id: string;
 }
+export interface DownloadResult {
+  type: 'cassette/store/DOWNLOAD_RESULT';
+  result: {
+    id: string;
+    event: string;
+    token: string;
+    album: DSAlbum;
+    name: string;
+    progress: number;
+  }
+}
+export interface UpdateProgress {
+  type: 'cassette/store/UPDATE_DL_PROGRESS';
+  id: string;
+  progress: number;
+}
 export type StoreAction =
   ToggleDownloadsAction
   | ToggleSearchAction
@@ -63,7 +79,9 @@ export type StoreAction =
   | ResolveDSAlbumAction
   | SelectDSAlbumAction
   | SelectResultsAction
-  | ResolveResultsAction;
+  | ResolveResultsAction
+  | DownloadResult
+  | UpdateProgress;
 
 export type StoreActions = {
   toggleDownloads: () => void;
@@ -73,4 +91,5 @@ export type StoreActions = {
   selectDSAlbum: (album: string) => void;
   goBackToSearch: () => void;
   loadResults: (artist: string, album: string) => void;
+  downloadResult: (release: Release, album: DSAlbum) => void;
 }

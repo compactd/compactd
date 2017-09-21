@@ -15,7 +15,7 @@ interface Options {
 const defaultOpts: Options = {
   scgiPort: config.get('scgiPort'),
   scgiHost: config.get('scgiHost'),
-  targetPath: path.join(config.get('configPath'), '/downloads')
+  targetPath: path.join(config.get('dataDirectory'), '/downloads')
 };
 
 export default class RTorrentItem {

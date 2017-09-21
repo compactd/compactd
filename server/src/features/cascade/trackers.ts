@@ -6,6 +6,7 @@ import {Tracker, mapTrackerToParams, trackerURI, DSAlbum} from 'compactd-models'
 import RTorrentItem from './rTorrent';
 import jwt from '../../jwt';
 import httpEventEmitter from '../../http-event';
+import {mainStory} from 'storyboard';
 
 export async function createTracker (type: string, name: string, username: string) {
   const trackers = new PouchDB<Tracker>('trackers');
@@ -79,6 +80,7 @@ export async function searchTracker (id: string, album: DSAlbum) {
 const POLLING_INTERVAL = 200;
 
 export async function downloadFile (id: string, torrent: string) {
+  mainStory.info('cascade', `Trying to download from '${id}' torrent id '${torrent}'`);
   const trackers = new PouchDB<Tracker>('trackers');
 
   const tracker = await trackers.get(id);

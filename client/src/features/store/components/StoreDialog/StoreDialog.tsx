@@ -144,7 +144,9 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     }
 
     const content = results.map((res) => {
-      return <div className="cascade-result" key={res._id}><span className="result-name">{res.name}</span> <span className="tags">
+      return <div className="cascade-result" key={res._id} onClick={() => {
+          actions.downloadResult(res, album)
+        }}><span className="result-name">{res.name}</span> <span className="tags">
         <span className={classnames("pt-tag pt-minimal format", {
           'pt-intent-success': res.format === 'flac'
         })}>
