@@ -4,6 +4,7 @@ import {Dialog, Button, Intent, Spinner} from '@blueprintjs/core';
 import {StoreState} from 'definitions';
 import {ResultItem} from '../ResultItem';
 import BetterImage from 'components/BetterImage';
+import * as classnames from 'classnames'; 
 
 require('./StoreDialog.scss');
 
@@ -97,7 +98,7 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     const albums = artist.topAlbums.map((album) => {
       return <div className="album-item" key={album.id}>
         <BetterImage src={album.cover} size={32} />
-        <div className="album-title">{album.name}</div>
+        <div className="album-title" onClick={() => actions.selectDSAlbum(album.id)}>{album.name}</div>
       </div>
     });
 
@@ -136,18 +137,51 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     const {store, actions} = this.props;
     
     const results = store.resultsById[store.album];
+    const album = store.albumsById[store.album];
     
     if (!results) {   
       return <div className="loading-ds"><Spinner /></div>
     }
 
     const content = results.map((res) => {
-      return <div className="cascade-result" key={res._id}>{res.name}</div>;
+      return <div className="cascade-result" key={res._id}><span className="result-name">{res.name}</span> <span className="tags">
+        <span className={classnames("pt-tag pt-minimal format", {
+          'pt-intent-success': res.format === 'flac'
+        })}>
+           <span className="pt-icon pt-icon-"></span> {res.format}
+        </span>
+        <span className={classnames("pt-tag ", {
+            'pt-intent-success': res.seeders > 4,
+            'pt-intent-warning': res.seeders <= 4
+          })}>
+           <span className="pt-icon pt-icon-caret-up"></span> {res.seeders}
+        </span>
+        <span className={classnames("pt-tag ", {
+          'pt-intent-warning': res.leechers / res.seeders >= 0.5,
+            'pt-minimal': res.leechers === 0
+        })}>
+        <span className="pt-icon pt-icon-caret-down"></span> {res.leechers}
+        </span>
+        </span>
+        </div>;
     });
 
     return <div className="ds-results">
-      Results
-      {content}
+      <div className="album-header">
+        <BetterImage src={album.cover} size={64} />
+        <div className="album-info">
+
+          <div className="album-title" onClick={() => actions.selectDSAlbum(album.id)}>
+            {album.name}
+          </div>
+          <div className="album-artist" onClick={() => actions.selectDSArtist(album.artist)}>
+            {album.artist}
+          </div>
+        </div>
+      </div>
+      <div className="results">
+        {content}
+      </div>
     </div>
   }
   renderContent(): JSX.Element {
@@ -163,7 +197,9 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     const album = store.albumsById[store.album];
 
     switch (this.props.store.scope) {
-      case 'artist': return this.renderArtist();
+      case 'artist': return <div className="footer">
+        <Button text="Cancel" />
+      </div>;
       case 'search': return <div className="footer">
           <Button text="Cancel" />
           <Button

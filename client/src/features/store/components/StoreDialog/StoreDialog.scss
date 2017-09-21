@@ -62,6 +62,7 @@ div.ds-artist-view {
     margin: 1.4em 0 1em 0.2em;
   }
   .album-item {
+
     display: none;
     margin: 0.3em;
     height: 32px;
@@ -71,6 +72,7 @@ div.ds-artist-view {
     }
     div.album-title {
       margin-top: 8px;
+      cursor: pointer;
     }
     &> div {
       display: inline-block;
@@ -148,4 +150,71 @@ div.ds-artist-view {
       box-shadow: 0 0 1px rgba(255, 255, 255, .1);
     }
   }
+}
+
+.ds-results {
+  .results {
+    column-count: 2;
+  }
+  div.album-header {
+    margin-bottom: 12px;
+    .image-container{
+      display: inline-block;
+    }
+    img {
+      border-radius: 2px;
+    }
+    div.album-info {
+      display: inline-block;
+      vertical-align: top;
+    }
+    div.album-artist {
+      display: block;
+      font-size: 24px;
+      margin: 12px 12px;
+      // vertical-align: top;
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    div.album-title {
+      // display: inline-block;
+      margin: 6px 12px 0 12px;
+      font-size: 24px;
+      vertical-align: top;
+      cursor: pointer;
+
+    }
+  }
+  .cascade-result {
+    margin: 0.3em;
+    cursor: pointer;
+    .result-name {
+      // padding-top: 10px;
+      vertical-align: top;
+      width: 280px;
+      display: inline-block;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: all 250ms ease;
+    }
+    .tags {
+      // float: right;
+      & > span {
+        margin-left: 0.4em;
+        width: 45px;
+        &.format {
+          width: 40 px;
+        }
+      }
+    }
+  }
+}
+.ds-results:hover .cascade-result:not(:hover) {
+  transition: all 250ms ease;
+  opacity: 0.7;
+}
+.cascade-result:hover {
+  transition: all 250ms ease;
+  opacity: 1;
 }
