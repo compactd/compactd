@@ -61,4 +61,15 @@ export default function(app: Express.Application) {
       });
     })
   });
+  app.post('/api/cascade/trackers/:type/:tname/results/:id/download', (req, res) => {
+    const {type, tname, id} = req.params;
+    Trackers.downloadFile(trackerURI({type, name: tname} as any)._id, id).then((result) => {
+      res.status(200).send(result);
+    }).catch((err) => {
+      res.status(500).send({error: 'An error occured. Please check logs for more details'});
+      mainStory.error('cascade', 'An error occured while download', {
+        attach: err
+      });
+    })
+  });
 }

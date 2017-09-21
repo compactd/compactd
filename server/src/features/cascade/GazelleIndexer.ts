@@ -95,7 +95,6 @@ export class GazelleIndexer extends Indexer {
       attach: res,
       attachLevel: 'trace'
     });
-
     return await res.json();
   }
   async searchAlbum(album: DSAlbum): Promise<Release[]> {
@@ -126,7 +125,29 @@ export class GazelleIndexer extends Indexer {
     }, []);
   }
   async downloadRelease(torrent_id: string): Promise<Buffer> {
-    throw new Error("Method not implemented.");
+    const query = qs.stringify({
+      id: torrent_id,
+      action: 'download'
+    });
+
+    const url = `${this.protocol}://${this.hostname}:${this.port}/torrents.php?${query}`;
+    
+    const time = Date.now();
+
+    const res = await fetch (url, {
+      headers: {
+        'Cookie': `session=${this.sessionCookie}`
+      }
+    });
+
+    mainStory.info('cascade', `GET ${url} - ${res.status} - ${time - Date.now()} ms`, {
+      attach: res,
+      attachLevel: 'trace'
+    });
+    
+    if (res.headers.get('content-type') === 'text/html; charset=UTF-8') throw new Error('Torrent doesnt exist');
+
+    return await res.buffer();
   }
 
 }

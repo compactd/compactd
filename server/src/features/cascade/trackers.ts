@@ -3,6 +3,9 @@ import Indexer from './';
 import {Indexer as IndexerParent} from './Indexer';
 import PouchDB from '../../database';
 import {Tracker, mapTrackerToParams, trackerURI, DSAlbum} from 'compactd-models';
+import RTorrentItem from './rTorrent';
+import jwt from '../../jwt';
+import httpEventEmitter from '../../http-event';
 
 export async function createTracker (type: string, name: string, username: string) {
   const trackers = new PouchDB<Tracker>('trackers');
@@ -71,4 +74,40 @@ export async function searchTracker (id: string, album: DSAlbum) {
   }
   
   return await indexer.searchAlbum(album);
+}
+
+const POLLING_INTERVAL = 200;
+
+export async function downloadFile (id: string, torrent: string) {
+  const trackers = new PouchDB<Tracker>('trackers');
+
+  const tracker = await trackers.get(id);
+
+  const indexer = indexers[tracker._id] = indexers[tracker._id] || new (Indexer(tracker.type))({
+    username: tracker.username,
+    tracker: tracker.type,
+    hostname: tracker.host
+  });
+
+  const buffer = await indexer.downloadRelease(torrent);
+
+  const item = await RTorrentItem.addTorrent(buffer);
+  const event = `dl_progress_${item.infoHash}`;
+
+  const token = httpEventEmitter.createEventThread(event, async () => {
+    const prog = await item.getProgress();
+    httpEventEmitter.emit(event, {progress: prog});
+    if (httpEventEmitter.listenerCount(event) === 1) {
+      setInterval(async () => {
+        const prog = await item.getProgress();
+        httpEventEmitter.emit(event, {progress: prog});
+      }, POLLING_INTERVAL);
+    }
+  });
+
+  return {
+    ok: true,
+    event: token,
+    name: item.name
+  };
 }

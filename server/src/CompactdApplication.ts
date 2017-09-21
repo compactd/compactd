@@ -13,6 +13,7 @@ import * as Stream from 'stream';
 import config from './config';
 import {mainStory} from 'storyboard';
 import * as request from 'request';
+import httpEventEmitter from './http-event';
 
 const expressProxy: any = require('express-http-proxy');
 const expressPouchDB: any = require('express-pouchdb');
@@ -55,7 +56,8 @@ export class CompactdApplication {
     });
   }
   public start () {
-    return new Promise<undefined>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
+      httpEventEmitter.attach(this.app);
       this.setupCouchDB();
       this.configure();
       this.route();
