@@ -13,6 +13,7 @@ import LibraryView from 'features/library/components/LibraryView';
 import PlayerView from 'features/player/components/PlayerView';
 import {PlaylistView} from 'features/player/components/PlaylistView';
 import {PlayerStatus} from 'features/player/components/PlayerStatus';
+import Sandbox from 'components/Sandbox';
 
 const {Flex, Box} = require('reflexbox');
 require('../styles/base.scss');
@@ -30,7 +31,7 @@ export class CompactdApplication extends
 
   render (): JSX.Element {
     // Inexplicable bug where i need to log these avoid undefined errors
-    doNothing(Route, LibraryView, HolisticView, PlayerView, PlaylistView, PlayerStatus);
+    doNothing(Route, LibraryView, HolisticView, PlayerView, PlaylistView, PlayerStatus, Sandbox);
 
     return (<Provider store={this.props.store}>
       <ConnectedRouter history={history}>
@@ -43,6 +44,8 @@ export class CompactdApplication extends
                   <LibraryView component={HolisticView} all={true} {...props}/>} />
                 <Route path="/library/:artist?/:album?" children={(props: any) =>
                   <LibraryView component={HolisticView} {...props}/>} />
+                <Route path="/sandbox" children={(props: any) =>
+                  <Sandbox />} />
               </Switch>
             </Box>
             <Box col={2} style={{

@@ -1,0 +1,21 @@
+.sandbox-header {
+  font-size: 22px;
+}
+
+.sandbox-container {
+  margin: 3em;
+  & label.pt-label {
+    display: inline-block;
+    margin: 1em;
+  }
+  .component {
+    width: 320px;
+    margin: 5em auto;
+    box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+  .sandbox-component {
+      width: 600px;
+  }
+}
