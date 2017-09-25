@@ -11,7 +11,9 @@ interface BetterImageProps {
   key?: string | number;
   src: string;
 }
-// data:image/svg+xml;utf8,
+const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
+
+
 const blobs: any = {};
 let loader = '';
 
@@ -41,6 +43,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     }}).then((res) => {
       return res.blob();
     }).then((blob) => {
+      if (!this.image) return;
       if (blob.size < 10) throw new Error();
       // Then the src prop has changed during the request - dont udpate!
       if (current !== this.props.src && check) return;
@@ -55,9 +58,12 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
       this.setState({loading: false});
     });
   }
+  componentWillUnmount () {
+    URL.revokeObjectURL(this.image.src);
+  }
   componentDidMount () {
     this.image.onerror = () => {
-      this.image.src = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
+      // this.image.src = ;:
       const fallback = this.props.fallback || '/api/assets/no-album.jpg';
       this.fetchImage(fallback, false);
     }
@@ -70,8 +76,8 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
   }
   componentWillReceiveProps (nextProps: BetterImageProps) {
     if (nextProps.src && this.props.src !== nextProps.src) {
-      this.image.src = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
-      // this.image.src && URL.revokeObjectURL(this.image.src);
+      this.image.src = BLANK_IMAGE;
+      this.image.src && URL.revokeObjectURL(this.image.src);
       this.fetchImage(nextProps.src);
     }
   }
@@ -88,7 +94,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
             display: 'block',
             height: `${this.props.height || this.props.size || 128}px`,
             width: `${this.props.width || this.props.size || 128}px`,
-          }} src="data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw=="/>
+          }} src={BLANK_IMAGE}/>
       </div>
     );
   }
