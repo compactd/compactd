@@ -211,7 +211,6 @@ function initResults () {
 
 
       Socket.listen(res.event, res.token, (data: any) => {
-        console.log(data);
         dispatch({
           type: UPDATE_DL_PROGRESS,
           id: res.id,
@@ -246,19 +245,17 @@ function downloadResult (release: Release, album: DSAlbum) {
       }
     });
     const dl = JSON.parse(localStorage.getItem('pending_downloads') || '[]');
-    console.log(dl);
     localStorage.setItem('pending_downloads', JSON.stringify([].concat(dl, [{
       id: release._id,
       event: event,
       token: data.event,
-      album: album,
+      album: Object.assign({}, album, {tracks: undefined}),
       name: data.name,
       progress: 0
     }])));
 
 
     Socket.listen(event, data.event, (data: any) => {
-      console.log(data);
       dispatch({
         type: UPDATE_DL_PROGRESS,
         id: release._id,

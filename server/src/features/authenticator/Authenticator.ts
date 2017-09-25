@@ -7,6 +7,8 @@ import * as crypto from 'crypto';
 import * as qs from 'qs';
 import * as assert from 'assert';
 import * as Express from 'express';
+import {mainStory} from 'storyboard';
+
 const docURI = require('docuri');
 
 const URI = docURI.route('users/:username') as (p: any) => any;
@@ -157,7 +159,7 @@ export default class Authenticator {
         throw new Error();
       }
     } catch (err) {
-      console.log(err);
+      mainStory.error('authenticator', err.message, {attach: err});
       throw Boom.create(400, 'Invalid credentials');
     }
 
@@ -190,7 +192,7 @@ export default class Authenticator {
         role: props.role
      });
     } catch (err) {
-      console.log(err.toString());
+      mainStory.error('authenticator', err.message, {attach: err});
       throw Boom.create(500, 'Unexpected internal error');
     }
   }

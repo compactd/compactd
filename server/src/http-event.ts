@@ -12,7 +12,6 @@ class HttpEventEmitter extends events.EventEmitter {
 
   createEventThread (event: string, onListen: Function = () => {}) {
     this.on('listen', (evt: string) => {
-      console.log('listen', evt);
       
       if (event === evt) {
         onListen();

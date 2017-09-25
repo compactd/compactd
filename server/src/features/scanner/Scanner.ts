@@ -237,7 +237,7 @@ export class Scanner extends events.EventEmitter {
             const db = new pouchDB(model);
             return db.put(props).catch((err) => {
               if (err.status === 409) return;
-              console.log(err);
+              mainStory.warn('scanner', err.message, {attach: err});
             });
           });
 

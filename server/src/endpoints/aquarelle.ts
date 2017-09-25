@@ -3,19 +3,20 @@ import * as Agent from '../features/aquarelle/AquarelleAgent';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
 import {artistURI, albumURI} from 'compactd-models';
+import {mainStory} from 'storyboard';
 
 const trickle = require('timetrickle');
 
 export default function(app: Express.Application) {
 
-  const limit = trickle(10, 2500);
+  const limit = trickle(10, 250);
 
   app.post('/api/aquarelle', (req, res) => {
     Agent.processAlbums().catch((err) => {
-      console.log(err);
+      mainStory.error('aquarelle', err.message, {attach: err});
     });
     Agent.processArtists().catch((err) => {
-      console.log(err);
+      mainStory.error('aquarelle', err.message, {attach: err});
     });
     res.status(201).send({ok: true});
   });

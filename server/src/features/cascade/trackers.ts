@@ -126,12 +126,9 @@ export async function downloadFile (id: string, torrent: string) {
 
   const item = await RTorrentItem.addTorrent(buffer);
   const event = `dl_progress_${item.infoHash}`;
-  console.log('emitting event', event);
   
   const token = httpEventEmitter.createEventThread(event, async () => {
-    console.log('received event', event);
     const prog = await item.getProgress();
-    console.log('received progress', prog);
     httpEventEmitter.emit(event, {progress: prog});
     if (httpEventEmitter.listenerCount(event) === 1) {
       const interval: NodeJS.Timer = setInterval(async () => {
