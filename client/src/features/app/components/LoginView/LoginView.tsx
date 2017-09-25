@@ -58,9 +58,11 @@ export class LoginView extends React.Component<LoginViewProps, LoginViewState> {
         <div className="login-content">
           <input className="pt-input" value={this.state.username}
             onChange={this.handleUsernameChange.bind(this)}
+            onKeyPress={(evt) => evt.key === 'Enter' && this.handleClick()}
             type="text" placeholder="Username" />
           <input className="pt-input" value={this.state.password}
             onChange={this.handlePasswordChange.bind(this)}
+            onKeyPress={(evt) => evt.key === 'Enter' && this.handleClick()}
             type="Password" placeholder="Password" />
         </div>
         <div className="login-footer">
