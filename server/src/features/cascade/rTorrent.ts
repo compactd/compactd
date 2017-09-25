@@ -62,7 +62,7 @@ export default class RTorrentItem {
     parameters.push(`d.directory.set="${opts.targetPath}"`);
 
     try {
-      await scgi.methodCall('load_raw_start', parameters,
+      await scgi.methodCall('load.raw_start' as any, parameters,
         opts.scgiHost, +opts.scgiPort);
     } catch (err) {
       mainStory.error('scgi', 'Error while calling scgi', {attach: err});

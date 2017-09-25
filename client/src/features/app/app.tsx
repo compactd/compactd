@@ -5,6 +5,7 @@ import * as thunk from 'redux-thunk';
 import * as jwt from 'jwt-decode';
 import {getDatabase} from 'app/database';
 import Toaster from 'app/toaster';
+import Socket from 'app/socket';
 
 const RESOLVE_STATE = 'compactd/app/RESOLVE_STATE';
 const SET_USER = 'compactd/app/SET_USER';
@@ -56,8 +57,10 @@ function login (username: string, password: string) {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({username, password})})
     .then((res) => res.json()).then((res) => {
-    sessionStorage.setItem('session_token',res.token);
-    return {type: SET_USER, user: jwt(res.token)};
+      sessionStorage.setItem('session_token',res.token);
+
+      
+      return {type: SET_USER, user: jwt(res.token)};
   }).catch((err) => {
     Toaster.error('Invalid username or password');
   });
@@ -125,6 +128,7 @@ function sync (): thunk.ThunkAction<void, Defs.CompactdState, void>  {
     const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers'];
 
     (syncDB(dbs, dbs.length) as any)(dispatch, getState);
+    Socket.connect();
   }
 }
 

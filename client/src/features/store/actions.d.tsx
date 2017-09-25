@@ -92,4 +92,5 @@ export type StoreActions = {
   goBackToSearch: () => void;
   loadResults: (artist: string, album: string) => void;
   downloadResult: (release: Release, album: DSAlbum) => void;
+  initResults: () => void;
 }

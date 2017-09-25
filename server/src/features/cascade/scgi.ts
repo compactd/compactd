@@ -43,11 +43,13 @@ export default {
     let time = Date.now();
 
     return new Promise((resolve, reject) => {
-      mainStory.debug('scgi', `Called ${methodName} on ${host}:${port} in ${Date.now() - time}ms`);
       deserializer.deserializeMethodResponse(stream, (error: Error, response: any) => {
         if (error) {
           return reject(error);
         }
+        mainStory.trace('scgi', `Called ${methodName} on ${host}:${port} in ${Date.now() - time}ms`, {
+          attach: response
+        });
         return resolve(response);
       });
     });

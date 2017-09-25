@@ -6,6 +6,7 @@ import * as PouchDB from 'pouchdb';
 import * as qs from 'querystring';
 import * as jwtDecode from 'jwt-decode';
 import * as io from 'socket.io-client';
+import Socket from 'app/socket';
 
 const TOGGLE_DOWNLOADS   = 'cassette/store/TOGGLE_DOWNLOADS';
 const TOGGLE_SEARCH      = 'cassette/store/TOGGLE_SEARCH';
@@ -39,7 +40,7 @@ export function reducer (state: Defs.StoreState = initialState,
   switch (action.type) {
     case DOWNLOAD_RESULT:
       return Object.assign({}, state, {
-        downloadsById: Object.assign({}, state, {
+        downloadsById: Object.assign({}, state.downloadsById, {
           [action.result.id]: action.result
         })
       });
@@ -198,6 +199,29 @@ function loadResults (artist: string, album: string) {
 
 }
 
+function initResults () {
+
+  const dl = JSON.parse(localStorage.getItem('pending_downloads') || '[]');
+  return (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
+    dl.forEach((res: any) => { 
+      dispatch({
+        type: DOWNLOAD_RESULT,
+        result: res
+      });
+
+
+      Socket.listen(res.event, res.token, (data: any) => {
+        console.log(data);
+        dispatch({
+          type: UPDATE_DL_PROGRESS,
+          id: res.id,
+          progress: data.progress
+        });
+      });
+    });
+  };
+}
+
 function downloadResult (release: Release, album: DSAlbum) {
   
   return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
@@ -221,20 +245,25 @@ function downloadResult (release: Release, album: DSAlbum) {
         progress: 0
       }
     });
+    const dl = JSON.parse(localStorage.getItem('pending_downloads') || '[]');
+    console.log(dl);
+    localStorage.setItem('pending_downloads', JSON.stringify([].concat(dl, [{
+      id: release._id,
+      event: event,
+      token: data.event,
+      album: album,
+      name: data.name,
+      progress: 0
+    }])));
 
-    const socket = io();
 
-    socket.on(event, (data: any) => {
+    Socket.listen(event, data.event, (data: any) => {
       console.log(data);
       dispatch({
         type: UPDATE_DL_PROGRESS,
         id: release._id,
         progress: data.progress
       });
-    });
-
-    socket.emit('listen', {
-      token: data.event
     });
   }
 }
@@ -253,5 +282,5 @@ function toggleSearch () {
 
 
 export const actions = {
-  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch, selectDSAlbum, loadResults, downloadResult
+  searchDatasource, toggleSearch, selectDSArtist, goBackToSearch, selectDSAlbum, loadResults, downloadResult, initResults
 }

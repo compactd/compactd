@@ -7,6 +7,12 @@ import RTorrentItem from './rTorrent';
 import jwt from '../../jwt';
 import httpEventEmitter from '../../http-event';
 import {mainStory} from 'storyboard';
+import config from '../../config';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+
+const passwords = path.join(config.get('dataDirectory'), 'credentials');
 
 export async function createTracker (type: string, name: string, username: string) {
   const trackers = new PouchDB<Tracker>('trackers');
@@ -16,6 +22,31 @@ export async function createTracker (type: string, name: string, username: strin
   await trackers.put({_id: id, ...props});
 
   return await trackers.get(id);
+}
+
+function loadPasswords (): Promise<{[id: string]: string}> {
+
+  return new Promise((resolve, reject) => {
+    if (!fs.existsSync(passwords)) resolve({});
+    return fs.readFile(passwords, (err, data) => {
+      if (err) return reject(err);
+      resolve(JSON.parse(data.toString()) as any);
+    });
+  });
+}
+
+function writePasswords (data: {[id: string]: string}) {
+  return new Promise((resolve, reject) => {
+    return fs.writeFile(passwords, JSON.stringify(data), (err) => {
+      if (err) reject(err);
+      return resolve();
+    })
+  })
+}
+
+async function updatePassword (data: {[id: string]: string}) {
+  const pass = await loadPasswords();
+  await writePasswords(Object.assign({}, pass, data));
 }
 
 /**
@@ -28,7 +59,7 @@ export async function setPassword (id: string, password: string) {
 
   const tracker = await trackers.get(id);
 
-  await keytar.setPassword(tracker._id, tracker.username, password);
+  await updatePassword({[tracker._id]: password});
 
   if (indexers[tracker._id]) {
     await indexers[tracker._id].logout();
@@ -44,7 +75,7 @@ export async function getPassword (id: string) {
 
   const tracker = await trackers.get(id);
 
-  return await keytar.getPassword(tracker._id, tracker.username);
+  return (await loadPasswords())[tracker._id];
 
 }
 
@@ -77,7 +108,7 @@ export async function searchTracker (id: string, album: DSAlbum) {
   return await indexer.searchAlbum(album);
 }
 
-const POLLING_INTERVAL = 200;
+const POLLING_INTERVAL = 1000;
 
 export async function downloadFile (id: string, torrent: string) {
   mainStory.info('cascade', `Trying to download from '${id}' torrent id '${torrent}'`);
@@ -95,14 +126,18 @@ export async function downloadFile (id: string, torrent: string) {
 
   const item = await RTorrentItem.addTorrent(buffer);
   const event = `dl_progress_${item.infoHash}`;
-
+  console.log('emitting event', event);
+  
   const token = httpEventEmitter.createEventThread(event, async () => {
+    console.log('received event', event);
     const prog = await item.getProgress();
+    console.log('received progress', prog);
     httpEventEmitter.emit(event, {progress: prog});
     if (httpEventEmitter.listenerCount(event) === 1) {
-      setInterval(async () => {
+      const interval: NodeJS.Timer = setInterval(async () => {
         const prog = await item.getProgress();
         httpEventEmitter.emit(event, {progress: prog});
+        if (prog === 1) return clearInterval(interval);
       }, POLLING_INTERVAL);
     }
   });

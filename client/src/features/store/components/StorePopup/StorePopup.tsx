@@ -10,10 +10,14 @@ interface StorePopupProps {
 }
 
 export class StorePopup extends React.Component<StorePopupProps, {}>{
+  componentDidMount() {
+    this.props.actions.initResults();
+  }
   render (): JSX.Element {
     const {actions, store} = this.props;
 
     const downloads = Object.values(store.downloadsById).map((dl) => {
+      if (!dl || !dl.album) return;
       return <div className="item" key={dl.id}>
           <span className="item-name">{dl.album.artist}</span>
           <span className="item-album">{dl.album.name}</span>
