@@ -2,7 +2,7 @@ import * as React from 'react';
 import {LibraryActions} from '../../actions.d';
 import {Link} from 'react-router-dom';
 import {Artist, artistURI} from 'compactd-models';
-import BetterImage from 'components/BetterImage';
+import ArtistComponent from 'components/ArtistComponent';
 import {MatchResult} from 'fuzzy';
 import * as classnames from 'classnames';
 import * as PropTypes from 'prop-types';
@@ -61,39 +61,30 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
     } = this.props;
     const slug = artistURI(artist._id).name;
 
-    let name: JSX.Element = <span className="not-filtered">{artist.name}</span>;
-
-    if (filterMatch) {
-      const match = filterMatch.rendered.split('')
-        .map((char: string, i: number, arr: string[]) => {
-          if (char === '$') return <span className="empty"></span>;
-          if (arr[i - 1] === '$') return <span className="match">{char}</span>;
-          return <span className="not-match">{char}</span>
-        });
-      name = <span className="filtered">{match}</span>;
-    }
-
-    return <div className={classnames("artist-list-item", {active})}
-      onClick={this.handleClick.bind(this)}>
-      <div className="artist-image">
-        <BetterImage src={`/api/aquarelle/${slug}?s=64`} size={64} />
-        <div className={classnames("image-overlay", {
-          hidden: !!counter.albums
-        })}></div>
-      </div>
-      <div className="artist-description">
-        <span className={classnames("artist-name", {
-          'pt-skeleton': !counter.albums
-        })}>
-          {name}
-        </span>
-        <span className={classnames("artist-album-count", {
-          'pt-skeleton': !counter.albums
-        })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
-          counter.tracks
-        } ${pluralize('track', counter.tracks)}`}
-        </span>
-      </div>
-    </div>
+    return <ArtistComponent layout='medium' theme='dark' 
+      artist={artist} fuzzyName={filterMatch && filterMatch.rendered}
+       counter={counter} subtitle='counters' />
+    // return <div className={classnames("artist-list-item", {active})}
+    //   onClick={this.handleClick.bind(this)}>
+    //   <div className="artist-image">
+    //     <BetterImage src={`/api/aquarelle/${slug}?s=64`} size={64} />
+    //     <div className={classnames("image-overlay", {
+    //       hidden: !!counter.albums
+    //     })}></div>
+    //   </div>
+    //   <div className="artist-description">
+    //     <span className={classnames("artist-name", {
+    //       'pt-skeleton': !counter.albums
+    //     })}>
+    //       {name}
+    //     </span>
+    //     <span className={classnames("artist-album-count", {
+    //       'pt-skeleton': !counter.albums
+    //     })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
+    //       counter.tracks
+    //     } ${pluralize('track', counter.tracks)}`}
+    //     </span>
+    //   </div>
+    // </div>
   }
 }

@@ -1,0 +1,132 @@
+div.artist-component {
+  &.light-theme {
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+
+      }
+      div.artist-subtitle {
+
+      }
+    }
+  }
+  &.dark-theme {
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+        color: #e7e0f4;
+        .match {
+          // color: #fff;
+        }
+        .not-match {
+          color: #7f8898;
+        }
+      }
+    }
+    div.artist-subtitle {
+      div.artist-counter {
+        color: #706f8c;
+      }
+    }
+    
+  }
+  &.minimal-layout {
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+
+      }
+      div.artist-subtitle {
+        
+      }
+    }
+  }
+  &.compact-layout {
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+
+      }
+      div.artist-subtitle {
+        
+      }
+    }
+  }
+  &.medium-layout  {
+    div.artist-image {
+      display: inline-block;
+
+      position: relative;
+      
+      margin: 0.5em 0.8em;
+
+      img {
+        height: 64px;
+        width: 64px;
+        border-radius: 32px;
+      }
+    }
+    div.artist-info {
+      display: inline-block;
+      vertical-align: top;
+      
+      margin-top: 1.3em;
+
+      div.artist-name {
+        font-size: 16px;
+      }
+      div.artist-subtitle {
+        margin-top: 8px;
+        font-size: 12px;
+      }
+    }
+  }
+  &.large-layout {
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+
+      }
+      div.artist-subtitle {
+        
+      }
+    }
+  }
+  &.active {
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+
+      }
+      div.artist-subtitle {
+        
+      }
+    }
+  }
+  &.clickable {
+
+    div.artist-image {
+
+    }
+    div.artist-info {
+      div.artist-name {
+
+      }
+      div.artist-subtitle {
+        
+      }
+    }
+  }
+}
