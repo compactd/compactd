@@ -118,7 +118,10 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
             </label>
           </div>
           <div className="sandbox-component">
-            <div className="component" style={{backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)'}}>
+            <div className="component" style={{
+              transition: 'all 0.3s ease',
+              backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)'
+              }}>
               {this.renderComponent()}
             </div>
           </div>

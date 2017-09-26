@@ -2,6 +2,10 @@
 @import '../../styles/colors';
 
 div.artist-component {
+  transition: all 0.3s ease;
+  * {
+    transition: all 0.3s ease;
+  }
   &.clickable {
     cursor: pointer;
   }
@@ -19,22 +23,16 @@ div.artist-component {
     }
   }
   &.light-theme {
-    div.artist-image {
-
-    }
     div.artist-info {
       div.artist-name {
-
+        color: $light-primary;
       }
       div.artist-subtitle {
-
+        color: $light-secondary;
       }
     }
   }
   &.dark-theme {
-    div.artist-image {
-
-    }
     div.artist-info {
       div.artist-name {
         color: $dark-primary;
@@ -57,16 +55,25 @@ div.artist-component {
     
   }
   &.minimal-layout {
+    height: 32px;
+    padding: 0px 2px;
     div.artist-image {
-
+      float: left;
+      img {
+        border-radius: 16px;
+      }
     }
     div.artist-info {
+      
       div.artist-name {
-
+        margin: 7px 3px 0 8px;
+        display: inline-block;
       }
       div.artist-subtitle {
-        
+        padding-left: 4px;
+        display: inline-block;
       }
+      @include ellipsis();
     }
   }
   &.compact-layout {
