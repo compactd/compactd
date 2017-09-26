@@ -8,8 +8,6 @@ import {baseConfig} from './baseConfig';
 import PouchDB from '../../database';
 import * as path from 'path';
 
-const randomPort: any = require('random-port');
-
 export interface ISDAOptions {
   adminPassword: string;
   adminUsername: string;
@@ -27,29 +25,6 @@ export class DatabaseConfigurator {
 
 
 
-  /**
-   * Start StandaloneDatabaseApplication as a child process
-   * Resolve when server is up with [port, process]
-   */
-  startServer () {
-    return new Promise<[number, ChildProcess]>((resolve, reject) => {
-      randomPort((port: number) => {
-        this.url = `localhost:${port}`;
-        const proc = fork(path.join(__dirname, './Bootstrap.js'));
-        proc.on('message', function (message: Message) {
-          if (message.type === 'SERVER_STARTED') {
-            resolve([port, proc]);
-          }
-        });
-        proc.send({
-          type: 'START_SERVER',
-          data: {
-            port, host: 'localhost'
-          }
-        } as Message);
-      });
-    });
-  }
 
   async configure () {
     // await this.startServer();
