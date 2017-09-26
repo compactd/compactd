@@ -140,15 +140,22 @@ div.album-component {
     }
   }
   &.large-layout {
+    height: 128px;
     div.album-image {
-
+      float: left;
+      img {
+        border-radius: 4px;
+      }
     }
     div.album-info {
+      margin-left: 144px;
+      padding-top: 6px;
       div.album-name {
-
+        font-size: 24px;
+        @include ellipsis();
       }
-      div.album-subtitle {
-        
+      div.album-subtitle > div {
+        font-size: 16px;
       }
     }
   }

@@ -87,7 +87,7 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
           counter={{
-            albums: 5, tracks: 42
+            tracks: 16
           }}
           active={this.state.active}
           onClick={this.state.clickable ? () => {

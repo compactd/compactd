@@ -23,7 +23,7 @@ interface AlbumComponentProps {
   subtitle?: 'counters' | 'text' | 'none' | 'artist';
   active?: boolean;
   className?: string;
-  counter?: {albums?: number, tracks: number};
+  counter?: {duration?: number, tracks: number};
   fuzzyName?: string;
   subtitleText?: string;
 }
@@ -57,20 +57,27 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
       case 'medium':
         return <BetterImage src={this.getLargeCover(64)} size={64} />;
       case 'large':
-        throw 'Large layout not implemented';
+        return <BetterImage src={this.getLargeCover(128)} size={128} />;
     }
   }
   renderSubtitle () {
     const {album, subtitle, counter, subtitleText} = this.props;
+    if (this.props.layout === 'large') {
+      return <div className="large-subtitle">
+        {this.props.artist.name ? <div className="album-artist">{this.props.artist.name}</div> : null}
+        {counter ? <div className={classnames("album-counter", {
+          'pt-skeleton': !counter.tracks,
+        })}>{`${counter.tracks} ${pluralize('tracks', counter.tracks)}`}
+        </div> : subtitleText}
+      </div>
+    }
     switch (subtitle) {
       case 'none': return;
       case 'artist': return <div className="album-artist">{this.props.artist.name}</div>;
       case 'text': return <div className="album-text">{subtitleText}</div>;
       case 'counters': return <div className={classnames("album-counter", {
-          'pt-skeleton': !counter.albums
-        })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
-          counter.tracks
-        } ${pluralize('track', counter.tracks)}`}
+          'pt-skeleton': !counter.tracks
+        })}>{`${counter.tracks} ${pluralize('tracks', counter.tracks)}`}
         </div>;
     }
   }
