@@ -6,7 +6,7 @@ import { createStructuredSelector } from 'reselect';
 import {Artist, DSArtist, artistURI} from 'compactd-models';
 import ArtistComponent from 'components/ArtistComponent';
 import { Select } from "@blueprintjs/labs";
-import { MenuItem } from "@blueprintjs/core";
+import { MenuItem, Switch } from "@blueprintjs/core";
 import {actions} from '../../features/library/library';
 import {LibraryActions, LibraryAction} from '../../features/library/actions.d';
 import {LibraryState, CompactdState, PlayerState} from 'definitions';
@@ -24,6 +24,7 @@ interface SandboxState {
   theme: 'dark' | 'light';
   subtitle: 'counters' | 'text' | 'none';
   active: boolean;
+  clickable: boolean;
 };
 
 const LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in placerat orci. Aliquam interdum rutrum nisl nec aliquam. In a erat et purus eleifend laoreet. Fusce eget augue vestibulum mauris porttitor pulvinar ut consectetur metus. Duis non lectus ac neque vestibulum accumsan. Nunc ac pretium odio, id volutpat dui. Aliquam feugiat nibh enim, a congue velit vehicula viverra. Nulla efficitur purus et libero rhoncus, sollicitudin vestibulum dolor blandit. Sed vitae ante enim. Vestibulum a lectus eu risus dignissim condimentum sed eu sapien. Nam sollicitudin sodales ante. Donec dictum in purus vitae lobortis.';
@@ -46,18 +47,29 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
       layout: 'medium',
       theme: 'dark',
       subtitle: 'none',
-      active: false
+      active: false,
+      clickable: false
     };
   }
   renderComponent() {
     switch (this.state.type) {
       case 'artist': 
         const artist = this.props.library.artists.find((el) => el._id === this.state.artist);
-        return <ArtistComponent artist={artist || {
-          name: 'Please select an artist'
-        }} layout={this.state.layout} theme={this.state.theme} subtitle={this.state.subtitle} counter={{
-          albums: 5, tracks: 42
-        }} subtitleText={LOREM} />
+        return <ArtistComponent
+          artist={artist || {
+            name: 'Please select an artist'
+          }}
+          layout={this.state.layout}
+          theme={this.state.theme} 
+          subtitle={this.state.subtitle}
+          counter={{
+            albums: 5, tracks: 42
+          }}
+          active={this.state.active}
+          onClick={this.state.clickable ? () => {
+            this.setState({active: !this.state.active})
+          } : null}
+          subtitleText={LOREM} />
     }
   }
   componentDidMount() {
@@ -68,6 +80,13 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
     return (evt: React.ChangeEvent<HTMLSelectElement>) => {
       this.setState({
         [prop]: evt.target.value
+      } as any);
+    }
+  }
+  handleSwitchChange(prop: string) {
+    return (evt: React.ChangeEvent<HTMLInputElement>) => {
+      this.setState({
+        [prop]: evt.target.checked
       } as any);
     }
   }
@@ -119,14 +138,18 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           </div>
           <div className="sandbox-component">
             <div className="component" style={{
-              transition: 'all 0.3s ease',
-              backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)'
+                transition: 'all 0.3s ease',
+                backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)'
               }}>
               {this.renderComponent()}
             </div>
           </div>
           <div className="sandbox-selects">
             {this.renderSelects()}
+          </div>
+          <div className="sandbox-switches">
+            <Switch checked={this.state.active} label="Active item" onChange={this.handleSwitchChange('active')} />
+            <Switch checked={this.state.clickable} label="Clickable item" onChange={this.handleSwitchChange('clickable')} />
           </div>
         </div>
       </div>

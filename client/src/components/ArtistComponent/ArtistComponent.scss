@@ -8,6 +8,9 @@ div.artist-component {
   }
   &.clickable {
     cursor: pointer;
+    div {
+      user-select: none;
+    }
   }
   &:not(.clickable) {
     div.artist-info {
@@ -23,6 +26,9 @@ div.artist-component {
     }
   }
   &.light-theme {
+    &.active {
+      background-color: rgba(83, 80, 112, 0.05);
+    }
     div.artist-info {
       div.artist-name {
         color: $light-primary;
@@ -33,6 +39,9 @@ div.artist-component {
     }
   }
   &.dark-theme {
+    &.active {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
     div.artist-info {
       div.artist-name {
         color: $dark-primary;

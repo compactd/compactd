@@ -93,7 +93,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
 
     return <div className={classnames(className, 'artist-component', `${theme}-theme`, `${layout}-layout`, {active,
         'clickable': !!this.props.onClick
-        })}>
+        })} onClick={onClick as any}>
       <div className="artist-image">{this.renderImage()}</div>
       <div className="artist-info">
         <div className="artist-name">
