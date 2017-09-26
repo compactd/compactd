@@ -19,16 +19,14 @@ interface SandboxProps {
 
 interface SandboxState {
   type: 'artist' | 'album' | 'track';
-  artist: {
-    name: string;
-    cover?: string;
-    largeCover?: string;
-  } & Partial<Artist> & Partial<DSArtist> & any;
+  artist: string;
   layout: 'minimal' | 'compact' | 'medium' | 'large';
   theme: 'dark' | 'light';
-  subtitle: 'counters' | 'bio' | 'none';
+  subtitle: 'counters' | 'text' | 'none';
   active: boolean;
 };
+
+const LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in placerat orci. Aliquam interdum rutrum nisl nec aliquam. In a erat et purus eleifend laoreet. Fusce eget augue vestibulum mauris porttitor pulvinar ut consectetur metus. Duis non lectus ac neque vestibulum accumsan. Nunc ac pretium odio, id volutpat dui. Aliquam feugiat nibh enim, a congue velit vehicula viverra. Nulla efficitur purus et libero rhoncus, sollicitudin vestibulum dolor blandit. Sed vitae ante enim. Vestibulum a lectus eu risus dignissim condimentum sed eu sapien. Nam sollicitudin sodales ante. Donec dictum in purus vitae lobortis.';
 
 const mapStateProps = createStructuredSelector({
   library: (state: CompactdState) => state.library,
@@ -44,7 +42,7 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
     super();
     this.state = {
       type: 'artist',
-      artist: {name: 'My Artist'},
+      artist: '',
       layout: 'medium',
       theme: 'dark',
       subtitle: 'none',
@@ -53,11 +51,18 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
   }
   renderComponent() {
     switch (this.state.type) {
-      case 'artist': return <ArtistComponent artist={this.state.artist} layout={this.state.layout} theme={this.state.theme} subtitle={this.state.subtitle} />
+      case 'artist': 
+        const artist = this.props.library.artists.find((el) => el._id === this.state.artist);
+        return <ArtistComponent artist={artist || {
+          name: 'Please select an artist'
+        }} layout={this.state.layout} theme={this.state.theme} subtitle={this.state.subtitle} counter={{
+          albums: 5, tracks: 42
+        }} subtitleText={LOREM} />
     }
   }
   componentDidMount() {
     this.props.actions.fetchAllArtists();
+    
   }
   handleSelectChange(prop: string) {
     return (evt: React.ChangeEvent<HTMLSelectElement>) => {
@@ -105,8 +110,9 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
               Component subtitle
               <div className="pt-select">
                 <select name="component-subtitle" id="component-subtitle" value={this.state.subtitle} onChange={this.handleSelectChange('subtitle')}>
-                  <option value="bio">Bio</option>
+                  <option value="text">Text</option>
                   <option value="counters">Counters</option>
+                  <option value="none">None</option>
                 </select>
               </div>
             </label>
@@ -122,14 +128,22 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
         </div>
       </div>
   }
-  private renderArtist ({ handleClick, isActive, item }: any) {
-    return <MenuItem text={item.name} onClick={handleClick} disabled={isActive} key={item._id}/>
-  }
   private renderSelects() {
-    const ArtistSelect = Select.ofType<Artist>();
-    return <ArtistSelect itemRenderer={this.renderArtist} items={this.props.library.artists} onItemSelect={(item) => {
-      this.setState({artist: item});
-    }}/>;
+    const artists = this.props.library.artists.map((artist) => {
+      return <option value={artist._id} key={artist._id}>{artist.name}</option>
+    });
+    return <label className="artist pt-label">
+      Artist selection
+      <div className="pt-select">
+        <select name="component-artist" id="component-artist" value={this.state.artist} onChange={this.handleSelectChange('artist')}>
+          {artists}
+        </select>
+      </div>
+    </label>
+    // const ArtistSelect = Select.ofType<Artist>();
+    // return <ArtistSelect itemRenderer={this.renderArtist} items={this.props.library.artists} onItemSelect={(item) => {
+    //   this.setState({artist: item});
+    // }}/>;
   }
 }
 export default Sandbox;
