@@ -7,7 +7,7 @@ import {Artist, DSArtist, artistURI} from 'compactd-models';
 import ArtistComponent from 'components/ArtistComponent';
 import AlbumComponent from 'components/AlbumComponent';
 import { Select } from "@blueprintjs/labs";
-import { MenuItem, Switch } from "@blueprintjs/core";
+import { MenuItem, Switch, NumericInput } from "@blueprintjs/core";
 import {actions} from '../../features/library/library';
 import {LibraryActions, LibraryAction} from '../../features/library/actions.d';
 import {LibraryState, CompactdState, PlayerState} from 'definitions';
@@ -27,6 +27,8 @@ interface SandboxState {
   subtitle: 'counters' | 'text' | 'none';
   active: boolean;
   clickable: boolean;
+  width: number;
+  margin: number;
 };
 
 const LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in placerat orci. Aliquam interdum rutrum nisl nec aliquam. In a erat et purus eleifend laoreet. Fusce eget augue vestibulum mauris porttitor pulvinar ut consectetur metus. Duis non lectus ac neque vestibulum accumsan. Nunc ac pretium odio, id volutpat dui. Aliquam feugiat nibh enim, a congue velit vehicula viverra. Nulla efficitur purus et libero rhoncus, sollicitudin vestibulum dolor blandit. Sed vitae ante enim. Vestibulum a lectus eu risus dignissim condimentum sed eu sapien. Nam sollicitudin sodales ante. Donec dictum in purus vitae lobortis.';
@@ -51,7 +53,9 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
       theme: 'dark',
       subtitle: 'none',
       active: false,
-      clickable: false
+      clickable: false,
+      width: 320,
+      margin: 0
     };
   }
   renderComponent() {
@@ -87,7 +91,7 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
           counter={{
-            tracks: 16
+            tracks: 16  
           }}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
@@ -173,7 +177,10 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           <div className="sandbox-component">
             <div className="component" style={{
                 transition: 'all 0.3s ease',
-                backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)'
+                backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)',
+                width: `${this.state.width}px`,
+                padding: `${this.state.margin}px`,
+                margin: '3em'
               }}>
               {this.renderComponent()}
             </div>
@@ -184,6 +191,16 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           <div className="sandbox-switches">
             <Switch checked={this.state.active} label="Active item" onChange={this.handleSwitchChange('active')} />
             <Switch checked={this.state.clickable} label="Clickable item" onChange={this.handleSwitchChange('clickable')} />
+          </div>
+          <div className="numeric-inputs">      
+            <label className="width pt-label">
+              Container width
+              <div><NumericInput value={this.state.width} onValueChange={(num) => this.setState({width: num.valueOf()})} stepSize={10}/></div>
+            </label>
+            <label className="margin pt-label">
+              Container margin
+              <NumericInput value={this.state.margin} onValueChange={(num) => this.setState({margin: num.valueOf()})} stepSize={2}/>
+            </label>
           </div>
         </div>
       </div>

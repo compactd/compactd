@@ -15,7 +15,10 @@
     border-radius: 3px;
   }
 
+  .numeric-inputs input {
+    margin-top: 0 !important;
+  }
   .sandbox-component {
-      width: 600px;
+    height: 280px;
   }
 }
