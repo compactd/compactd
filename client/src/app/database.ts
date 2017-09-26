@@ -1,4 +1,4 @@
-import * as PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb';
 
 export const getDatabase = function<T> (name: string) {
 

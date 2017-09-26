@@ -22,7 +22,7 @@ class HttpEventEmitter extends events.EventEmitter {
     }, {expiresIn: '1d', subject: 'event'});
   }
   getEventThread (token: string): {event: string} {
-    return jwt.verify(token, {subject: 'event'});
+    return jwt.verify(token, {subject: 'event'}) as any;
   }
   attach (app: Express.Application) {
     this.io = SocketIO(app);

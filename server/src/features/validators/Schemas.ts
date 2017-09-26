@@ -1,4 +1,4 @@
-export type Validator = (value: any) => string;
+export type Validator = (k: string, value: any) => string;
 const types = {
   string: Object.assign(function (k: string, v: any) {
     return typeof v === 'string' ? '' : (typeof v === 'undefined' ? '' :

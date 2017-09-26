@@ -1,6 +1,6 @@
 import * as Defs from 'definitions';
 import { LibraryAction } from './actions.d';
-import * as PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb';
 import {artistURI} from 'compactd-models';
 import Toaster from 'app/toaster';
 const trickle = require('timetrickle');
@@ -63,24 +63,23 @@ export function reducer (state: Defs.LibraryState = initialState,
   return state;
 }
 
-const fetchAlbum = (album: string) => {
-  return Promise.resolve().then(() => {
-    const albums = new PouchDB<Defs.Album>('albums');
-    return albums.get(album);
-  }).then((doc) => {
-    const tracks = new PouchDB<Defs.Track>('tracks');
-    return tracks.allDocs({
+const fetchAlbum = async (album: string) => {
+
+  const Album = new PouchDB<Defs.Album>('albums');
+  const Track = new PouchDB<Defs.Track>('tracks');
+
+  const albums = await Album.get(album);
+
+  const tracks = await Track.allDocs({
       include_docs: true,
       startkey: album,
       endkey: album + '\uffff'
-    }).then((docs) => [doc, docs]);
-  }).then(([album, tracks]:
-    [Defs.Album, PouchDB.Core.AllDocsResponse<Defs.Track>]) => {
-    return {
-      type: RESOLVE_ALBUM,
-      album: Object.assign({}, album, {tracks: tracks.rows.map(el => el.doc)})
-    };
-  });
+    })
+
+  return {
+    type: RESOLVE_ALBUM,
+    album: Object.assign({}, album, {tracks: tracks.rows.map(el => el.doc)})
+  };
 };
 
 function waitLimit (limit: any) {
@@ -167,30 +166,24 @@ function fetchAllAlbums () {
   });
 }
 
-function fetchArtist (slug: string) {
-  return Promise.resolve().then(() => {
-    const artists = new PouchDB<Defs.Artist>('artists');
-    return artists.get(artistURI({name: slug}));
-  }).then((doc) => {
-    const albums = new PouchDB<Defs.Album>('albums');
-    return albums.allDocs({
-      startkey: `library/${slug}/`,
-      endkey: `library/${slug}/\uffff`,
-      include_docs: true}).then((docs) => [doc, docs]);
-  }).then(([artist, docs]:
-    [Defs.Artist, PouchDB.Core.AllDocsResponse<Defs.Album>]) => {
+async function fetchArtist (slug: string) {
+  const Artist = new PouchDB<Defs.Artist>('artists');
+  const Album = new PouchDB<Defs.Album>('albums');
 
-    return {
-      type: RESOLVE_ARTIST,
-      artist: {
-        _id: artist._id,
-        name: artist.name,
-        albums: docs.rows.map((el) => el.doc)
-      }
+  const artist = await Artist.get(artistURI({name: slug}));
+  const albums = await Album.allDocs({
+    startkey: `library/${slug}/`,
+    endkey: `library/${slug}/\uffff`,
+    include_docs: true});
+
+  return {
+    type: RESOLVE_ARTIST,
+    artist: {
+      _id: artist._id,
+      name: artist.name,
+      albums: albums.rows.map((el) => el.doc)
     }
-  }).catch((err) => {
-    Toaster.error(err);
-  });
+  }
 }
 
 export const actions = {

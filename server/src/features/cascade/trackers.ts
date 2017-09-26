@@ -15,6 +15,7 @@ import * as mkdirp from 'mkdirp';
 const passwords = path.join(config.get('dataDirectory'), 'credentials');
 
 export async function createTracker (type: string, name: string, username: string) {
+  
   const trackers = new PouchDB<Tracker>('trackers');
   const props = {type, name, username};
   const id = trackerURI(mapTrackerToParams(props));

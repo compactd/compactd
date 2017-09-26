@@ -60,7 +60,7 @@ export class DatabaseConfigurator {
     return;
   }
 
-  createConfig (): Promise<undefined> {
+  createConfig (): Promise<any> {
     const db = new PouchDB('config');
 
     return Promise.all(baseConfig.map((({key, value}) => {
@@ -70,7 +70,7 @@ export class DatabaseConfigurator {
     })));
   }
 
-  configureDatabases (): Promise<undefined>{
+  configureDatabases (): Promise<any>{
     return Promise.all(dbs.map(({name, schema, perms}) => {
       const db = new PouchDB(name);
 

@@ -6,7 +6,7 @@
     "module": "commonjs",
     "target": "es6",
     "allowJs": true,
-    "lib": ["es2016", "dom", "es7"],
+    "lib": ["es2016", "dom", "es7", "es6"],
     "typeRoots": [
       "../types/",
       "types/"

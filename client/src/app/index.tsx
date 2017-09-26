@@ -16,8 +16,8 @@ render(
   rootEl
 );
 
-if (module.hot) {
-  module.hot.accept('./CompactdApplication', () => { 
+if ((module as any).hot) {
+  (module as any).hot.accept('./CompactdApplication', () => { 
     const NextApp: typeof CompactdApplication = require("./CompactdApplication").CompactdApplication;
     render(
       <AppContainer>

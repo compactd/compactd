@@ -1,4 +1,5 @@
-import * as PouchDB from 'pouchdb';
+import Pouch from 'pouchdb';
+const PouchDB: typeof Pouch = require('pouchdb');
 
 export default Object.assign(PouchDB.defaults({
   prefix: `http://admin:password@localhost:5984/`

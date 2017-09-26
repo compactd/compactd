@@ -1,6 +1,6 @@
 import * as Defs from 'definitions';
 import { AppAction } from './actions.d';
-import * as PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb';
 import * as thunk from 'redux-thunk';
 import * as jwt from 'jwt-decode';
 import {getDatabase} from 'app/database';

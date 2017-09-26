@@ -112,7 +112,7 @@ export default class Authenticator {
    */
   verifySession (token: string): string {
     try {
-      const session = jwt.verify(token, this.secret, {
+      const session: any = jwt.verify(token, this.secret, {
         issuer: `compactd#${this.instanceID}`
       });
       if (!session.ok || !session.user) {

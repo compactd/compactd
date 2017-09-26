@@ -21,7 +21,7 @@ export async function createSession (id: string) {
 }
 
 export function readToken (token: string) {
-  const {fil, typ} = jwt.decode(token, config.get('secret'));
+  const {fil, typ} = jwt.decode(token, config.get('secret')) as any;
   assert.equal(typ, 'dt');
   return fil;
 } 

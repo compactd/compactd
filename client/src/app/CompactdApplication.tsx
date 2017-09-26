@@ -1,3 +1,6 @@
+/// <reference types="node" />
+
+
 import * as React from 'react';
 import { render } from "react-dom";
 import { Provider } from 'react-redux';
@@ -23,13 +26,14 @@ interface CompactdApplicationProps {
 }
 
 const doNothing = (...args: any[]) =>{
-  return '';
+  return console.log(args);
 }
 
 export class CompactdApplication extends
   React.Component<CompactdApplicationProps, {}> {
 
   render (): JSX.Element {
+    console.log(ConnectedRouter);
     // Inexplicable bug where i need to log these avoid undefined errors
     doNothing(Route, LibraryView, HolisticView, PlayerView, PlaylistView, PlayerStatus, Sandbox);
 
@@ -45,7 +49,7 @@ export class CompactdApplication extends
                 <Route path="/library/:artist?/:album?" children={(props: any) =>
                   <LibraryView component={HolisticView} {...props}/>} />
                 <Route path="/sandbox" children={(props: any) =>
-                  <Sandbox />} />
+                  <Sandbox {...props}/>} />
               </Switch>
             </Box>
             <Box col={2} style={{

@@ -17,7 +17,6 @@ import httpEventEmitter from './http-event';
 import * as http from 'http';
 
 const expressProxy: any = require('express-http-proxy');
-const expressPouchDB: any = require('express-pouchdb');
 
 export class CompactdApplication {
   private auth: Authenticator;

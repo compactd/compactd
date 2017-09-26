@@ -1,5 +1,5 @@
 import * as Defs from 'definitions';
-import * as PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb';
 import * as path from 'path';
 import {albumURI} from 'compactd-models';
 import { PlayerAction, PlayerStack } from './actions.d';
