@@ -142,42 +142,36 @@ div.artist-component {
   }
   &.large-layout {
     div.artist-image {
-
+      float: left;
     }
     div.artist-info {
+      margin-left: 144px;
+      padding-top: 6px;
       div.artist-name {
-
+        font-size: 24px;
+        @include ellipsis();
       }
-      div.artist-subtitle {
+      .large-subtitle {
         
+        // padding-bottom: 8px;
+      }
+      .large-subtitle > div {
+        margin-top: 6px;
+        &.artist-text {
+          padding-top: 7px;
+          height: 67px;
+          width: 100%;
+          display: block; /* Fallback for non-webkit */
+          display: -webkit-box; /* Fallback for non-webkit */
+          margin: 0 auto;
+          font-size: 12px;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
   }
-  &.active {
-    div.artist-image {
-
-    }
-    div.artist-info {
-      div.artist-name {
-
-      }
-      div.artist-subtitle {
-        
-      }
-    }
-  }
-  &.clickable {
-
-    div.artist-image {
-
-    }
-    div.artist-info {
-      div.artist-name {
-
-      }
-      div.artist-subtitle {
-        
-      }
-    }
-  }
+ 
 }

@@ -50,20 +50,30 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
       case 'medium':
         return <BetterImage src={this.getLargeCover(64)} size={64} />;
       case 'large':
-        throw 'Large layout not implemented';
+       return <BetterImage src={this.getLargeCover(128)} size={128} />;
     }
+  }
+  renderCounters () {
+    const {artist, subtitle, counter, subtitleText} = this.props;
+    return <div className={classnames("artist-counter", {
+      'pt-skeleton': !counter.albums
+    })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
+      counter.tracks
+    } ${pluralize('track', counter.tracks)}`}
+    </div>;
   }
   renderSubtitle () {
     const {artist, subtitle, counter, subtitleText} = this.props;
+    if (this.props.layout === 'large') {
+      return <div className="large-subtitle">
+        {counter ? this.renderCounters() : null}
+        {subtitleText ? <div className="artist-text">{subtitleText}</div> : null}
+      </div>
+    }
     switch (subtitle) {
       case 'none': return;
       case 'text': return <div className="artist-text">{subtitleText}</div>;
-      case 'counters': return <div className={classnames("artist-counter", {
-          'pt-skeleton': !counter.albums
-        })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
-          counter.tracks
-        } ${pluralize('track', counter.tracks)}`}
-        </div>;
+      case 'counters': return this.renderCounters();
     }
   }
   renderName () {
