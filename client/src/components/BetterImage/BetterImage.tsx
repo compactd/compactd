@@ -84,7 +84,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
   render() {
     return (
       <div className={classnames('image-container', this.props.divClassName)} key={this.props.key}>
-        <img className={classnames('better-image', this.props.className, {
+        <img draggable={false} className={classnames('better-image', this.props.className, {
           'pt-skeleton': this.state.loading
         })} ref={
             (ref) => this.image = ref

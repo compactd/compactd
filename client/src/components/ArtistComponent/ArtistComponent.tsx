@@ -15,11 +15,12 @@ interface ArtistComponentProps {
   mode?: 'popup' | 'normal';
   onClick?: Function;
   theme?: 'dark' | 'light';
-  subtitle?: 'counters' | 'bio' | 'none';
+  subtitle?: 'counters' | 'text' | 'none';
   active?: boolean;
   className?: string;
   counter?: {albums?: number, tracks: number};
   fuzzyName?: string;
+  subtitleText?: string;
 }
 
 export default class ArtistComponent extends React.Component<ArtistComponentProps, {}> {
@@ -53,10 +54,10 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     }
   }
   renderSubtitle () {
-    const {artist, subtitle, counter} = this.props;
+    const {artist, subtitle, counter, subtitleText} = this.props;
     switch (subtitle) {
       case 'none': return;
-      case 'bio': return <div className="artist-bio">{artist.bio}</div>;
+      case 'text': return <div className="artist-text">{subtitleText}</div>;
       case 'counters': return <div className={classnames("artist-counter", {
           'pt-skeleton': !counter.albums
         })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
@@ -104,4 +105,5 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
       </div>
     </div>
   }
+
 }
