@@ -221,6 +221,7 @@ function delay(ms) {
 
 async function checkCouchDB (spin) {
   let res, data;
+  
   try {
     res = await fetch(`http://localhost:5984/`);
     data = await res.json();
@@ -265,6 +266,15 @@ function checkSecret (spin) {
       console.log(chalk.red(`  ✘ Your JWT Secret doesn't have a high entropy (current: ${
        ent
       } < ${MIN_ENTROPY})`));
+      return Promise.reject('Entropy too low');
+    }
+    const ent2 = entropy(config.get('couchPassword'));
+
+    if (ent2 < 256) {
+      spin.stop();
+      console.log(chalk.red(`  ✘ Your couchDB password is too weak (current: ${
+       ent2
+      } < 256)`));
       return Promise.reject('Entropy too low');
     }
     spin.stop();
