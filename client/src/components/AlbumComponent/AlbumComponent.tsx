@@ -60,25 +60,26 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
         return <BetterImage src={this.getLargeCover(128)} size={128} />;
     }
   }
+  renderCounters () {
+    const {album, subtitle, counter, subtitleText} = this.props;
+    return <div className={classnames("album-counter", {
+      'pt-skeleton': !counter.tracks,
+    })}>{`${counter.tracks || 10} ${pluralize('tracks', counter.tracks || 10)}`}
+    </div>;
+  }
   renderSubtitle () {
     const {album, subtitle, counter, subtitleText} = this.props;
     if (this.props.layout === 'large') {
       return <div className="large-subtitle">
         {this.props.artist.name ? <div className="album-artist">{this.props.artist.name}</div> : null}
-        {counter ? <div className={classnames("album-counter", {
-          'pt-skeleton': !counter.tracks,
-        })}>{`${counter.tracks} ${pluralize('tracks', counter.tracks)}`}
-        </div> : subtitleText}
+        {counter ? this.renderCounters() : subtitleText}
       </div>
     }
     switch (subtitle) {
       case 'none': return;
       case 'artist': return <div className="album-artist">{this.props.artist.name}</div>;
       case 'text': return <div className="album-text">{subtitleText}</div>;
-      case 'counters': return <div className={classnames("album-counter", {
-          'pt-skeleton': !counter.tracks
-        })}>{`${counter.tracks} ${pluralize('tracks', counter.tracks)}`}
-        </div>;
+      case 'counters': return this.renderCounters();
     }
   }
   renderName () {

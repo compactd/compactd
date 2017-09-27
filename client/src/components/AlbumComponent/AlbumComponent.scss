@@ -3,8 +3,11 @@
 
 div.album-component {
   transition: all 0.3s ease;
-  * {
+  div {
     transition: all 0.3s ease;
+  }
+  div.album-counter {
+    display: inline-block;
   }
   &.clickable {
     cursor: pointer;
