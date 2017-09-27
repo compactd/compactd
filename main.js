@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 
 const sbConfig = require('storyboard').config;
 
