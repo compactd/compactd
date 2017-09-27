@@ -29,7 +29,7 @@ const {Scanner}     = require('./server/dist/features/scanner/Scanner');
 
 const capabilities = require('fluent-ffmpeg/lib/capabilities');
 const Agent        = require('./server/dist/features/aquarelle/AquarelleAgent');
-
+const pm2          = require('pm2')
 
 const AVAILABLE_MODES = ['serve', 'configure', 'recover', 'reset', 'clean'];
 
@@ -69,6 +69,27 @@ async function checkFile() {
 }
 
 switch (mode) {
+  case 'serve':
+    console.log(chalk.yellow(`\n  Thanks for downloading compactd ${pkg.version} !`));
+    console.log(chalk.grey('\n  Trying to start compactd in the background...'));
+    pm2.connect(function (err) {
+      if (err) {
+        console.error(err);
+        process.exit(2);
+      }
+      pm2.start({
+        name: 'compactd',
+        script: './server/index.js'
+      }, function (err, app) {
+        if (err) {
+          console.error(err);
+          process.exit(2);
+        }
+        pm2.disconnect();
+        console.log('\n  ' + chalk.bgGreen.black(' Successfully started compactd in the background') + '\n');
+      });
+    })
+    return;
   case 'configure':
     console.log(chalk.yellow(`\n  Thanks for downloading compactd ${pkg.version} !`));
     console.log(chalk.grey('\n  This wizard will guide you through the configuration of compactd'));
