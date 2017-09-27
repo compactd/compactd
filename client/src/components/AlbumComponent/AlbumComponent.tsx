@@ -23,7 +23,7 @@ interface AlbumComponentProps {
   subtitle?: 'counters' | 'text' | 'none' | 'artist';
   active?: boolean;
   className?: string;
-  counter?: {duration?: number, tracks: number};
+  counter?: {duration?: number, tracks?: number};
   fuzzyName?: string;
   subtitleText?: string;
 }

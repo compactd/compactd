@@ -11,6 +11,7 @@ import { MenuItem, Switch, NumericInput } from "@blueprintjs/core";
 import {actions} from '../../features/library/library';
 import {LibraryActions, LibraryAction} from '../../features/library/actions.d';
 import {LibraryState, CompactdState, PlayerState} from 'definitions';
+import * as classnames from 'classnames';
 import './Sandbox.scss';
 
 interface SandboxProps {
@@ -27,6 +28,8 @@ interface SandboxState {
   subtitle: 'counters' | 'text' | 'none';
   active: boolean;
   clickable: boolean;
+  boxes: boolean;
+  skeleton: boolean;
   width: number;
   margin: number;
 };
@@ -53,8 +56,10 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
       theme: 'dark',
       subtitle: 'none',
       active: false,
+      skeleton: false,
       clickable: false,
       width: 320,
+      boxes: false,
       margin: 0
     };
   }
@@ -69,9 +74,9 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           layout={this.state.layout}
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
-          counter={{
+          counter={!this.state.skeleton ? {
             albums: 5, tracks: 42
-          }}
+          } : {}}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
             this.setState({active: !this.state.active})
@@ -90,9 +95,9 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           layout={this.state.layout}
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
-          counter={{
+          counter={!this.state.skeleton ? {
             tracks: 16  
-          }}
+          } : {}}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
             this.setState({active: !this.state.active})
@@ -126,7 +131,6 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
     }
   }
   public render(): JSX.Element {
-    console.log(this.state);
     
       return <div className="sandbox-container">
         <div className="sandbox-header">Welcome to the sandbox</div>
@@ -175,7 +179,7 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
             </label>
           </div>
           <div className="sandbox-component">
-            <div className="component" style={{
+            <div className={classnames("component", {'draw-boxes': this.state.boxes})} style={{
                 transition: 'all 0.3s ease',
                 backgroundColor: this.state.theme === 'light' ? '#fff' : 'rgb(60, 56, 72)',
                 width: `${this.state.width}px`,
@@ -191,6 +195,8 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           <div className="sandbox-switches">
             <Switch checked={this.state.active} label="Active item" onChange={this.handleSwitchChange('active')} />
             <Switch checked={this.state.clickable} label="Clickable item" onChange={this.handleSwitchChange('clickable')} />
+            <Switch checked={this.state.skeleton} label="Loading counters" onChange={this.handleSwitchChange('skeleton')} />
+            <Switch checked={this.state.boxes} label="Draw bounding boxes" onChange={this.handleSwitchChange('boxes')} />
           </div>
           <div className="numeric-inputs">      
             <label className="width pt-label">

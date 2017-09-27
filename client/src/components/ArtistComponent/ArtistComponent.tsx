@@ -18,7 +18,7 @@ interface ArtistComponentProps {
   subtitle?: 'counters' | 'text' | 'none';
   active?: boolean;
   className?: string;
-  counter?: {albums?: number, tracks: number};
+  counter?: {albums?: number, tracks?: number};
   fuzzyName?: string;
   subtitleText?: string;
 }
@@ -57,9 +57,9 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const {artist, subtitle, counter, subtitleText} = this.props;
     return <div className={classnames("artist-counter", {
       'pt-skeleton': !counter.albums
-    })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
-      counter.tracks
-    } ${pluralize('track', counter.tracks)}`}
+    })}>{`${counter.albums || 10} ${pluralize('album', counter.albums || 10)} • ${
+      counter.tracks || 10
+    } ${pluralize('track', counter.tracks || 10)}`}
     </div>;
   }
   renderSubtitle () {
