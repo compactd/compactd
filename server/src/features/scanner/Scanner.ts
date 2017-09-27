@@ -68,7 +68,7 @@ export class Scanner extends events.EventEmitter {
   }
 
   getSerializedEntries (dir: string): Promise<FSTree.FSEntries> {
-    const file = path.join(dir, `fstrees/${path.basename(this.library)}.entries.json`);
+    const file = path.join(dir, `fstree/${path.basename(this.library)}.entries.json`);
 
     return new Promise<FSTree.FSEntries>((resolve, reject) => {
       if (!existsSync(file)) return resolve([]);
@@ -99,7 +99,8 @@ export class Scanner extends events.EventEmitter {
   }
 
   async getPatch () {
-    const serialized = await this.getSerializedEntries('/home/vincent/.compactd/');
+    const serialized = await this.getSerializedEntries(config.get('dataDirectory'));
+    mainStory.info('scanner', `Already scanned ${serialized.length} items...`);
     const staled = FSTree.fromEntries(serialized || []);
     const current = FSTree.fromEntries(this.entries || []);
 
