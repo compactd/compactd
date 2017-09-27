@@ -1,4 +1,4 @@
-import {Album, Artist} from 'compactd-models';
+import {Album, Artist, Track} from 'compactd-models';
 
 interface LibraryActionBase {
   type: string;
@@ -35,19 +35,33 @@ interface ActionResolveAlbum {
   album: Album;
 }
 
+interface ActionResolveRecommendations {
+  type: 'compactd/library/RESOLVE_RECOMMENDATIONS';
+  topTracks: {key: string, value: number}[];
+}
+
+interface ActionResolveTrack {
+  type: 'compactd/library/RESOLVE_TRACK';
+  track: Track;
+}
+
 export type LibraryAction = ActionResolveAllAlbums |
                             ActionResolveArtist |
                             ActionResolveAlbum |
                             ActionResolveAllArtists |
                             ActionToggleExpandArtist |
-                            ActionResolveCounter;
+                            ActionResolveCounter |
+                            ActionResolveRecommendations |
+                            ActionResolveTrack;
 
 export type LibraryActions = {
   fetchArtistCounter: (id: string) => void;
   fetchAlbumCounter: (id: string) => void;
   fetchArtist: (artist: string) => void;
+  fetchTrack: (track: string) => void;
   fetchAlbum: (album: string) => void;
   fetchAllArtists: () => void;
   fetchAllAlbums: () => void;
   toggleExpandArtist: () => void;
+  fetchRecommendations: () => void;
 }

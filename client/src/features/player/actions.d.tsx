@@ -53,7 +53,7 @@ export type PlayerAction =  PlayNextAction |
 
 // Album | [Album, number] | Track[] | Track
 
-export type PlayerStack = Album | [string, number] | Track[] | Track;
+export type PlayerStack = Album | [string, number] | Track[] | Track | string[];
 
 export type PlayerActions = {
   playNext: (index?: number) => void;

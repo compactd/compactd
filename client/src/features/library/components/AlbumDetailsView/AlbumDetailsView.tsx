@@ -5,6 +5,7 @@ import ScrollableDiv from 'components/ScrollableDiv';
 import {TrackListItem} from '../TrackListItem';
 import {albumURI} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
+import SuggestionsView from '../SuggestionsView';
 
 require('./AlbumDetailsView.scss');
 
@@ -41,7 +42,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     const id = this.getAlbumId();
     const album = library.albumsById[id];
     if (!album) {
-      return <div className="suggestions">Suggestions</div>;
+      return <SuggestionsView library={library} actions={actions} />;
     }
     const p = albumURI(album._id);
 

@@ -54,7 +54,11 @@ export function reducer (state: Defs.PlayerState = initialState,
         playing: !state.playing
       });
     case PLAY_AFTER_ACTION:
-      return Object.assign({}, state, {});
+      return Object.assign({}, state, {
+        stack: state.stack.length > 0 ? [state.stack[0], ...action.stack, state.stack.slice(1)]: [...action.stack],
+        playing: true,
+        prevStack: state.stack[0] ? state.prevStack.concat(state.stack[0]) : state.prevStack
+      });
   }
   return state;
 }
@@ -71,6 +75,60 @@ function playPrevious () {
 
 function playNext () {
   return {type: PLAY_NEXT_ACTION}
+}
+
+async function playAfter (stack: PlayerStack): Promise<PlayerAction> {
+  await Promise.resolve();
+  const tracks = new PouchDB<Defs.Track>('tracks');
+
+  if (Array.isArray(stack)) {
+    if (stack.length === 2 && Number.isInteger(stack[1] as any)) {
+      const [album, index] = stack as [string, number];
+      const num = `00${index || 0}`.slice(-2);
+      const base = album;
+      const docs = await tracks.allDocs({
+        include_docs: true,
+        startkey: path.join(base, num),
+        endkey: path.join(base, '99')
+      });
+      return {
+        type: PLAY_AFTER_ACTION,
+        stack: docs.rows.map((row) => row.doc)
+      };
+    }
+    if (typeof stack[0] === 'string') {
+      const docs = await Promise.all((stack as string[]).map((id) => {
+        return tracks.get(id);
+      }));
+      return await replacePlayerStack(docs);
+    }
+    return {
+      type: PLAY_AFTER_ACTION,
+      stack: stack as Defs.Track[]
+    }
+  }
+
+  if ((stack as Defs.Track).album) {
+    const track = stack as Defs.Track;
+
+    return {
+      type: PLAY_AFTER_ACTION,
+      stack: [track]
+    };
+  }
+  const album = stack as Defs.Album;
+
+  const docs = await tracks.allDocs({
+    include_docs: true,
+    startkey: album._id,
+    endkey: album._id + '\uffff'
+  });
+
+  return {
+    type: REPLACE_PLAYER_STACK_ACTION,
+    stack: docs.rows.map((row) => row.doc)
+  };
+  
 }
 
 function jumpTo (target: string | number | Defs.Track) {
@@ -116,6 +174,12 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
         stack: docs.rows.map((row) => row.doc)
       };
     }
+    if (typeof stack[0] === 'string') {
+      const docs = await Promise.all((stack as string[]).map((id) => {
+        return tracks.get(id);
+      }));
+      return await replacePlayerStack(docs);
+    }
     return {
       type: REPLACE_PLAYER_STACK_ACTION,
       stack: stack as Defs.Track[]
@@ -145,5 +209,5 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
 }
 
 export const actions = {
-  replacePlayerStack, playNext, playPrevious, togglePlayback, jumpTo
+  replacePlayerStack, playNext, playPrevious, togglePlayback, jumpTo, playAfter
 }

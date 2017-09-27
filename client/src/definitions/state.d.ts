@@ -2,6 +2,10 @@ import * as Compactd from './common.d';
 import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker, Release} from 'compactd-models';
 
 export interface LibraryState {
+  topTracks: {key: string, value: number}[],
+  tracksById: {
+    [id: string]: Compactd.Track
+  }
   albumsById: {
     [id: string]: Compactd.Album & {tracks?: [Compactd.Track]}
   };

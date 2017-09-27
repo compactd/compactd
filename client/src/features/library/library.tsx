@@ -12,24 +12,36 @@ const RESOLVE_ARTIST = 'compactd/library/RESOLVE_ARTIST';
 const RESOLVE_ALL_ARTISTS = 'compactd/library/RESOLVE_ALL_ARTISTS';
 const RESOLVE_ALL_ALBUMS = 'compactd/library/RESOLVE_ALL_ALBUMS';
 const RESOLVE_ALBUM  = 'compactd/library/RESOLVE_ALBUM';
+const RESOLVE_TRACK  = 'compactd/library/RESOLVE_TRACK';
 const TOGGLE_EXPAND_ARTIST  = 'compactd/library/TOGGLE_EXPAND_ARTIST';
 const RESOLVE_COUNTER = 'compactd/library/RESOLVE_COUNTER';
+const RESOLVE_RECOMMENDATIONS = 'compactd/library/RESOLVE_RECOMMENDATIONS';
 
 const initialState: Defs.LibraryState = {
-  albumsById: {
-  },
-  artistsById: {
-  },
+  albumsById: {},
+  artistsById: {},
+  tracksById: {},
   albums: [],
   artists: [],
   tracks: [],
   expandArtists: true,
-  counters: {}
+  counters: {},
+  topTracks: []
 };
 
 export function reducer (state: Defs.LibraryState = initialState,
   action: LibraryAction): Defs.LibraryState {
   switch (action.type) {
+    case RESOLVE_TRACK:
+      return Object.assign({}, state, {
+        tracksById: Object.assign({}, state.tracksById, {
+          [action.track._id]: action.track
+        })
+      });
+    case RESOLVE_RECOMMENDATIONS:
+      return Object.assign({}, state, {
+        topTracks: action.topTracks
+      });
     case RESOLVE_COUNTER:
       return Object.assign({}, state, {
         counters: Object.assign({}, state.counters, {[action.id]: {
@@ -88,6 +100,18 @@ function waitLimit (limit: any) {
     limit(() => resolve());
   });
 }
+
+const fetchTrack = async (track: string) => {
+
+  const Track = new PouchDB<Defs.Track>('tracks');
+
+  const item = await Track.get(track);
+  
+  return {
+    type: RESOLVE_TRACK,
+    track: item
+  };
+};
 
 const arlimit = trickle(5, 200);
 
@@ -167,7 +191,10 @@ function fetchAllAlbums () {
   });
 }
 
-async function fetchArtist (slug: string) {
+async function fetchArtist (slug: string): Promise<LibraryAction> {
+  if (slug.startsWith('library/')) {
+    return await fetchArtist(artistURI(slug).name);
+  }
   const Artist = new PouchDB<Defs.Artist>('artists');
   const Album = new PouchDB<Defs.Album>('albums');
 
@@ -187,7 +214,24 @@ async function fetchArtist (slug: string) {
   }
 }
 
+async function fetchTopTracks () {
+  const res = await fetch('/api/reports/tracks/top?limit=30', {
+    headers: {
+      Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`
+    }
+  });
+  return await res.json();
+}
+
+async function fetchRecommendations (): Promise<LibraryAction> {
+  const topTracks = await fetchTopTracks();
+  return {
+    type: RESOLVE_RECOMMENDATIONS,
+    topTracks
+  }
+}
+
 export const actions = {
   fetchArtistCounter, fetchAlbumCounter,
-  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum
+  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum, fetchRecommendations, fetchTrack
 };

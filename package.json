@@ -12,6 +12,8 @@
   "dependencies": {
     "@blueprintjs/labs": "^0.10.0",
     "@types/history": "^4.6.0",
+    "@types/ms": "^0.7.30",
+    "@types/numeral": "0.0.22",
     "@types/pouchdb-find": "^6.3.0",
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.1",
@@ -36,7 +38,9 @@
     "leveldown": "^1.7.2",
     "merge2": "^1.0.3",
     "morgan": "^1.8.1",
+    "ms": "^2.0.0",
     "node-fetch": "^1.6.3",
+    "numeral": "^2.0.6",
     "parse-torrent": "^5.8.3",
     "password-hash-and-salt": "^0.1.4",
     "pouchdb": "^6.3.4",

@@ -1,0 +1,63 @@
+@import '../../../../styles/colors';
+@import '../../../../styles/utils';
+
+div.suggestions-view{
+  margin: 44px;
+  div.track-item {
+    position: relative;
+    margin: 0;
+    border-radius: 2px;
+    padding: 8px 16px;
+    @include ellipsis();
+    cursor: pointer;
+    &:hover {
+      transition: all 0.1s ease;
+      background-color: rgba(233, 234, 241, 0.78);
+      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.06);
+      .track-float {
+        display: block;
+        opacity: 1;
+      }
+    }
+  }
+  .top-tracks {
+    width: 420px;
+    padding: 20px 32px 32px 32px;
+    border-radius: 2px;
+    @include card-shadow();
+  }
+
+  .header {
+    margin: 16px 4px;
+    font-size: 16px;
+  }
+
+
+  .track-name {
+    display: inline-block;
+  }
+
+  .track-artist {
+    display: inline-block;
+    margin-left: 8px;
+    color: $light-secondary;
+  }
+
+  .track-float {
+    color: $light-secondary;
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    opacity: 0;
+    .track-report {
+      background-color: white;
+      width: 40px;
+      text-align: center;
+      border-radius: 20px;
+      padding: 2px;
+    }
+    span {
+    }
+  }
+  
+}
