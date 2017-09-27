@@ -48,7 +48,12 @@ class SocketEventEmitter {
     });
 
   }
-  listen (event: string, token: string, callback: Function) {
+  listen (event: string, token: string | Function, callback?: Function): void {
+    console.log(event, token, callback);
+    if (typeof token === 'function') {;
+      
+      return this.listen((jwtDecode(event) as any).event, event, token);
+    }
     this.socket.on(event, callback);
     this.socket.emit('listen', {token});
   }

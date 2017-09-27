@@ -1,19 +1,30 @@
 import * as Defs from 'definitions';
 import { SettingsAction } from './actions.d';
-import {Artist, Album, Tracker, trackerURI, mapTrackerToParams} from 'compactd-models';
+import {Artist, Album, Tracker, trackerURI, mapTrackerToParams, Library} from 'compactd-models';
 import {getDatabase} from 'app/database';
+import {Intent} from '@blueprintjs/core';
 import Toaster from 'app/toaster';
+import Socket from 'app/socket';
 
 const initialState: Defs.SettingsState = {
-  opened: false
+  opened: false,
+  scanning: false,
+  trackers: [],
+  libraries: []
 };
 
 const TOGGLE_SETTINGS_PAGE = 'cassette/settings/TOGGLE_SETTINGS_PAGE';
 const RESOLVE_TRACKERS = 'cassette/settings/RESOLVE_TRACKERS';
+const RESOLVE_LIBRARIES = 'cassette/settings/RESOLVE_LIBRARIES';
+const SET_SCANNING = 'cassette/settings/SET_SCANNING';
 
 export function reducer (state: Defs.SettingsState = initialState,
   action: SettingsAction): Defs.SettingsState {
   switch (action.type) {
+    case SET_SCANNING:
+      return Object.assign({}, state, {
+        scanning: action.scanning
+      });
     case TOGGLE_SETTINGS_PAGE:
       return Object.assign({}, state, {
         opened: !state.opened
@@ -21,6 +32,10 @@ export function reducer (state: Defs.SettingsState = initialState,
     case RESOLVE_TRACKERS:
       return Object.assign({}, state, {
         trackers: action.trackers
+      });
+    case RESOLVE_LIBRARIES:
+      return Object.assign({}, state, {
+        libraries: action.libraries
       });
   }
   return state;
@@ -37,6 +52,21 @@ function loadTrackers () {
       dispatch({
         type: RESOLVE_TRACKERS,
         trackers: trackers.rows.filter((el) => el.key !== '_design/validator').map((el) => el.doc)
+      })
+    } catch (err) {
+      Toaster.error(err);
+    }
+  }  
+}
+
+function loadLibraries () {
+  return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
+    try {
+      const Library = getDatabase<Library>('libraries');
+      const libraries = await Library.allDocs({include_docs: true});
+      dispatch({
+        type: RESOLVE_LIBRARIES,
+        libraries: libraries.rows.filter((el) => el.key !== '_design/validator').map((el) => el.doc)
       })
     } catch (err) {
       Toaster.error(err);
@@ -109,6 +139,49 @@ function addTracker (name: string, type: 'gazelle', username: string, host: stri
   }
 }
 
+function scan (id: string) {
+  return async (dispatch: any) => {
+    dispatch({type: SET_SCANNING, scanning: true});
+    const res = await fetch(`/api/scans`, {
+      method: 'POST',
+      body: JSON.stringify({
+        libraryId: id
+      }),
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`
+      }
+    });
+    if (res.status !== 201) {
+      return Toaster.error('An error happened while trying to start scan. Check logs for more details');
+    }
+    const data = await res.json();
+    const {finish, open_folder, error} = data.events;
+
+    const toast = Toaster.show({
+      icon: 'search',
+      message: 'Scanning your music',
+      intent: 'PRIMARY',
+      timeout: 999999999
+    });
+    console.log(toast);
+    
+    Socket.listen(finish, () => {
+      Toaster.update(toast, {message: 'Scan sucessfully finished', intent: Intent.SUCCESS});
+      dispatch({type: SET_SCANNING, scanning: false, timeoout: 2000});
+    });
+
+    Socket.listen(open_folder, (evt: any) => {
+      Toaster.update(toast, {message: `Scanning folder ${evt.folder}`});
+    });
+
+    Socket.listen(error, (evt: any) => {
+      dispatch({type: SET_SCANNING, scanning: false});
+      Toaster.update(toast, {message: 'Scan failed, please check logs for more details', intent: Intent.DANGER});
+    });
+  }
+}
+
 export const actions = {
-  toggleSettingsPage, loadTrackers, editTracker, editTrackerPassword, addTracker
+  toggleSettingsPage, loadTrackers, editTracker, editTrackerPassword, addTracker, loadLibraries, scan
 }

@@ -4,6 +4,7 @@ import {CompactdState, SettingsState} from 'definitions';
 import { Tab2, Tabs2 } from "@blueprintjs/core";
 import * as classnames from 'classnames';
 import {TrackersView} from '../TrackersView';
+import {LibrariesView} from '../LibrariesView';
 
 require('./SettingsPage.scss');
 
@@ -23,7 +24,7 @@ export class SettingsPage extends React.Component<SettingsPageProps, {}>{
         <Tabs2 id="settings" vertical className="pt-large">
           <Tab2 id="ge" title="General" panel={<span>settings</span>} />
           <Tab2 id="tr" title="Trackers" panel={<TrackersView actions={actions} settings={settings}/>} />
-          <Tab2 id="lb" title="Libraries" panel={<span>libraries</span>} />
+          <Tab2 id="lb" title="Libraries" panel={<LibrariesView actions={actions} settings={settings} />} />
           <Tabs2.Expander />
         </Tabs2>
       </div>

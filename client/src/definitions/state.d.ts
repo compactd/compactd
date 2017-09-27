@@ -100,6 +100,7 @@ export interface StoreState {
 }
 
 export interface SettingsState {
+  scanning: boolean;
   opened: boolean;
   libraries?: Library[];
   trackers?: Tracker[];
