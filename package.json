@@ -1,6 +1,6 @@
 {
   "name": "compactd",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Remote music player that allows to play music remotely",
   "main": "./server/index.js",
   "bin": {
@@ -149,7 +149,7 @@
     "webpack-dev-server": "^2.7.1",
     "webpack-hot-middleware": "^2.19.0",
     "webpack-merge": "^4.1.0"
-  }, 
+  },
   "engines": {
     "node": ">=7.6",
     "cpu": "x64"
