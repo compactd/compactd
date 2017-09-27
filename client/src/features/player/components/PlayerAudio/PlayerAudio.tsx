@@ -11,7 +11,15 @@ interface PlayerAudioProps {
 }
 
 const tokens: {[id: string]: string}  = {};
-
+async function report (source: string) {
+  const res = await fetch(`/api/reports/${source}/listen`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`
+    }
+  });
+  return;
+}
 async function fetchToken (source: string) {
   if (tokens[source]) return tokens[source];
 
@@ -86,6 +94,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
         if (nextProps.playing) {
           this.audio.play();
         }
+        report(nextProps.source);
       });
     }
     if (nextProps.playing !== this.props.playing && nextProps.source) {

@@ -6,6 +6,7 @@ import {dbs} from './dbs';
 import {createValidator} from '../validators';
 import {baseConfig} from './baseConfig';
 import PouchDB from '../../database';
+import * as Analytics from '../analytics/Analytics';
 import * as path from 'path';
 
 export interface ISDAOptions {
@@ -32,6 +33,7 @@ export class DatabaseConfigurator {
     await this.configureDatabases();
     await this.createConfig();
     await this.setupNode();
+    await Analytics.initialize();
     return;
   }
 
