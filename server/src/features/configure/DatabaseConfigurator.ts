@@ -8,6 +8,7 @@ import {baseConfig} from './baseConfig';
 import PouchDB from '../../database';
 import * as Analytics from '../analytics/Analytics';
 import * as path from 'path';
+import config from '../../config';
 
 export interface ISDAOptions {
   adminPassword: string;
@@ -23,9 +24,6 @@ export class DatabaseConfigurator {
   constructor (opts: ISDAOptions) {
     this.opts = opts;
   }
-
-
-
 
   async configure () {
     // await this.startServer();
@@ -73,7 +71,7 @@ export class DatabaseConfigurator {
           username: this.opts.adminUsername,
           password: this.opts.adminPassword,
           bind_address: "0.0.0.0",
-          port: 5984})
+          port: config.get('couchPort')})
       }).then((res) => res.json());
 
     const fres: any = await fetch(`http://${

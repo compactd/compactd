@@ -42,6 +42,18 @@ const conf = convict({
     default: '127.0.0.1',
     env: 'COMPACTD_COUCH_HOST'
   },
+  couchUser: {
+    doc: 'CouchDB admin user',
+    format: '*',
+    default: 'admin',
+    env: 'COMPACTD_COUCH_USER'
+  },
+  couchPassword: {
+    doc: 'CouchDB admin password',
+    format: '*',
+    default: '',
+    env: 'COMPACTD_COUCH_PASSWORD'
+  },
   dataDirectory: {
     doc: "The config root.",
     format: "*",
