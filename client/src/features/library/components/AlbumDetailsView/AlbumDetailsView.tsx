@@ -18,10 +18,12 @@ interface AlbumDetailsViewProps {
 
 export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>{
   getAlbumId (props: AlbumDetailsViewProps = this.props) {
+    
     return albumURI({name: props.album, artist: props.artist});
   }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
     if (this.getAlbumId() !== this.getAlbumId(nextProps)) {
+
       this.props.actions.fetchAlbum(this.getAlbumId(nextProps));
     }
   }

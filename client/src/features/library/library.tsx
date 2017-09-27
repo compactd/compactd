@@ -68,17 +68,18 @@ const fetchAlbum = async (album: string) => {
   const Album = new PouchDB<Defs.Album>('albums');
   const Track = new PouchDB<Defs.Track>('tracks');
 
-  const albums = await Album.get(album);
+  const item = await Album.get(album);
 
   const tracks = await Track.allDocs({
       include_docs: true,
       startkey: album,
       endkey: album + '\uffff'
     })
-
+    
+  
   return {
     type: RESOLVE_ALBUM,
-    album: Object.assign({}, album, {tracks: tracks.rows.map(el => el.doc)})
+    album: Object.assign({}, item, {tracks: tracks.rows.map(el => el.doc)})
   };
 };
 
