@@ -18,7 +18,7 @@ interface AlbumComponentProps {
   } & Partial<Album> & Partial<DSAlbum> & any;
   layout: 'minimal' | 'compact' | 'medium' | 'large';
   mode?: 'popup' | 'normal';
-  onClick?: Function;
+  onClick?: (evt: MouseEvent) => void;
   theme?: 'dark' | 'light';
   subtitle?: 'counters' | 'text' | 'none' | 'artist';
   active?: boolean;

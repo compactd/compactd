@@ -6,7 +6,7 @@ import ScrollableDiv from 'components/ScrollableDiv';
 import {Album, albumURI, artistURI} from 'compactd-models';
 import * as fuzzy from 'fuzzy';
 import {match} from 'react-router';
-import BetterImage from 'components/BetterImage';
+import {BetterImage, ArtistComponent} from 'components';
 
 require('./AlbumsListView.scss');
 
@@ -72,14 +72,11 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
                 active={this.props.match.params.album === albumURI(album._id).name}
                 album={album} actions={actions} all={this.props.all}/>
     })
-
-    const header = this.props.artist ?
-    <div className="artist-header">
-      <div className="artist-image">
-        <BetterImage size={32} src={`/api/aquarelle/${artistURI(artist._id).name}?s=32`} />
-      </div>
-      <div className="artist-name">Albums by {(artist || {name: ''}).name}</div>
-    </div>  : <div className="pt-input-group">
+    
+    const header = (this.props.artist && artist) ?
+        <div className="artist-header">
+          <ArtistComponent layout="compact" artist={artist} theme="dark" />
+        </div>  : <div className="pt-input-group">
           <span className="pt-icon pt-icon-search"></span>
           <input className="pt-input" type="search"
             onChange={this.handleAlbumsFilterChange.bind(this)}

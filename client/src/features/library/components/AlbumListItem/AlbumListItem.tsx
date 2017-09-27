@@ -6,6 +6,7 @@ import * as PropTypes from 'prop-types';
 import {MatchResult} from 'fuzzy';
 import * as classnames from 'classnames';
 import BetterImage from 'components/BetterImage';
+import AlbumComponent from 'components/AlbumComponent';
 import * as pluralize from 'pluralize';
 
 require('./AlbumListItem.scss');
@@ -29,7 +30,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
       }).isRequired
     }).isRequired
   }
-  handleClick (event: any) {
+  handleClick (event: MouseEvent) {
     if (
       !event.defaultPrevented && // onClick prevented default
       event.button === 0// && // ignore right clicks
@@ -55,36 +56,17 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
   render (): JSX.Element {
     const {actions, album, filterMatch, active, counter = {tracks: 0}} = this.props;
     let name: JSX.Element = <span className="not-filtered">{album.name}</span>;
-
-    if (filterMatch) {
-      const match = filterMatch.rendered.split('')
-        .map((char: string, i: number, arr: string[]) => {
-          if (char === '$') return <span className="empty"></span>;
-          if (arr[i - 1] === '$') return <span className="match">{char}</span>;
-          return <span className="not-match">{char}</span>
-        });
-      name = <span className="filtered">{match}</span>;
-    }
-    const p = albumURI(album._id);
-
-    return <div className={classnames("album-list-item", {active})} onClick={this.handleClick.bind(this)}>
-      <div className="album-image">
-        <BetterImage className={classnames({
-          'pt-skeleton': !this.props.counter
-        })} src={`/api/aquarelle/${p.artist}/${p.name}?s=64`} size={64} />
+    
+    return <div className="album-list-item">
+        <AlbumComponent
+          active={active}
+          layout="medium" 
+          theme="dark" 
+          subtitle="counters"
+          counter={counter} 
+          album={album} 
+          fuzzyName={filterMatch && filterMatch.rendered} 
+          onClick={this.handleClick.bind(this)}/>
       </div>
-      <div className="album-description">
-        <span className={classnames("album-name", {
-          'pt-skeleton': !this.props.counter
-        })}>
-          {name}
-        </span>
-        <span className={classnames("album-track-count", {
-          'pt-skeleton': !this.props.counter
-        })}>
-          {counter.tracks} {pluralize('track', counter.tracks)}
-        </span>
-      </div>
-    </div>
   }
 }

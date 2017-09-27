@@ -29,7 +29,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       }).isRequired
     }).isRequired
   }
-  handleClick (event: any) {
+  handleClick (event: MouseEvent) {
     if (
       !event.defaultPrevented && // onClick prevented default
       event.button === 0// && // ignore right clicks
@@ -60,31 +60,16 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       counter = {albums: 0, tracks: 0}
     } = this.props;
     const slug = artistURI(artist._id).name;
-
-    return <ArtistComponent layout='medium' theme='dark' 
-      artist={artist} fuzzyName={filterMatch && filterMatch.rendered}
-       counter={counter} subtitle='counters' />
-    // return <div className={classnames("artist-list-item", {active})}
-    //   onClick={this.handleClick.bind(this)}>
-    //   <div className="artist-image">
-    //     <BetterImage src={`/api/aquarelle/${slug}?s=64`} size={64} />
-    //     <div className={classnames("image-overlay", {
-    //       hidden: !!counter.albums
-    //     })}></div>
-    //   </div>
-    //   <div className="artist-description">
-    //     <span className={classnames("artist-name", {
-    //       'pt-skeleton': !counter.albums
-    //     })}>
-    //       {name}
-    //     </span>
-    //     <span className={classnames("artist-album-count", {
-    //       'pt-skeleton': !counter.albums
-    //     })}>{`${counter.albums} ${pluralize('album', counter.albums)} • ${
-    //       counter.tracks
-    //     } ${pluralize('track', counter.tracks)}`}
-    //     </span>
-    //   </div>
-    // </div>
+    return <div className="artist-list-item"> 
+      <ArtistComponent 
+        active={active} 
+        layout='medium' 
+        theme='dark' 
+        artist={artist} 
+        fuzzyName={filterMatch && filterMatch.rendered} 
+        counter={counter} 
+        subtitle='counters' 
+        onClick={this.handleClick.bind(this)} />
+    </div>
   }
 }
