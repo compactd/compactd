@@ -1,5 +1,5 @@
-require('source-map-support').install();
-const {DevApplication} = require('./dist/DevApplication');
-const app = new DevApplication();
+// require('source-map-support').install();
+const {ProdApplication} = require('./dist/ProdApplication');
+const app = new ProdApplication();
 
 app.start();
