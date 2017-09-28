@@ -32,7 +32,7 @@ export default class RTorrentItem {
   getProgress () {
 
     return Promise.all([
-      ['d.get_complete', [this.infoHash]],
+      ['d.get_completed_bytes', [this.infoHash]],
       ['d.get_bytes_done', [this.infoHash]],
       ['d.get_size_bytes', [this.infoHash]]
     ].map(([name, params]) => {
