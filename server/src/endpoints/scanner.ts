@@ -5,7 +5,17 @@ import {mainStory} from 'storyboard';
 import {Library} from 'compactd-models';
 import httpEventEmitter from '../http-event';
 import * as shortid from 'shortid';
+import * as Agent from '../features/aquarelle/AquarelleAgent';
 
+async function downloadCovers () {
+  await Agent.processAlbums().catch((err) => {
+    mainStory.error('aquarelle', err.message);
+  });
+  await Agent.processArtists().catch((err) => {
+    mainStory.error('aquarelle', err.message);
+  });
+}
+ 
 export default function(app: Express.Application) {
   app.post('/api/scans', (req, res) => {
     const id = req.body.libraryId;
@@ -27,7 +37,7 @@ export default function(app: Express.Application) {
         httpEventEmitter.emit(openFolder, {folder});
       });
       
-      scanner.scan(PouchDB).then(() => {
+      scanner.scan(PouchDB).then(downloadCovers).then(() => {
         httpEventEmitter.emit(scanFinish, {ok: true});
       }).catch((err) => {
         mainStory.error('scanner', err.message, {attach: err});
