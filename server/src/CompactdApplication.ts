@@ -16,8 +16,6 @@ import * as request from 'request';
 import httpEventEmitter from './http-event';
 import * as http from 'http';
 
-const expressProxy: any = require('express-http-proxy');
-
 export class CompactdApplication {
   private auth: Authenticator;
   protected app: express.Application;
