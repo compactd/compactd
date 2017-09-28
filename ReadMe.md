@@ -7,9 +7,11 @@ cassette. It aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
 music onto your server just like headphones does.
 
+[![https://i.imgur.com/dzdT26k.jpg](https://i.imgur.com/dzdT26km.jpg)](https://i.imgur.com/dzdT26k.jpg)
+
 ## Why?
 
-I felt like the next version (1.0), while full of new features, began to be
+I felt like the next version of cassette (1.0), while full of new features, began to be
 cluttered and slow, relying on outdated technologies when new exciting
 things are up. Since I'm not trying to be profitable, but rather I code for the
 fun, and I like to discover new things and new patterns I decided to go for
@@ -20,42 +22,62 @@ implement all of this myself :D
 
 ## Stack
 
-I plan to use React, Redux, Reselect, PouchDB (ofc!)...
+Redux, React, PouchDB, Webpack, Typescript, Socket.io...
 
-## Scripts
+## Prequisites
 
-There are a few scripts to configure Compactd for now. On the long term, these
-will be automated/added to the UI.
+ - Node v8 and npm v5. I recommend using https://github.com/creationix/nvm
+ - CouchDB v2. You can install it following [this guide](https://github.com/apache/couchdb/blob/master/INSTALL.Unix.md) for linux . Windows is quite straightforward, on Debian, you will need to build it from source following the tutorial. Just make sure you don't configure anything or any password.
+ - Latest Ffmpeg. Installation varies from OS, you might wanna follow [this guide](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg)
+ - rTorrent with XML-RPC support (optional). Only needed if you wanna download new stuff.
+ 
+## Installation
 
-### Configuring database
+```
+$ npm install --global compactd
+```
 
-Before starting cassette for the first time, you need to configure CouchDB
-so permissions and validation are done correctly.
+And that's all!
 
-     node server/dist/features/configure
+## Configuring
 
-### Creating user and logging in
+Before starting anything, you need to create a directory in your home directory named `.compactd`. In that file create a new file `config.json`. This is the minimal content for this file
 
-You have to POST to `/api/users` and `/api/sessions` wth username and password
-as JSON data.
-
-### Adding a library and scanning
-
-Right now you can't add a library in the UI. You need to use `curl` once the
-server is started. Create a CouchDB entry in libary db:
-
-    {
-      "_id": "config/library/name-of-library",
-      "name": "Name of library",
-      "path": "Path to folder"
-    }
-
-And then curl:
-
-     curl -X POST /api/scans -D libraryId=config/library/name-of-library
-
-(Please note you will have to bear a valid token)
-
-
-_cluster_setup {"action":"enable_cluster","username":"admin","password":"password","bind_address":"0.0.0.0","port":5984}
-{action: "finish_cluster"}
+```json
+{
+  "secret": "make sure to input a really really long random string as this will enforce the security of your server",
+  "couchPassword": "this is the password that will secure couchdb installation. make it long (but it doesn't need to be as long as secret)"
+ }
+ ```
+ 
+ You may set other values, such as `scgiPort` for rtorrent. You may see all possible options by running
+ 
+ ```
+ $ compactd --print-config
+ ```
+ 
+ Once this is done, save the file and run from anywhere:
+ 
+ ```
+ $ compactd --configure
+ ```
+ 
+ Follow the steps. Once it is down everything is configured!
+ 
+ ## Starting
+ 
+ Just run
+ 
+ ```
+ $ compactd --serve
+ ```
+ 
+ This will spawn a pm2 process in the background if it's not already running for process management.
+ 
+ ## Stopping, restarting
+ 
+ ```
+ $ compactd --stop
+ $ compactd --restart
+ ```
+ 
