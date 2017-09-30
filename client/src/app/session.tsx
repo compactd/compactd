@@ -45,6 +45,9 @@ class SessionManager {
       return Promise.reject('Invalid username or password');
     });
   }
+  fetch (input: RequestInfo, init?: RequestInit) {
+    return fetch(input, this.init(init));
+  }
   headers (headers: any = {}) {
     return Object.assign({}, headers, {
       Authorization: `Bearer ${this.getToken()}`
