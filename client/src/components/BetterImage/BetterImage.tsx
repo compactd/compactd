@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 
+import Session from 'app/session';
+
 interface BetterImageProps {
   divClassName?: string;
   className?: string;
@@ -19,10 +21,7 @@ let loader = '';
 
 function fetchLoader (): Promise<string> {
   if (loader) return Promise.resolve(loader);
-  return fetch('/api/assets/oval-min.svg', {
-    headers: {
-      'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-  }}).then((res) => res.text())
+  return fetch('/api/assets/oval-min.svg', Session.init()).then((res) => res.text())
     .then((svg) => {
     return `data:image/svg+xml;utf8,${svg}`;
   });
@@ -38,9 +37,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     this.setState({loading: true});
     
     fetch(current, {
-      headers: current.startsWith('http') ? {} : {
-        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-    }}).then((res) => {
+      headers: current.startsWith('http') ? {} : Session.headers()}).then((res) => {
       return res.blob();
     }).then((blob) => {
       if (!this.image) return;
