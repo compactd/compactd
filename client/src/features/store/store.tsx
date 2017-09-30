@@ -7,6 +7,7 @@ import * as qs from 'querystring';
 import * as jwtDecode from 'jwt-decode';
 import * as io from 'socket.io-client';
 import Socket from 'app/socket';
+import Session from 'app/session';
 
 const TOGGLE_DOWNLOADS   = 'cassette/store/TOGGLE_DOWNLOADS';
 const TOGGLE_SEARCH      = 'cassette/store/TOGGLE_SEARCH';
@@ -111,10 +112,7 @@ function searchDatasource (q: string) {
       type: SET_SEARCH_RESULTS,
       query: q
     })
-    const res = fetch('/api/datasource/search?query=' + q, {
-      headers: {
-        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-    }}).then((res) => res.json())
+    const res = Session.fetch('/api/datasource/search?query=' + q).then((res) => res.json())
       .then((res) => {
         dispatch({
           type: SET_SEARCH_RESULTS,
@@ -132,10 +130,7 @@ function selectDSArtist (artist: string) {
       type: SELECT_DS_ARTIST,
       artist
     })
-    const res = fetch('/api/datasource/artists/' + artist, {
-      headers: {
-        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-    }}).then((res) => res.json())
+    const res = Session.fetch('/api/datasource/artists/' + artist).then((res) => res.json())
       .then((res) => {
         dispatch({
           type: RESOLVE_DS_ARTIST,
@@ -153,10 +148,7 @@ function selectDSAlbum (album: string) {
       type: SELECT_DS_ALBUM,
       album
     })
-    const res = fetch('/api/datasource/albums/' + album, {
-      headers: {
-        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-    }}).then((res) => res.json())
+    const res = Session.fetch('/api/datasource/albums/' + album).then((res) => res.json())
       .then((res) => {
         dispatch({
           type: RESOLVE_DS_ALBUM,
@@ -182,10 +174,7 @@ function loadResults (artist: string, album: string) {
     const res = await Promise.all(trackers.rows.map(async ({doc}) => {
       if (doc._id === '_design/validator') return [];
       const query = qs.stringify({name: album, artist});
-      const res = await fetch(`/api/cascade/${doc._id}/search?${query}`, {
-        headers: {
-          'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-      }})
+      const res = await Session.fetch(`/api/cascade/${doc._id}/search?${query}`)
       const data = await res.json();
       return data;
     }));
@@ -225,11 +214,10 @@ function downloadResult (release: Release, album: DSAlbum) {
   
   return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
     
-    const res = await fetch(`/api/cascade/${release._id}/download`, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token')
-    }});
+    const res = await Session.fetch(`/api/cascade/${release._id}/download`, {
+      method: 'POST'
+    });
+    
     const data = await res.json();
     const {store} = getState();
     const {event} = jwtDecode(data.event) as any;
