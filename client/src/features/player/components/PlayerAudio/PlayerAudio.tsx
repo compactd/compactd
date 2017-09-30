@@ -1,6 +1,8 @@
 import * as React from 'react';
 import {PlayerActions} from '../../actions.d';
 import {AudioSource} from 'definitions';
+import Session from 'app/session';
+
 require('./PlayerAudio.scss');
 
 interface PlayerAudioProps {
@@ -12,12 +14,9 @@ interface PlayerAudioProps {
 
 const tokens: {[id: string]: string}  = {};
 async function report (source: string) {
-  const res = await fetch(`/api/reports/${source}/listen`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`
-    }
-  });
+  const res = await fetch(`/api/reports/${source}/listen`, Session.init({
+    method: 'POST'
+  }));
   return;
 }
 async function fetchToken (source: string) {
@@ -26,10 +25,9 @@ async function fetchToken (source: string) {
   const {ok, token} = await (await fetch('/api/boombox/direct', {
     method: 'POST',
     body: JSON.stringify({track: source}),
-    headers: {
-      Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`,
+    headers: Session.headers({
       'Content-Type': 'application/json'
-    }
+    })
   })).json();
 
   if (ok) {
