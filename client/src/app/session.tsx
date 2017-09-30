@@ -50,6 +50,11 @@ class SessionManager {
       Authorization: `Bearer ${this.getToken()}`
     });
   }
+  init (init: RequestInit = {}) {
+    return Object.assign({}, init, {
+      headers: this.headers(init.headers)
+    });
+  }
   logout () {
     this.storage.removeItem(this.tokenName);
   }
