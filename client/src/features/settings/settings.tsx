@@ -5,6 +5,7 @@ import {getDatabase} from 'app/database';
 import {Intent} from '@blueprintjs/core';
 import Toaster from 'app/toaster';
 import Socket from 'app/socket';
+import Session from 'app/session';
 
 const initialState: Defs.SettingsState = {
   opened: false,
@@ -106,10 +107,9 @@ function editTrackerPassword (id: string, password: string ) {
       const res = await fetch(`/api/cascade/trackers/${type}/${name}/password`, {
         method: 'post',
         body: JSON.stringify({password}),
-        headers: {
-          'Authorization': 'Bearer ' + window.sessionStorage.getItem('session_token'),
+        headers: Session.headers({
           'content-type': 'application/json'
-        }
+        })
       });
       const data: any = await res.json();
       if (!res.ok) return Toaster.error(data.error);
@@ -147,10 +147,9 @@ function scan (id: string) {
       body: JSON.stringify({
         libraryId: id
       }),
-      headers: {
+      headers: Session.headers({
         'content-type': 'application/json',
-        Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`
-      }
+      })
     });
     if (res.status !== 201) {
       return Toaster.error('An error happened while trying to start scan. Check logs for more details');
@@ -164,7 +163,6 @@ function scan (id: string) {
       intent: 'PRIMARY',
       timeout: 999999999
     });
-    console.log(toast);
     
     Socket.listen(finish, () => {
       Toaster.update(toast, {message: 'Scan sucessfully finished', intent: Intent.SUCCESS});
