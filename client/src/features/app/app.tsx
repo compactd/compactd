@@ -6,6 +6,7 @@ import * as jwt from 'jwt-decode';
 import {getDatabase} from 'app/database';
 import Toaster from 'app/toaster';
 import Socket from 'app/socket';
+import Session from 'app/session';
 
 const RESOLVE_STATE = 'compactd/app/RESOLVE_STATE';
 const SET_USER = 'compactd/app/SET_USER';
@@ -52,17 +53,10 @@ export function reducer (state: Defs.AppState = initialState,
 }
 
 function login (username: string, password: string) {
-  return fetch('/api/sessions',
-    {method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({username, password})})
-    .then((res) => res.json()).then((res) => {
-      sessionStorage.setItem('session_token',res.token);
-
-      
-      return {type: SET_USER, user: jwt(res.token)};
+  return Session.signIn(username, password).then((token) => {
+    return {type: SET_USER, user: jwt(token.user)};
   }).catch((err) => {
-    Toaster.error('Invalid username or password');
+    Toaster.error(err);
   });
 }
 
