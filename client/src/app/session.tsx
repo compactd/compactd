@@ -6,6 +6,9 @@ class SessionManager {
   constructor(storage = window.localStorage) {
     this.storage = storage;
   }
+  public getUser () {
+    return this.decodeToken().user;
+  }
   public getToken () {
     return this.storage.getItem(this.tokenName);
   }
@@ -13,6 +16,7 @@ class SessionManager {
     this.storage.setItem(this.tokenName, token);
   }
   protected decodeToken (token = this.getToken()) {
+    if (!token) return null;
     return jwt(token) as {
       exp: number,
       iat: number,
@@ -22,7 +26,8 @@ class SessionManager {
     }
   }
   isSignedIn () {
-    const session =  this.decodeToken();
+    const session = this.decodeToken();
+    if (!session) return false;
     if (session.exp > Date.now()) {
       return false;
     }

@@ -54,7 +54,7 @@ export function reducer (state: Defs.AppState = initialState,
 
 function login (username: string, password: string) {
   return Session.signIn(username, password).then((token) => {
-    return {type: SET_USER, user: jwt(token.user)};
+    return {type: SET_USER, user: token.user};
   }).catch((err) => {
     Toaster.error(err);
   });
@@ -64,16 +64,14 @@ function fetchState () {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, 400);
   }).then(() => {
-    const token = sessionStorage.getItem('session_token');
-    try {
-      const user = jwt(token || '');
+    if (Session.isSignedIn()) {
       return {
         type: RESOLVE_STATE,
         configured: true,
-        user: user
+        user: Session.getUser()
       }
-    } catch (err) {
-      Toaster.error(err);
+    } else {
+      Toaster.error('Invalid or expired token');
     }
     return {
       type: RESOLVE_STATE,
