@@ -3,3 +3,4 @@ client/dist
 server/dist
 .git
 *.log
+clearCouch.bat

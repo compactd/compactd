@@ -10,17 +10,20 @@ if(process.argv.includes('--verbose')  || process.env.STORYBOARD) {
   }
 }
 
-const CLI      = require('clui');
-const chalk    = require('chalk');
-const config   = require('./server/dist/config').default;
-const entropy  = require('string-entropy');
-const fs       = require('fs-promise');
-const pkg      = require('./package.json');
-const path     = require('path');
-const shortid  = require('shortid');
-const inquirer = require('inquirer');
-const Spinner  = CLI.Spinner;
-const fetch    = require('node-fetch');
+const CLI       = require('clui');
+const chalk     = require('chalk');
+const crypto    = require('crypto');
+const base64url = require('base64url');
+const config    = require('./server/dist/config').default;
+const entropy   = require('string-entropy');
+const fs        = require('fs-promise');
+const pkg       = require('./package.json');
+const path      = require('path');
+const shortid   = require('shortid');
+const mkdirp    = require('mkdirp');
+const inquirer  = require('inquirer');
+const Spinner   = CLI.Spinner;
+const fetch     = require('node-fetch');
 
 const {configure}   = require('./server/dist/features/configure');
 const Authenticator = require('./server/dist/features/authenticator').default;
@@ -274,8 +277,46 @@ async function checkCouchDB (spin) {
   }
 }
 
+function generateSecret (spin) {
+  spin.message('Generating secret and password');
+
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const secret = base64url(crypto.randomBytes(144));
+      const couchPassword = base64url(crypto.randomBytes(64));
+
+      config.set('secret', secret);
+      config.set('couchPassword', couchPassword);
+
+      mkdirp.sync(config.get('dataDirectory'));
+
+      const out = path.join(config.get('dataDirectory'), 'config.json');
+      fs.writeFile(out, JSON.stringify({secret, couchPassword}, null, 2), (err) => {
+        if (err) {
+          spin.stop();
+          return reject(err)
+        }
+        checkSecret(spin).then(() => {
+          spin.stop()
+
+          // There is a weird bug which makes the rest of the script fails for apparently no reason
+          // Anyway the only way to make it work for now is to restart the script
+          console.log('\n  Please start this script again to configure\n');
+          process.exit(0);
+        }).catch((err) => {
+          spin.stop();
+          reject(err);
+        });
+      });
+    }, 420);
+  });
+}
+
 function checkSecret (spin) {
   const secret = config.get('secret');
+  if (!fs.existsSync(path.join(config.get('dataDirectory'), 'config.json'))) {
+    return generateSecret(spin);
+  }
   if (secret === 'pleaseChangeThisValue') {
     spin.stop();
     console.log(chalk.red(`  ✘ Please set your secret in the config file`));
