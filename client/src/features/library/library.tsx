@@ -3,6 +3,8 @@ import { LibraryAction } from './actions.d';
 import PouchDB from 'pouchdb';
 import {artistURI} from 'compactd-models';
 import Toaster from 'app/toaster';
+import session from 'app/session';
+
 const trickle = require('timetrickle');
 // import * as IFetch from '@types/whatwg-fetch';
 // import "whatwg-fetch";
@@ -216,9 +218,7 @@ async function fetchArtist (slug: string): Promise<LibraryAction> {
 
 async function fetchTopTracks () {
   const res = await fetch('/api/reports/tracks/top?limit=30', {
-    headers: {
-      Authorization: `Bearer ${window.sessionStorage.getItem('session_token')}`
-    }
+    headers: session.headers()
   });
   return await res.json();
 }
