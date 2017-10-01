@@ -197,6 +197,7 @@ export class Scanner extends events.EventEmitter {
             bitrate: '' + Math.round(+probed.format.bit_rate / 1000),
             track: trackID,
             duration: probed.format.duration,
+            library: this.library,
             format: ext,
             hash: ''
           };
