@@ -8,7 +8,6 @@ require('./PlaylistItem.scss');
 interface PlaylistItemProps {
   actions: PlayerActions;
   player: PlayerState;
-  library: LibraryState;
   track: Track;
   index: number;
 }
@@ -17,8 +16,20 @@ export class PlaylistItem extends React.Component<PlaylistItemProps, {}>{
   handleItemClick () {
     this.props.actions.jumpTo(this.props.track._id);
   }
+  componentDidMount () {
+    const {actions, track, player} = this.props;
+    if (track.artist) {
+      actions.fetchDatabaseArtist(track.artist);
+    }
+  }
+  componentWillUpdateProps (nextProps: PlaylistItemProps) {
+    const {actions, track, player} = this.props;
+    if (nextProps.track && nextProps.track.artist && nextProps.track.artist !== track.artist) {
+      actions.fetchDatabaseArtist(nextProps.track.artist);
+    }
+  }
   render (): JSX.Element {
-    const {actions, track, library} = this.props;
+    const {actions, track, player} = this.props;
 
     const date = new Date(null);
     date.setSeconds(track.duration || 0);
@@ -27,7 +38,7 @@ export class PlaylistItem extends React.Component<PlaylistItemProps, {}>{
 
     return <div className="playlist-item" onClick={() => this.handleItemClick()}>
       <span className="playlist-duration">{duration}</span>
-      <span className="playlist-item-name">{track.name} ― {library.artistsById[track.artist].name}</span>
+      <span className="playlist-item-name">{track.name} ― {player.artistsById[track.artist].name}</span>
     </div>
   }
 }
