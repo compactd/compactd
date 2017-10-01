@@ -125,6 +125,7 @@ export interface File extends Document {
   artist: string;
   album: string;
   track: string;
+  library: string;
   duration: number;
   format: string;
   bitrate: string;
