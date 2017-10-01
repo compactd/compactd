@@ -1,5 +1,6 @@
 
 import {Artist, Album, Track, artistURI, albumURI} from 'compactd-models';
+import PouchDB from 'pouchdb';
 
 interface ResolveTrackAction {
   track: Track
@@ -22,17 +23,17 @@ export interface ActionCreators {
    * fetches an artist and add it to the store `artistsById`
    * @param slug the slug or _id of the artist
    */
-  fetchArtist: (slug: string) => void;
+  fetchDatabaseArtist: (slug: string) => void;
   /**
    * fetches an album and it to the store `albumsById`
    * @param id the _id of the album
    */
-  fetchAlbum: (id: string) => void;
+  fetchDatabaseAlbum: (id: string) => void;
   /**
    * fetches a track and add it to the store `tracksById`
    * @param id the track id to fetch
    */
-  fetchTrack: (id: string) => void;
+  fetchDatabaseTrack: (id: string) => void;
 }
 
 export interface MusicContentState {
@@ -48,7 +49,7 @@ type Omit<T, K extends keyof T> = {[P in Diff<keyof T, K>]: T[P]};
  * This class augments a reducer/action couple by allowing it to fetch 
  * albums and artists and tracks and save it to the store
  */
-export default class MusicContentStore<T extends MusicContentState> {
+export default class MusicContentDecorator<T extends MusicContentState> {
   protected feature: string;
   constructor(feature: string) {
     this.feature = feature;
@@ -107,9 +108,9 @@ export default class MusicContentStore<T extends MusicContentState> {
    */
   public getActionCreators (): ActionCreators {
     return {
-      fetchAlbum: this.fetchAlbum,
-      fetchArtist: this.fetchArtist,
-      fetchTrack: this.fetchTrack
+      fetchDatabaseAlbum: this.fetchAlbum.bind(this),
+      fetchDatabaseArtist: this.fetchArtist.bind(this),
+      fetchDatabaseTrack: this.fetchTrack.bind(this)
     }
   }
   /**
@@ -151,9 +152,8 @@ export default class MusicContentStore<T extends MusicContentState> {
     }
     return state;
   }
-  public createReducer (initialState: Omit<T, 'albumsById' | 'artistsById' | 'tracksById'>,
-    reduce: (state: T, action: any) => T): (state: T, action: any) => T {
-    return (state = this.initialState(initialState), action: any): T => {
+  public createReducer<K> (initialState: T, reduce: (state: T, action: any) => T): (state: T, action: K) => T {
+    return (state = initialState, action: any): T => {
       return this.reduce(reduce(state, action), action);
     }
   }
