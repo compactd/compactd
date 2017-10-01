@@ -30,7 +30,6 @@ const initialState: Defs.LibraryState = {
   counters: {},
   topTracks: []
 };
-
 export function reducer (state: Defs.LibraryState = initialState,
   action: LibraryAction): Defs.LibraryState {
   switch (action.type) {

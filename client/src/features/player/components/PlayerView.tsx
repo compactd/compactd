@@ -9,13 +9,11 @@ import {PlayerState, CompactdState, LibraryState} from 'definitions';
 interface PlayerViewProps {
   actions: PlayerActions;
   player: PlayerState;
-  library: LibraryState;
   component: any;
 }
 
 @(connect as any)(createStructuredSelector({
-  player: (state: CompactdState) => state.player,
-  library: (state: CompactdState) => state.library
+  player: (state: CompactdState) => state.player
 }), (dispatch: Dispatch<PlayerAction>) => ({
   actions: bindActionCreators(actions, dispatch)
 }))
@@ -23,7 +21,7 @@ class PlayerView extends React.Component<PlayerViewProps, {}> {
   render (): JSX.Element {
     return <div className="player-block">
       <this.props.component actions={this.props.actions}
-        player={this.props.player} library={this.props.library} />
+        player={this.props.player} />
     </div>;
   }
 }

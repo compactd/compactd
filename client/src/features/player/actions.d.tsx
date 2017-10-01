@@ -1,4 +1,5 @@
 import {Artist, Album, Track} from 'definitions';
+import { MusicContentAction, ActionCreators } from 'app/content-decorator';
 
 interface PlayerActionBase {
   type: string;
@@ -49,7 +50,8 @@ export type PlayerAction =  PlayNextAction |
                             ClearPlaylistAction |
                             TogglePlaybackAction |
                             JumpToAction |
-                            PlayAfterAction;
+                            PlayAfterAction |
+                            PlayNextAction;
 
 // Album | [Album, number] | Track[] | Track
 
@@ -63,4 +65,4 @@ export type PlayerActions = {
   togglePlayback: () => void;
   playAfter: (stack: PlayerStack) => void;
   jumpTo: (target: Track | number | string) => void;
-}
+} & ActionCreators;

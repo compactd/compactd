@@ -1,4 +1,5 @@
 import * as Compactd from './common.d';
+import {MusicContentState} from 'app/content-decorator';
 import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker, Release} from 'compactd-models';
 
 export interface LibraryState {
@@ -49,7 +50,7 @@ export interface AppState {
   user?: string;
 }
 
-export interface PlayerState {
+export interface PlayerState extends MusicContentState {
   /**
    * An array containing a list of the next tracks
    */

@@ -3,6 +3,7 @@ import PouchDB from 'pouchdb';
 import * as path from 'path';
 import {albumURI} from 'compactd-models';
 import { PlayerAction, PlayerStack } from './actions.d';
+import MusicContentStore from 'app/content-decorator';
 import Toaster from 'app/toaster';
 
 const PLAY_NEXT_ACTION = 'cassette/player/PLAY_NEXT_ACTION';
@@ -13,14 +14,16 @@ const TOGGLE_PLAYBACK_ACTION = 'cassette/player/TOGGLE_PLAYBACK_ACTION';
 const PLAY_AFTER_ACTION = 'cassette/player/PLAY_AFTER_ACTION';
 const JUMP_TO = 'cassette/player/JUMP_TO';
 
-const initialState: Defs.PlayerState = {
+const decorator = new MusicContentStore<Defs.PlayerState>('player');
+
+const initialState: Defs.PlayerState = decorator.initialState({
   playing: false,
   stack: [],
   prevStack: []
-};
+});
 
-export function reducer (state: Defs.PlayerState = initialState,
-  action: PlayerAction): Defs.PlayerState {
+export const reducer = decorator.createReducer(initialState, (state: Defs.PlayerState = initialState,
+  action: PlayerAction): Defs.PlayerState => {
   switch (action.type) {
     case JUMP_TO:
       const index = action.target;
@@ -61,7 +64,7 @@ export function reducer (state: Defs.PlayerState = initialState,
       });
   }
   return state;
-}
+})
 
 function togglePlayback () {
   return {
@@ -208,6 +211,6 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
   };
 }
 
-export const actions = {
+export const actions = decorator.addActionsCreators({
   replacePlayerStack, playNext, playPrevious, togglePlayback, jumpTo, playAfter
-}
+})

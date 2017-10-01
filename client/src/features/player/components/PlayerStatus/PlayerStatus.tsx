@@ -11,7 +11,6 @@ require('./PlayerStatus.scss');
 interface PlayerStatusProps {
   actions: PlayerActions;
   player: PlayerState;
-  library: LibraryState;
 }
 
 export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
@@ -22,12 +21,25 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
   onAudioEnd () {
     this.props.actions.playNext();
   }
+  componentDidMount () {
+    if (this.props.player.stack.length && this.props.player.stack[0].artist) {
+      this.props.actions.fetchDatabaseArtist(this.props.player.stack[0].artist);
+    }
+  }
+  componentWillReceiveProps (nextProps: PlayerStatusProps) {
+    if (!this.props.player.stack.length) {
+      return this.props.actions.fetchDatabaseArtist(nextProps.player.stack[0].artist);
+    }
+    if (nextProps.player.stack[0].artist !== this.props.player.stack[0].artist) {
+      this.props.actions.fetchDatabaseArtist(nextProps.player.stack[0].artist);
+    }
+  }
   render (): JSX.Element {
     const {actions, player} = this.props;
     const content = player.stack.length > 0 ?
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
-        <span className="artist-name">{this.props.library.artistsById[player.stack[0].artist].name}</span>
+        <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
       </div> : <div className="player-name">
       </div>
     return <div className="player-status">
