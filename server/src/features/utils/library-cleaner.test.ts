@@ -1,7 +1,6 @@
 import test from 'ava';
 import clean from './library-cleaner';
 import Pouch from 'pouchdb';
-// import 'storyboard-preset-console';
 
 const PouchDB: typeof Pouch = require('pouchdb').defaults({adapter: 'memory'});
 

@@ -4,3 +4,4 @@ server/dist
 .git
 *.log
 clearCouch.bat
+.vscode/launch.json

@@ -30,30 +30,28 @@ export default async function (pouch: typeof PouchDB, dryRun = false) {
   const [albums, albumsId]  = await getIDs(pouch, 'albums');
 
   const widowAlbums = albumsId.filter((album) => {
-    return !tracksId.find((track) => track.id.startsWith(album.id));
+    return !tracksId.find((track) => track.id.startsWith(album.id))
+    || widowTracks.find((track) => track.id.startsWith(album.id));
   });
 
-  mainStory.debug('vacuum', `Removing ${widowTracks.length} albums`, {
+  mainStory.debug('vacuum', `Removing ${widowAlbums.length} albums`, {
     attach: widowAlbums, attachLevel: 'trace'});
 
   if (!dryRun) {
     await Promise.all(widowAlbums.map((doc) => {
-      return albums.remove(doc.id, doc.rev).then(() => {
-        console.log('remvoved', doc);
-        
-      });
+      return albums.remove(doc.id, doc.rev);
     }));
   }
 
 
   const [artists, artistsId] = await getIDs(pouch, 'artists');
-  console.log(artistsId, albumsId);
-  
+
   const widowArtists = artistsId.filter((artist) => {
-    return !albumsId.find((album) => album.id.startsWith(artist.id));
+    return !albumsId.find((album) => album.id.startsWith(artist.id))
+      || widowAlbums.find((album) => album.id.startsWith(artist.id));
   });
 
-  mainStory.debug('vacuum', `Removing ${widowTracks.length} artists`, {
+  mainStory.debug('vacuum', `Removing ${widowArtists.length} artists`, {
     attach: widowArtists, attachLevel: 'trace'});
 
   
