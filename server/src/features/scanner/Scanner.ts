@@ -82,7 +82,12 @@ export class Scanner extends events.EventEmitter {
       });
     });
   }
+  get treePath () {
+    const dir = config.get('dataDirectory');
 
+    return path.join(dir, `fstree/${path.basename(this.library)}.entries.json`)
+  }
+  
   serializeEntries (dir: string) {
     mkdirp.sync(path.join(dir, 'fstree/'));
     const file = path.join(dir, `fstree/${path.basename(this.library)}.entries.json`);
