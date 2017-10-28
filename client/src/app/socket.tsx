@@ -3,6 +3,7 @@ import * as jwtDecode from 'jwt-decode';
 import * as io from 'socket.io-client';
 import Toaster from 'app/toaster';
 import * as events from 'events';
+import Session from './session';
 
 class SocketEventEmitter {
   private socket: SocketIOClient.Socket;
@@ -16,11 +17,17 @@ class SocketEventEmitter {
     })
   }
   connect () {
-
+    
     this.socket = io.connect();
+  
     (window as any).socket = this.socket;
 
     this.socket.on('connect', () => {
+      console.log('connect');
+      setTimeout(() => {
+
+        this.socket.emit('authenticate', {token: Session.getToken()});
+      }, 100)
       Toaster.show({
         icon: 'feed-subscribed' as any,
         intent: 'NONE',

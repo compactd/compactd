@@ -60,7 +60,7 @@ export class CompactdApplication {
       this.configure();
       this.route();
       const server = http.createServer(this.app);
-      httpEventEmitter.attach(server as any);
+      httpEventEmitter.attach(server as any, this.auth);
       server.listen(this.port, this.host, () => {
         mainStory.info('http', `Express listening on ${this.host}:${this.port} `);
         resolve();
