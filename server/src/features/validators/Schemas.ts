@@ -16,6 +16,14 @@ const types = {
       'Field ' + k + ' is required' :
       'Field ' + k + ' must be a number but got a '  + typeof v);
   }}),
+  boolean: Object.assign(function (k: string, v: any) {
+    return typeof v === 'boolean' ? '' : (typeof v === 'undefined' ? '' :
+      'Field ' + k + ' must be a boolean but got a '  + typeof v);
+  }, {required: function (k: string, v: any) {
+    return typeof v === 'boolean' ? '' : (typeof v === 'undefined' ?
+      'Field ' + k + ' is required' :
+      'Field ' + k + ' must be a boolean but got a '  + typeof v);
+  }}),
   any: function () {
     return '';
   }
@@ -40,7 +48,8 @@ export const TrackSchema: ISchema = {
   number: types.number,
   disc: types.string,
   duration: types.number,
-  track_artist: types.string
+  track_artist: types.string,
+  hidden: types.boolean
 }
 
 export const TrackerSchema: ISchema = {

@@ -78,6 +78,7 @@ export interface Track extends Document {
     number: number;
     duration: number;
     disc: string;
+    hidden?: boolean;
 }
 export interface TrackParams extends RouteParams {
     name: string;
