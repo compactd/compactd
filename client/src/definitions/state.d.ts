@@ -91,11 +91,10 @@ export interface StoreState {
   downloadsById: {
     [id: string]: {
       id: string;
-      event: string;
-      token: string;
-      album: DSAlbum;
+      hash: string;
       name: string;
       progress: number;
+      done: boolean;
     }
   }
 }

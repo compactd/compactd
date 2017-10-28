@@ -3,6 +3,7 @@
     "sourceMap": true,
     "outDir": "./dist/",
     "noImplicitAny": true,
+    "noUnusedLocals": false,
     "module": "commonjs",
     "target": "es6",
     "allowJs": true,

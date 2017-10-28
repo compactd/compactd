@@ -1,18 +1,26 @@
-import * as keytar from 'keytar';
 import Indexer from './';
 import {Indexer as IndexerParent} from './Indexer';
 import PouchDB from '../../database';
 import {Tracker, mapTrackerToParams, trackerURI, DSAlbum} from 'compactd-models';
-import RTorrentItem from './rTorrent';
-import jwt from '../../jwt';
-import httpEventEmitter from '../../http-event';
 import {mainStory} from 'storyboard';
 import config from '../../config';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
+import * as util from 'util';
+import {DelugeClient} from 'polytorrent';
+import event from '../../http-event';
 
 const passwords = path.join(config.get('dataDirectory'), 'credentials');
+
+const client = new DelugeClient({
+  host: config.get('delugeHost'),
+  port: config.get('delugePort'),
+  password: config.get('delugePassword'),
+  log: (level, msg, obj, objLevel = level) => {
+    // console.log('deluge', msg, obj);
+  }
+});
 
 export async function createTracker (type: string, name: string, username: string) {
   
@@ -109,11 +117,12 @@ export async function searchTracker (id: string, album: DSAlbum) {
   return await indexer.searchAlbum(album);
 }
 
-const POLLING_INTERVAL = 1000;
+const POLLING_INTERVAL = 500;
 
 export async function downloadFile (id: string, torrent: string) {
   mainStory.info('cascade', `Trying to download from '${id}' torrent id '${torrent}'`);
   const trackers = new PouchDB<Tracker>('trackers');
+  const downloads = new PouchDB('downloads');
 
   const tracker = await trackers.get(id);
 
@@ -124,25 +133,110 @@ export async function downloadFile (id: string, torrent: string) {
   });
 
   const buffer = await indexer.downloadRelease(torrent);
-
-  const item = await RTorrentItem.addTorrent(buffer);
-  const event = `dl_progress_${item.infoHash}`;
   
-  const token = httpEventEmitter.createEventThread(event, async () => {
-    const prog = await item.getProgress();
-    httpEventEmitter.emit(event, {progress: prog});
-    if (httpEventEmitter.listenerCount(event) === 1) {
-      const interval: NodeJS.Timer = setInterval(async () => {
-        const prog = await item.getProgress();
-        httpEventEmitter.emit(event, {progress: prog});
-        if (prog === 1) return clearInterval(interval);
-      }, POLLING_INTERVAL);
-    }
+  const temp = path.join(config.get('dataDirectory'), 'temp');
+
+  await util.promisify(mkdirp)(temp, {});
+
+  const download = await client.addFile(buffer, {
+    tempDirectory: temp,
+    directory: config.get('downloadDirectory')
   });
+
+  await download.update();
+
+  await downloads.put({
+    _id: `downloads/${download.hash}`,
+    date: Date.now(),
+    name: download.name,
+    hash: download.hash,
+    done: download.progress === 1,
+  });
+
+  watchTorrent([download.hash]);
 
   return {
     ok: true,
-    event: token,
-    name: item.name
+    hash: download.hash,
+    name: download.name
   };
 }
+
+const DATE_TS_TRESHOLD = 1000 * 60 * 60 * 24;
+
+export async function getDownloads () {
+
+  const downloads = new PouchDB('downloads');
+  const res = await downloads.allDocs({include_docs: true});
+  const torrents = res.rows.map((doc) => {
+    return doc.doc;
+  }).filter((doc: any) => {
+    if (!doc.done_ts) return true;
+    return Date.now() - doc.done_ts < DATE_TS_TRESHOLD;
+  });
+
+  return torrents.map((t: any) => ({
+    _id: t._id,
+    hash: t.hash,
+    name: t.name,
+    done: t.done
+  }));
+}
+
+async function watchTorrent (hashes: string[]) {
+  const dls = new PouchDB('downloads');
+  
+  const downloads = await Promise.all(hashes.map(async (hash) => {
+    
+    const t = await client.getTorrent(hash);
+    
+    return t;
+  }));
+  
+  downloads.forEach((dl) => {
+    
+    dl.removeAllListeners();
+    dl.once('finish', async () => {
+      event.emit('client_call', {
+        method: 'torrentFinished',
+        args: [dl.hash, dl.name]
+      });
+      const doc: any = await dls.get(`downloads/${dl.hash}`);
+      await dls.put({
+        date: doc.date,
+        hash: doc.hash,
+        name: doc.name,
+        _id: doc._id,
+        _rev: doc._rev,
+        done: true,
+        done_ts: Date.now()
+      });
+
+    });
+    dl.on('progress', (p) => {
+      event.emit('client_call', {
+        method: 'torrentProgress',
+        args: [dl.hash, p]
+      });
+    });
+    dl.liveFeed(POLLING_INTERVAL);
+  });
+}
+
+async function watchDownloads () {
+  await client.connect();
+  const downloads = new PouchDB('downloads');
+  const res = await downloads.allDocs({include_docs: true});
+
+  const torrents = res.rows.map((doc) => {
+    return doc.doc;
+  }).filter((doc: any) => {
+    return !doc.done;
+  });
+  
+  watchTorrent(torrents.map((doc: any) => doc.hash));
+}
+
+process.nextTick(() => {
+  watchDownloads();
+});

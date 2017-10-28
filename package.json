@@ -1,6 +1,6 @@
 {
   "name": "compactd",
-  "version": "1.1.2",
+  "version": "1.0.0",
   "description": "Remote music player that allows to play music remotely",
   "main": "./server/index.js",
   "bin": {
@@ -38,6 +38,7 @@
     "parse-torrent": "^5.8.3",
     "password-hash-and-salt": "^0.1.4",
     "pm2": "^2.7.1",
+    "polytorrent": "^1.1.10",
     "pouchdb": "^6.3.4",
     "pouchdb-find": "^6.3.4",
     "qs": "^6.4.0",

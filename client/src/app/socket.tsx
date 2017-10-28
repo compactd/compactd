@@ -8,6 +8,13 @@ class SocketEventEmitter {
   private socket: SocketIOClient.Socket;
   constructor() {
   }
+  onClientCall (method: string, cb: (...args: any[]) => void) {
+    this.socket.on('client_call', (data: any) => {
+      if (data.method === method) {
+        cb(...data.args);
+      }
+    })
+  }
   connect () {
 
     this.socket = io.connect();

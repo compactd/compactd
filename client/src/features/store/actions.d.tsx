@@ -58,16 +58,13 @@ export interface DownloadResult {
   type: 'cassette/store/DOWNLOAD_RESULT';
   result: {
     id: string;
-    event: string;
-    token: string;
-    album: DSAlbum;
+    hash: string;
     name: string;
-    progress: number;
   }
 }
 export interface UpdateProgress {
   type: 'cassette/store/UPDATE_DL_PROGRESS';
-  id: string;
+  hash: string;
   progress: number;
 }
 export type StoreAction =

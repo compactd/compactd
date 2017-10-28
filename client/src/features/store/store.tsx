@@ -42,13 +42,13 @@ export function reducer (state: Defs.StoreState = initialState,
     case DOWNLOAD_RESULT:
       return Object.assign({}, state, {
         downloadsById: Object.assign({}, state.downloadsById, {
-          [action.result.id]: action.result
+          [action.result.hash]: action.result
         })
       });
     case UPDATE_DL_PROGRESS:
       return Object.assign({}, state, {
         downloadsById: Object.assign({}, state, {
-          [action.id]: Object.assign({}, state.downloadsById[action.id], {
+          [action.hash]: Object.assign({}, state.downloadsById[action.hash], {
             progress: action.progress
           })
         })
@@ -189,22 +189,20 @@ function loadResults (artist: string, album: string) {
 }
 
 function initResults () {
-
-  const dl = JSON.parse(localStorage.getItem('pending_downloads') || '[]');
-  return (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
-    dl.forEach((res: any) => { 
+  return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
+    const res = await Session.fetch('/api/cascade/downloads');
+    const downloads = await res.json();
+    downloads.forEach((res: any) => { 
       dispatch({
         type: DOWNLOAD_RESULT,
         result: res
       });
-
-
-      Socket.listen(res.event, res.token, (data: any) => {
-        dispatch({
-          type: UPDATE_DL_PROGRESS,
-          id: res.id,
-          progress: data.progress
-        });
+    });
+    Socket.onClientCall('torrentProgress', (hash: string, progress: number) => {
+      // if (hash !== data.hash) return;
+      dispatch({
+        type: UPDATE_DL_PROGRESS,
+        hash, progress
       });
     });
   };
@@ -220,34 +218,20 @@ function downloadResult (release: Release, album: DSAlbum) {
     
     const data = await res.json();
     const {store} = getState();
-    const {event} = jwtDecode(data.event) as any;
+
     dispatch({
       type: DOWNLOAD_RESULT,
       result: {
-        id: release._id,
-        event: event,
-        token: data.event,
-        album: album,
-        name: data.name,
-        progress: 0
+        id: release._id + '/' + data.hash,
+        hash: data.hash,
+        name: data.name
       }
     });
-    const dl = JSON.parse(localStorage.getItem('pending_downloads') || '[]');
-    localStorage.setItem('pending_downloads', JSON.stringify([].concat(dl, [{
-      id: release._id,
-      event: event,
-      token: data.event,
-      album: Object.assign({}, album, {tracks: undefined}),
-      name: data.name,
-      progress: 0
-    }])));
-
-
-    Socket.listen(event, data.event, (data: any) => {
+    Socket.onClientCall('torrentProgress', (hash: string, progress: number) => {
+      if (hash !== data.hash) return;
       dispatch({
         type: UPDATE_DL_PROGRESS,
-        id: release._id,
-        progress: data.progress
+        hash, progress
       });
     });
   }

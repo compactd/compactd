@@ -1,3 +1,6 @@
+@import '../../../../styles/utils';
+@import '../../../../styles/colors';
+
 div.store-popup{
   .popup-content {
     width: 420px;
@@ -17,6 +20,23 @@ div.store-popup{
 
   .pt-progress-bar.pt-intent-success {
       display: inline-block;
+      width: 169px;
+      vertical-align: top;
+      margin-top: 4px;
+      margin-left: 4px;
+  }
+  .done-indicator {
+    display: inline-block;
+    width: 169px;
+    vertical-align: top;
+    margin-top: 0px;
+    margin-left: 4px;
+    color: rgb(121, 170, 118);
+    text-align: center;
+    span.pt-icon {
+        margin-right: 12px;
+    }
+    @include no-select();
   }
 
   span.item-album {
@@ -27,6 +47,9 @@ div.store-popup{
   span.item-name {
       display: inline-block;
       margin-right: 0.3em;
+      width: 200px;
+      @include ellipsis();
+      @include no-select();
   }
 
   .popup-main {

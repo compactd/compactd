@@ -25,10 +25,18 @@ class HttpEventEmitter extends events.EventEmitter {
     return jwt.verify(token, {subject: 'event'}) as any;
   }
   attach (app: Express.Application) {
-    this.io = SocketIO(app);
+    this.io = SocketIO(app, {
+      
+    });
 
     this.io.on('connection', (socket) => {
       mainStory.info('socket', `Connected to ${socket.handshake.address} via ${socket.handshake.url} [${socket.id}]`);
+      this.on('client_call', (data: any) => {
+        this.io.emit('client_call', data);
+      });
+      this.io.on('server_call', (data: any) => {
+        this.emit('server_call')
+      });
       socket.on('listen', (data: any) => {
         mainStory.debug('socket', `Trying to listen to an event... [${socket.id}]`);
         if (!data.token) return socket.emit('remote_error', {code: 400, message: 'Emitted a listen event without a token'});

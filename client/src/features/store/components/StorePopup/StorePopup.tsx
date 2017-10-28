@@ -17,13 +17,17 @@ export class StorePopup extends React.Component<StorePopupProps, {}>{
     const {actions, store} = this.props;
 
     const downloads = Object.values(store.downloadsById).map((dl) => {
-      if (!dl || !dl.album) return;
-      return <div className="item" key={dl.id}>
-          <span className="item-name">{dl.album.artist}</span>
-          <span className="item-album">{dl.album.name}</span>
-          <div className="pt-progress-bar pt-intent-success">
-            <div className="pt-progress-meter" style={{width: dl.progress * 100 + "%"}}></div>
-          </div>
+      if (!dl || !dl.hash) return;
+      return <div className="item" key={dl.hash}>
+          <span className="item-name">{dl.name}</span>
+          {/* <span className="item-album">{dl.album.name}</span> */}
+          {
+            dl.done ? 
+              <div className="done-indicator"><span className="pt-icon pt-icon-tick"></span>Done </div> :
+              <div className="pt-progress-bar pt-intent-success">
+                <div className="pt-progress-meter" style={{width: (dl.progress || 0) * 100 + "%"}}></div>
+              </div>
+          }
         </div>
     })
 

@@ -72,4 +72,14 @@ export default function(app: Express.Application) {
       });
     })
   });
+  app.get('/api/cascade/downloads', (req, res) => {
+    Trackers.getDownloads().then((result) => {
+      return res.status(200).send(result);
+    }).catch((err) => {
+      res.status(500).send({error: 'An error occured. Please check logs for more details'});
+      mainStory.error('cascade', 'An error occured while download', {
+        attach: err
+      });
+    });
+  })
 }

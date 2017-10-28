@@ -60,17 +60,29 @@ const conf = convict({
     default: path.join(os.homedir(), '.compactd/'),
     env: "COMPACTD_DATA_DIR"
   },
-  scgiPort: {
-    doc: "The SCGI port of rTorrent",
-    format: "port",
-    default: "52461",
-    env: "COMPACTD_SCGI_PORT"
+  downloadDirectory: {
+    doc: "Download directory",
+    format: '*',
+    default: path.join(os.homedir(), '.compactd/downloads'),
+    env: 'COMPACTD_DOWNLOAD_DIR'
   },
-  scgiHost: {
-    doc: "The SCGI host of rTorrent",
+  delugePort: {
+    doc: "The deluge-web port",
+    format: "port",
+    default: "8112",
+    env: "COMPACTD_DELUGE_PORT"
+  },
+  delugeHost: {
+    doc: "The deluge-web host",
     format: "ipaddress",
     default: "127.0.0.1",
-    env: "COMPACTD_SCGI_HOST"
+    env: "COMPACTD_DELUGE_HOST"
+  },
+  delugePassword: {
+    doc: "The deluge-web password",
+    format: "*",
+    default: "deluge",
+    env: 'COMPACTD_DELUGE_PASSWORD'
   },
   secret: {
     doc: 'jsonwebtoken secret',
