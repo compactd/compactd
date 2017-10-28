@@ -187,14 +187,19 @@ async function watchTorrent (hashes: string[]) {
   const dls = new PouchDB('downloads');
   
   const downloads = await Promise.all(hashes.map(async (hash) => {
-    
-    const t = await client.getTorrent(hash);
-    
-    return t;
+    try {
+
+      const t = await client.getTorrent(hash);
+      
+      return t;
+    } catch (err) {
+      mainStory.error('deluge', 'Deluge RPC error: ' + err.message);
+      return Promise.resolve();
+    }
   }));
   
   downloads.forEach((dl) => {
-    
+    if (!dl) return;
     dl.removeAllListeners();
     dl.once('finish', async () => {
       event.emit('client_call', {
@@ -224,7 +229,13 @@ async function watchTorrent (hashes: string[]) {
 }
 
 async function watchDownloads () {
-  await client.connect();
+  try {
+
+    await client.connect();
+  } catch (err) {
+    mainStory.error('deluge', 'Deluge RPC error: ' + err.message);
+    return;
+  }
   const downloads = new PouchDB('downloads');
   const res = await downloads.allDocs({include_docs: true});
 
@@ -234,7 +245,9 @@ async function watchDownloads () {
     return !doc.done;
   });
   
-  watchTorrent(torrents.map((doc: any) => doc.hash));
+  watchTorrent(torrents.map((doc: any) => doc.hash)).catch((err) => {
+    mainStory.error('deluge', 'Deluge RPC error: ' + err.message);
+  });
 }
 
 process.nextTick(() => {
