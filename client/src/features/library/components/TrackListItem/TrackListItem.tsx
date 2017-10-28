@@ -22,14 +22,16 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
       <Menu>
         <MenuItem text={this.props.track.name} disabled/>
         <MenuDivider />
-        <MenuItem iconName="pt-icon-play" text="Play track" />
-        <MenuItem iconName="pt-icon-add-to-artifact" text="Play after this track" />
+        <MenuItem iconName="pt-icon-play" text="Play track" onClick={this.handleClick.bind(this)} />
+        <MenuItem iconName="pt-icon-add-to-artifact" text="Play after this track" onClick={() => {
+          this.props.actions.playAfter(this.props.track)
+        }}/>
         <MenuDivider />
         <MenuItem onClick={() => this.props.actions.toggleHideTrack(this.props.track._id)}
           iconName={this.props.track.hidden ? 'pt-icon-eye-open' : "pt-icon-eye-off"}
           text={this.props.track.hidden ? 'Unhide' : "Hide from track list"} />
         <MenuItem iconName="pt-icon-disable" text="Remove track from library" onClick={() => this.props.actions.offerRemove(this.props.track._id)}/>
-        <MenuItem iconName="pt-icon-trash" text="Delete" />
+        <MenuItem iconName="pt-icon-trash" text="Delete" disabled/>
       </Menu>
     );
   }
