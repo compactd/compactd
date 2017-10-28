@@ -48,3 +48,21 @@ export async function createViews () {
   };
   await files.put(ddoc as any);
 }
+
+export async function toggleHideTrack (trackID: string) {
+  const Track = new PouchDB<Track>('tracks');
+
+  const track = await Track.get(trackID);
+
+  await Track.put({
+    _id: track._id,
+    _rev: track._rev,
+    name: track.name,
+    artist: track.artist,
+    album: track.album,
+    number: track.number,
+    duration: track.duration,
+    disc: track.disc,
+    hidden: !track.hidden,
+  });
+}

@@ -230,7 +230,18 @@ async function fetchRecommendations (): Promise<LibraryAction> {
   }
 }
 
+async function toggleHideTrack (trackId: string) {
+  
+  await session.fetch('/api/tracks/toggle-hidden', {
+    method: 'POST',
+    body: JSON.stringify({
+      track: trackId
+    }),
+    headers: {'content-type': 'application/json'}
+  })
+}
+
 export const actions = {
   fetchArtistCounter, fetchAlbumCounter,
-  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum, fetchRecommendations, fetchTrack
+  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum, fetchRecommendations, fetchTrack, toggleHideTrack
 };

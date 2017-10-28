@@ -63,5 +63,6 @@ export type LibraryActions = {
   fetchAllArtists: () => void;
   fetchAllAlbums: () => void;
   toggleExpandArtist: () => void;
+  toggleHideTrack: (track: string) => void;
   fetchRecommendations: () => void;
 }
