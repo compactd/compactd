@@ -25,7 +25,7 @@ export class CompactdApplication {
   constructor(host: string = 'localhost', port: number = 9000) {
     this.app = express();
     this.port = port;
-    this.auth = new Authenticator(shortid.generate(), config.get('secret'));
+    this.auth = new Authenticator('instance', config.get('secret'));
     this.host = host;
   }
 
@@ -34,11 +34,12 @@ export class CompactdApplication {
     //   config.get('couchHost') + ':' + config.get('couchPort'), {
     //   proxyReqOptDecorator: this.auth.proxyRequestDecorator()
     // }));
-    this.app.all('/database/*', bodyParser.urlencoded({extended: true}), bodyParser.json(), (req, res) => {
+    this.app.all('/database/*', bodyParser.urlencoded({extended: true}), bodyParser.json(), async (req, res) => {
       // req.pause();
       
-      const headers = this.auth.proxyRequestDecorator()({headers: {...req.headers}}, req);
+      const headers = await this.auth.proxyRequestDecorator()({headers: {...req.headers}}, req);
       const remoteUrl = req.url.slice(10);
+      
       const opts = Object.assign({
         method: req.method,
         url: `http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`,

@@ -8,6 +8,7 @@ import * as qs from 'qs';
 import * as assert from 'assert';
 import * as Express from 'express';
 import {mainStory} from 'storyboard';
+import * as cluster from 'cluster';
 
 const docURI = require('docuri');
 
@@ -93,7 +94,6 @@ export default class Authenticator {
    * @param user the DatabaseUser to create
    */
   async createDatabaseUser (user: DatabaseUser) {
-    const auth = `Basic ${new Buffer(PouchDB.credentials).toString('base64')}`;
     const _users = new PouchDB('_users');
     try {
       const current = await _users.get(user._id);
@@ -123,6 +123,31 @@ export default class Authenticator {
       throw Boom.create(400, 'Invalid or expired token');
     }
   }
+  /**
+   * Returns a database user object, fit for clusters
+   * It appends the cluster id/ master to username and id
+   * @param user the orginal username
+   * @param pass the databse password 
+   */
+  getDatabaseUser (user: string, pass: string): DatabaseUser {
+    if (cluster.isMaster) {
+      return {
+        _id: 'org.couchdb.user:m_' + user,
+        name: 'm_' + user,
+        roles: ['end_user'],
+        type: 'user',
+        password: pass
+      };
+    } else {
+      return {
+        _id: `org.couchdb.user:c${cluster.worker.id}_${user}`,
+        name: `c${cluster.worker.id}_${user}`,
+        roles: ['end_user'],
+        type: 'user',
+        password: pass
+      };
+    }
+  }
 
   /**
    * Creates a signed session token, create a database user with random password
@@ -137,13 +162,7 @@ export default class Authenticator {
       const user = await appUsers.get(`users/${username}`);
       if (await this.verifyPassword(pass, user.password)) {
         const pwd = await this.generatePassword();
-        const dbUser = {
-          _id: 'org.couchdb.user:' +  username,
-          name: username,
-          roles: ['end_user'],
-          type: 'user',
-          password: pwd
-        }
+        const dbUser = this.getDatabaseUser(username, pass);
         await this.createDatabaseUser(dbUser);
         this.passwords[username] = pwd;
         setTimeout(() => {
@@ -269,7 +288,7 @@ export default class Authenticator {
   }
 
   proxyRequestDecorator () {
-    return (proxyReqOpts: any, srcReq: any) => {
+    return async (proxyReqOpts: any, srcReq: any) => {
 
       if (process.env.ADMIN_PARTY) {
         const auth = new Buffer(PouchDB.credentials).toString('base64');
@@ -282,9 +301,23 @@ export default class Authenticator {
       }
 
       const [bearer, token] = proxyReqOpts.headers.authorization.split(' ');
-      const user = this.verifySession(token);
+      let user = this.verifySession(token);
+      if (!this.passwords[user]) {
+        
+        const pwd = await this.generatePassword();
+
+        await this.createDatabaseUser(this.getDatabaseUser(user, pwd));
+        
+        this.passwords[user] = pwd;
+      }
+      const pass = this.passwords[user];
+      if (cluster.isWorker) {
+        user = `c${cluster.worker.id}_${user}`;
+      } else {
+        user = `m_${user}`;
+      }
       
-      const auth = new Buffer(`${user}:${this.passwords[user]}`)
+      const auth = new Buffer(`${user}:${pass}`)
         .toString('base64')
       proxyReqOpts.headers.authorization = `Basic ${auth}`;
 
