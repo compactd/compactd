@@ -46,8 +46,19 @@ interface ActionResolveTrack {
 }
 
 interface ToggleHiddenAction {
-  type: 'cassette/player/TOGGLE_HIDDEN',
+  type: 'cassette/library/TOGGLE_HIDDEN',
   track: string;
+}
+
+interface OfferRemoveAction {
+  type: 'cassette/library/OFFER_REMOVE',
+  track: string;
+  setValue: boolean;
+}
+
+interface DoRemoveAction {
+  type: 'cassette/library/DO_REMOVE',
+  track: string
 }
 
 export type LibraryAction = ActionResolveAllAlbums |
@@ -58,7 +69,9 @@ export type LibraryAction = ActionResolveAllAlbums |
                             ActionResolveCounter |
                             ActionResolveRecommendations |
                             ActionResolveTrack |
-                            ToggleHiddenAction;;
+                            ToggleHiddenAction |
+                            DoRemoveAction |
+                            OfferRemoveAction;
 
 export type LibraryActions = {
   fetchArtistCounter: (id: string) => void;
@@ -71,4 +84,6 @@ export type LibraryActions = {
   toggleExpandArtist: () => void;
   toggleHideTrack: (track: string) => void;
   fetchRecommendations: () => void;
+  offerRemove: (id: string, setValue?: boolean) => void;
+  doRemove: (id: string) => void;
 }

@@ -8,7 +8,9 @@ export interface LibraryState {
     [id: string]: Compactd.Track
   }
   albumsById: {
-    [id: string]: Compactd.Album & {tracks?: [Compactd.Track]}
+    [id: string]: Compactd.Album & {
+      tracks?: [Compactd.Track & {offerRemove?: boolean}]
+    }
   };
   artistsById: {
     [id: string]: Compactd.Artist & {albums?: [Compactd.Album]}

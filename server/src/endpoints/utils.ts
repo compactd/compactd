@@ -14,4 +14,15 @@ export default function(app: Express.Application) {
       mainStory.error('utils', err.message, {attach: err});
     });
   });
+  app.post('/api/tracks/remove', (req, res) => {
+    utils.removeTrack(req.body.track).then(() => {
+      res.status(200).send({success: true});
+    }).catch((err) => {
+      res.status(500).send({
+        success: false,
+        error: 'An error occurred, please see logs for more details'
+      });
+      mainStory.error('utils', err.message, {attach: err});
+    });
+  });
 }

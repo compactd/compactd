@@ -18,7 +18,9 @@ const RESOLVE_TRACK  = 'compactd/library/RESOLVE_TRACK';
 const TOGGLE_EXPAND_ARTIST  = 'compactd/library/TOGGLE_EXPAND_ARTIST';
 const RESOLVE_COUNTER = 'compactd/library/RESOLVE_COUNTER';
 const RESOLVE_RECOMMENDATIONS = 'compactd/library/RESOLVE_RECOMMENDATIONS';
-const TOGGLE_HIDDEN = 'cassette/player/TOGGLE_HIDDEN';
+const TOGGLE_HIDDEN = 'cassette/library/TOGGLE_HIDDEN';
+const DO_REMOVE = 'cassette/library/DO_REMOVE';
+const OFFER_REMOVE = 'cassette/library/OFFER_REMOVE';
 
 const initialState: Defs.LibraryState = {
   albumsById: {},
@@ -39,6 +41,43 @@ const getParent = (str: string) => {
 export function reducer (state: Defs.LibraryState = initialState,
   action: LibraryAction): Defs.LibraryState {
   switch (action.type) {
+    case DO_REMOVE: {
+      const id = action.track;
+      const album = getParent(getParent(id));
+      
+      return {
+        ...state,
+        albumsById: {
+          ...state.albumsById,
+          [album]: {
+            ...state.albumsById[album],
+            tracks: state.albumsById[album].tracks.filter((track) => {
+              return track._id !==  id
+            }) as any
+          }
+        }
+      }
+    }
+    case OFFER_REMOVE: {
+      const id = action.track;
+      const album = getParent(getParent(id));
+      
+      return {
+        ...state,
+        albumsById: {
+          ...state.albumsById,
+          [album]: {
+            ...state.albumsById[album],
+            tracks: state.albumsById[album].tracks.map((track) => {
+              if (track._id === id) {
+                return {...track, offerRemove: action.setValue};
+              }
+              return {...track, offerRemove: false};
+            }) as any
+          }
+        }
+      }
+    }
     case TOGGLE_HIDDEN: 
       const id = action.track;
       const album = getParent(getParent(id));
@@ -269,8 +308,30 @@ async function toggleHideTrack (trackId: string) {
     track: trackId
   }
 }
+async function doRemove (trackId: string) {
+  
+  await session.fetch('/api/tracks/remove', {
+    method: 'POST',
+    body: JSON.stringify({
+      track: trackId
+    }),
+    headers: {'content-type': 'application/json'}
+  });
+  return {
+    type: DO_REMOVE,
+    track: trackId
+  }
+}
+
+function offerRemove (track: string, setValue = true) {
+  return {
+    type: OFFER_REMOVE, track, setValue
+  }
+}
+
+
 
 export const actions = {
   fetchArtistCounter, fetchAlbumCounter,
-  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum, fetchRecommendations, fetchTrack, toggleHideTrack
+  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum, fetchRecommendations, fetchTrack, toggleHideTrack, offerRemove, doRemove
 };

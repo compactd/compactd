@@ -66,3 +66,14 @@ export async function toggleHideTrack (trackID: string) {
     hidden: !track.hidden,
   });
 }
+
+export async function getRemoveToken (trackID: string) {
+  
+}
+export async function removeTrack (trackID: string) {
+  const Track = new PouchDB<Track>('tracks');
+
+  const track = await Track.get(trackID);
+
+  await Track.remove(track._id, track._rev);
+}
