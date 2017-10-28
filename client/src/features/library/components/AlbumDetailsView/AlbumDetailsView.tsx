@@ -17,7 +17,11 @@ interface AlbumDetailsViewProps {
   player: PlayerState;
 }
 
-export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>{
+export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {showHidden: boolean}>{
+  constructor() {
+    super();
+    this.state = {showHidden: false};
+  }
   getAlbumId (props: AlbumDetailsViewProps = this.props) {
     
     return albumURI({name: props.album, artist: props.artist});
@@ -35,7 +39,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
     const album = library.albumsById[id];
-    this.props.actions.replacePlayerStack(album);
+    this.props.actions.replacePlayerStack(album, !this.state.showHidden);
   }
   render (): JSX.Element {
     const {actions, library, artist, player} = this.props;
@@ -46,9 +50,26 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {}>
     }
     const p = albumURI(album._id);
 
-    const content = album.tracks.map((track) =>
-      <TrackListItem track={track} actions={actions} library={library} key={track._id}
-        playing={player.stack.length && player.stack[0]._id === track._id} />)
+    const content = album.tracks.map((track, index) => {
+      const el = <TrackListItem track={track} actions={actions} library={library} key={track._id}
+      playing={player.stack.length && player.stack[0]._id === track._id} playHidden={this.state.showHidden} />;
+      
+      if (track.hidden && !this.state.showHidden) {
+        if (index > 0 && album.tracks[index - 1].hidden) return;
+        return <div className="missing-track" onClick={() => {
+          this.setState({showHidden: true})
+        }}><div className="ellipsis">•••</div><div className="separator"></div></div>
+      }
+      if (track.hidden && this.state.showHidden) {
+        if (index > 0 && album.tracks[index - 1].hidden) {
+          return el;
+        };
+        return <div><div className="missing-track" onClick={() => {
+          this.setState({showHidden: false})
+        }}><div className="ellipsis">-</div><div className="separator"></div></div>{el}</div>
+      }
+      return el;
+    })
     return <div className="album-details-view">
       <div className="album-header">
         <div className="album-image" onClick={this.handleClick.bind(this)}>

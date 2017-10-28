@@ -158,9 +158,12 @@ function jumpTo (target: string | number | Defs.Track) {
   }
 }
 
-async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
+async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Promise<PlayerAction> {
   await Promise.resolve();
   const tracks = new PouchDB<Defs.Track>('tracks');
+  const filterHiddenFunc = (doc: Defs.Track) => {
+    return filterHidden ? !doc.hidden : true;
+  };
 
   if (Array.isArray(stack)) {
     if (stack.length === 2 && Number.isInteger(stack[1] as any)) {
@@ -174,7 +177,7 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
       });
       return {
         type: REPLACE_PLAYER_STACK_ACTION,
-        stack: docs.rows.map((row) => row.doc)
+        stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc)
       };
     }
     if (typeof stack[0] === 'string') {
@@ -207,7 +210,7 @@ async function replacePlayerStack(stack: PlayerStack): Promise<PlayerAction> {
 
   return {
     type: REPLACE_PLAYER_STACK_ACTION,
-    stack: docs.rows.map((row) => row.doc)
+    stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc)
   };
 }
 

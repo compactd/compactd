@@ -2,6 +2,9 @@ div.track-list-item {
   transition: all 0.1s ease;
   border-radius: 3px;
   display: flex;
+  &.hidden {
+    opacity: 0.5;
+  }
   & > div {
       display: inline-block;
       margin: 0.5em;

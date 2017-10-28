@@ -11,6 +11,7 @@ interface TrackListItemProps {
   track: Track;
   library: LibraryState;
   playing: boolean;
+  playHidden: boolean;
 }
 @ContextMenuTarget
 export class TrackListItem extends React.Component<TrackListItemProps, {}>{
@@ -24,7 +25,9 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
         <MenuItem iconName="pt-icon-play" text="Play track" />
         <MenuItem iconName="pt-icon-add-to-artifact" text="Play after this track" />
         <MenuDivider />
-        <MenuItem onClick={() => this.props.actions.toggleHideTrack(this.props.track._id)}iconName="pt-icon-eye-off" text="Hide" />
+        <MenuItem onClick={() => this.props.actions.toggleHideTrack(this.props.track._id)}
+          iconName={this.props.track.hidden ? 'pt-icon-eye-open' : "pt-icon-eye-off"}
+          text={this.props.track.hidden ? 'Unhide' : "Hide from track list"} />
         <MenuItem iconName="pt-icon-disable" text="Remove" />
         <MenuItem iconName="pt-icon-trash" text="Delete" />
       </Menu>
@@ -33,7 +36,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
 
   handleClick () {
     const {actions, track, library} = this.props;
-    actions.replacePlayerStack([track.album, track.number]);
+    actions.replacePlayerStack([track.album, track.number], !this.props.playHidden);
   }
   render (): JSX.Element {
     const {actions, track, library, playing} = this.props;
@@ -42,10 +45,10 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
 
     const duration = date.toISOString().substr(14, 5);
 
-    return <div className={classnames("track-list-item", {playing})} onClick={this.handleClick.bind(this)}>
+    return <div className={classnames("track-list-item", {playing, hidden: track.hidden})} onClick={this.handleClick.bind(this)}>
       <div className="track-number">{track.number}</div>
       <div className="track-name">{track.name}</div>
-      <div className="track-info">{track.hidden ? 'hidden': ''}</div>
+      <div className="track-info"></div>
       <div className="track-duration">{duration}</div>
     </div>
   }

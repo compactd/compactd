@@ -45,6 +45,11 @@ interface ActionResolveTrack {
   track: Track;
 }
 
+interface ToggleHiddenAction {
+  type: 'cassette/player/TOGGLE_HIDDEN',
+  track: string;
+}
+
 export type LibraryAction = ActionResolveAllAlbums |
                             ActionResolveArtist |
                             ActionResolveAlbum |
@@ -52,7 +57,8 @@ export type LibraryAction = ActionResolveAllAlbums |
                             ActionToggleExpandArtist |
                             ActionResolveCounter |
                             ActionResolveRecommendations |
-                            ActionResolveTrack;
+                            ActionResolveTrack |
+                            ToggleHiddenAction;;
 
 export type LibraryActions = {
   fetchArtistCounter: (id: string) => void;

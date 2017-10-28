@@ -44,6 +44,7 @@ interface JumpToAction {
   target: number;
 }
 
+
 export type PlayerAction =  PlayNextAction |
                             PlayPreviousAction |
                             ReplacePlayerStackAction |
@@ -51,7 +52,7 @@ export type PlayerAction =  PlayNextAction |
                             TogglePlaybackAction |
                             JumpToAction |
                             PlayAfterAction |
-                            PlayNextAction;
+                            PlayNextAction
 
 // Album | [Album, number] | Track[] | Track
 
@@ -60,7 +61,7 @@ export type PlayerStack = Album | [string, number] | Track[] | Track | string[]
 export type PlayerActions = {
   playNext: (index?: number) => void;
   playPrevious: () => void;
-  replacePlayerStack: (stack: PlayerStack) => void;
+  replacePlayerStack: (stack: PlayerStack, filterHidden?: boolean) => void;
   clearPlaylist: () => void;
   togglePlayback: () => void;
   playAfter: (stack: PlayerStack) => void;

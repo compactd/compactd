@@ -18,6 +18,7 @@ const RESOLVE_TRACK  = 'compactd/library/RESOLVE_TRACK';
 const TOGGLE_EXPAND_ARTIST  = 'compactd/library/TOGGLE_EXPAND_ARTIST';
 const RESOLVE_COUNTER = 'compactd/library/RESOLVE_COUNTER';
 const RESOLVE_RECOMMENDATIONS = 'compactd/library/RESOLVE_RECOMMENDATIONS';
+const TOGGLE_HIDDEN = 'cassette/player/TOGGLE_HIDDEN';
 
 const initialState: Defs.LibraryState = {
   albumsById: {},
@@ -30,9 +31,33 @@ const initialState: Defs.LibraryState = {
   counters: {},
   topTracks: []
 };
+
+const getParent = (str: string) => {
+  return str.substring(0, str.lastIndexOf('/'));
+}
+
 export function reducer (state: Defs.LibraryState = initialState,
   action: LibraryAction): Defs.LibraryState {
   switch (action.type) {
+    case TOGGLE_HIDDEN: 
+      const id = action.track;
+      const album = getParent(getParent(id));
+      
+      return {
+        ...state,
+        albumsById: {
+          ...state.albumsById,
+          [album]: {
+            ...state.albumsById[album],
+            tracks: state.albumsById[album].tracks.map((track) => {
+              if (track._id === id) {
+                return {...track, hidden: !track.hidden};
+              }
+              return track
+            }) as any
+          }
+        }
+      }
     case RESOLVE_TRACK:
       return Object.assign({}, state, {
         tracksById: Object.assign({}, state.tracksById, {
@@ -238,7 +263,11 @@ async function toggleHideTrack (trackId: string) {
       track: trackId
     }),
     headers: {'content-type': 'application/json'}
-  })
+  });
+  return {
+    type: TOGGLE_HIDDEN,
+    track: trackId
+  }
 }
 
 export const actions = {
