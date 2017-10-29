@@ -139,13 +139,13 @@ function addTracker (name: string, type: 'gazelle', username: string, host: stri
   }
 }
 
-function scan (id: string) {
+function scan (id: string, full = false) {
   return async (dispatch: any) => {
     dispatch({type: SET_SCANNING, scanning: true});
     const res = await fetch(`/api/scans`, {
       method: 'POST',
       body: JSON.stringify({
-        libraryId: id, full: true
+        libraryId: id, full
       }),
       headers: Session.headers({
         'content-type': 'application/json',
