@@ -4,6 +4,7 @@ import PouchDB from 'pouchdb';
 import {artistURI} from 'compactd-models';
 import Toaster from 'app/toaster';
 import session from 'app/session';
+import {syncDatabases} from 'app/database';
 
 const trickle = require('timetrickle');
 // import * as IFetch from '@types/whatwg-fetch';
@@ -308,18 +309,31 @@ async function toggleHideTrack (trackId: string) {
     track: trackId
   }
 }
-async function doRemove (trackId: string) {
+function doRemove (trackId: string) {
+  return async(dispatch: any) => {
+    const Track = new PouchDB<Defs.Track>('tracks');
+    const track = await Track.get(trackId);
+
+    await session.fetch('/api/tracks/remove', {
+      method: 'POST',
+      body: JSON.stringify({
+        track: trackId
+      }),
+      headers: {'content-type': 'application/json'}
+    });
   
-  await session.fetch('/api/tracks/remove', {
-    method: 'POST',
-    body: JSON.stringify({
+  
+    dispatch({
+      type: DO_REMOVE,
       track: trackId
-    }),
-    headers: {'content-type': 'application/json'}
-  });
-  return {
-    type: DO_REMOVE,
-    track: trackId
+    });
+
+    await syncDatabases('artists', 'albums', 'tracks');
+    dispatch(await fetchAllArtists());
+    dispatch(await fetchAllAlbums());
+    dispatch(await fetchArtistCounter(track.artist));
+    dispatch(await fetchAlbumCounter(track.album));
+
   }
 }
 
@@ -329,9 +343,29 @@ function offerRemove (track: string, setValue = true) {
   }
 }
 
+function setTrackArtist  (track: string, artist: string) {
+  return async (dispatch: any) => {
 
+    await session.fetch('/api/tracks/set-artist', {
+      method: 'POST',
+      body: JSON.stringify({
+        track, artist
+      }),
+      headers: {'content-type': 'application/json'}
+    });
+  
+    await syncDatabases('artists', 'albums', 'tracks');
+  
+    dispatch(await fetchAllArtists());
+    dispatch(await fetchAllAlbums());
+    dispatch(await fetchArtistCounter(artist));
+  }
+}
 
 export const actions = {
   fetchArtistCounter, fetchAlbumCounter,
-  fetchArtist, fetchAllArtists, fetchAllAlbums, toggleExpandArtist, fetchAlbum, fetchRecommendations, fetchTrack, toggleHideTrack, offerRemove, doRemove
+  fetchArtist, fetchAllArtists, fetchAllAlbums,
+  toggleExpandArtist, fetchAlbum, fetchRecommendations,
+  fetchTrack, toggleHideTrack, offerRemove, doRemove,
+  setTrackArtist
 };

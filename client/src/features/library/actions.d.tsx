@@ -86,4 +86,5 @@ export type LibraryActions = {
   fetchRecommendations: () => void;
   offerRemove: (id: string, setValue?: boolean) => void;
   doRemove: (id: string) => void;
+  setTrackArtist: (track: string, artist: string) => void;
 }

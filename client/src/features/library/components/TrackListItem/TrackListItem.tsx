@@ -2,7 +2,8 @@ import * as React from 'react';
 import {Actions} from 'definitions/actions';
 import {Track, LibraryState} from 'definitions';
 import * as classnames from 'classnames';
-import { ContextMenuTarget, Menu, MenuItem, MenuDivider, Dialog, Button } from "@blueprintjs/core";
+import { ContextMenuTarget, Menu, MenuItem, MenuDivider, Dialog, Button, Popover, Position } from "@blueprintjs/core";
+import ArtistComponent from 'components/ArtistComponent';
 
 require('./TrackListItem.scss');
 
@@ -14,7 +15,15 @@ interface TrackListItemProps {
   playHidden: boolean;
 }
 @ContextMenuTarget
-export class TrackListItem extends React.Component<TrackListItemProps, {}>{
+export class TrackListItem extends React.Component<TrackListItemProps, {
+  openSetArtist: boolean
+}>{
+  constructor () {
+    super();
+    this.state = {
+      openSetArtist: false
+    }
+  }
   public renderContextMenu() {
     
     // return a single element, or nothing to use default browser behavior
@@ -32,6 +41,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
           text={this.props.track.hidden ? 'Unhide' : "Hide from track list"} />
         <MenuItem iconName="pt-icon-disable" text="Remove track from library" onClick={() => this.props.actions.offerRemove(this.props.track._id)}/>
         <MenuItem iconName="pt-icon-trash" text="Delete" disabled/>
+        <MenuItem iconName="pt-icon-edit" text="Change artist" onClick={() => this.setState({openSetArtist: true})}/>
       </Menu>
     );
   }
@@ -41,6 +51,16 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
     if (this.props.track.offerRemove) return;
     actions.replacePlayerStack([track.album, track.number], !this.props.playHidden);
   }
+  renderArtistSelectContent () {
+    const {actions, track, library} = this.props;
+    if (!this.state.openSetArtist) return <div className=""></div>;
+    const artists = this.props.library.artists.map((artist) => {
+      return <ArtistComponent layout="compact" artist={artist} onClick={() => actions.setTrackArtist(track._id, artist._id)}/>;
+    })
+    return <div className="artist-select">
+      {artists}
+    </div>
+  }
   render (): JSX.Element {
     const {actions, track, library, playing} = this.props;
     const date = new Date(null);
@@ -48,13 +68,18 @@ export class TrackListItem extends React.Component<TrackListItemProps, {}>{
 
     const duration = date.toISOString().substr(14, 5);
 
-    return <div className={classnames("track-list-item", {playing, hidden: track.hidden, removing: !!track.offerRemove})} onClick={this.handleClick.bind(this)}>
+    return <div><Popover
+      isOpen={this.state.openSetArtist}
+      position={Position.BOTTOM}
+      content={this.renderArtistSelectContent()}
+      onClose={() => this.setState({openSetArtist: false})}>
+    <div className={classnames("track-list-item", {playing, hidden: track.hidden, removing: !!track.offerRemove, active: this.state.openSetArtist})} onClick={this.handleClick.bind(this)}>
       <div className="track-number">{track.number}</div>
       <div className="track-name">{track.name}</div>
       <div className="track-info">{track.offerRemove? <div className="remove-offer">remove?
         <div className="yes" onClick={() => actions.doRemove(track._id)}>yes</div>
         <div className="no" onClick={() => actions.offerRemove(track._id, false)}>cancel</div></div>: ''}</div>
       <div className="track-duration">{duration}</div>
-    </div>
+    </div></Popover></div>
   }
 }

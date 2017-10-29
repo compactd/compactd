@@ -145,7 +145,7 @@ function scan (id: string) {
     const res = await fetch(`/api/scans`, {
       method: 'POST',
       body: JSON.stringify({
-        libraryId: id
+        libraryId: id, full: true
       }),
       headers: Session.headers({
         'content-type': 'application/json',

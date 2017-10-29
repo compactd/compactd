@@ -10,16 +10,21 @@ async function getIDs<T> (pouch: typeof PouchDB, db: string): Promise<[PouchDB.D
   return [data, ids];
 }
 
-export default async function (pouch: typeof PouchDB, dryRun = false) {
+
+export default async function clean (pouch: typeof PouchDB, dryRun = false) {
+  let didSomething = false;
+
   const [files, filesId]   = await getIDs(pouch, 'files');
   const [tracks, tracksId]  = await getIDs(pouch, 'tracks');
 
   const widowTracks = tracksId.filter((track) => {
-    return !filesId.find((file) => file.id.startsWith(track.id));
+    return !filesId.find((file) => file.id.startsWith(`${track.id}/`));
   });
 
   mainStory.debug('vacuum', `Removing ${widowTracks.length} tracks`, {
-    attach: widowTracks, attachLevel: 'trace'});
+    attach: widowTracks, attachLevel: 'debug'});
+
+  if (widowTracks.length) didSomething = true;
 
   if (!dryRun) {
     await Promise.all(widowTracks.map((doc) => {
@@ -30,12 +35,14 @@ export default async function (pouch: typeof PouchDB, dryRun = false) {
   const [albums, albumsId]  = await getIDs(pouch, 'albums');
 
   const widowAlbums = albumsId.filter((album) => {
-    return !tracksId.find((track) => track.id.startsWith(album.id))
-    || widowTracks.find((track) => track.id.startsWith(album.id));
+    return !tracksId.find((track) => track.id.startsWith(`${album.id}/`))
+    // || widowTracks.find((track) => track.id.startsWith(`${album.id}/`));
   });
 
+  if (widowAlbums.length) didSomething = true;
+
   mainStory.debug('vacuum', `Removing ${widowAlbums.length} albums`, {
-    attach: widowAlbums, attachLevel: 'trace'});
+    attach: widowAlbums, attachLevel: 'debug'});
 
   if (!dryRun) {
     await Promise.all(widowAlbums.map((doc) => {
@@ -47,17 +54,22 @@ export default async function (pouch: typeof PouchDB, dryRun = false) {
   const [artists, artistsId] = await getIDs(pouch, 'artists');
 
   const widowArtists = artistsId.filter((artist) => {
-    return !albumsId.find((album) => album.id.startsWith(artist.id))
-      || widowAlbums.find((album) => album.id.startsWith(artist.id));
+    return !albumsId.find((album) => album.id.startsWith(`${artist.id}/`))
+      // || widowAlbums.find((album) => album.id.startsWith(`${artist.id}/`));
   });
 
+  if (widowArtists.length) didSomething = true;
+
   mainStory.debug('vacuum', `Removing ${widowArtists.length} artists`, {
-    attach: widowArtists, attachLevel: 'trace'});
+    attach: widowArtists, attachLevel: 'debug'});
 
   
   if (!dryRun) {
     await Promise.all(widowArtists.map((doc) => {
       return artists.remove(doc.id, doc.rev);
     }));
+  }
+  if (didSomething) {
+    await clean(pouch, dryRun);
   }
 }

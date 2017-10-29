@@ -6,6 +6,7 @@ import {Library} from 'compactd-models';
 import httpEventEmitter from '../http-event';
 import * as shortid from 'shortid';
 import * as Agent from '../features/aquarelle/AquarelleAgent';
+import * as utils from '../features/utils/library-utils';
 
 async function downloadCovers () {
   await Agent.processAlbums().catch((err) => {
@@ -19,9 +20,15 @@ async function downloadCovers () {
 export default function(app: Express.Application) {
   app.post('/api/scans', (req, res) => {
     const id = req.body.libraryId;
+    const full = req.body.full;
     
     const libraries = new PouchDB<Library>('libraries');
     libraries.get(id).then(() => {
+      if (full) {
+        return utils.resetLibrary(id);
+      }
+      return Promise.resolve();
+    }).then(() => {
       const scanner = new Scanner(id);
       const ts = Date.now();
 
