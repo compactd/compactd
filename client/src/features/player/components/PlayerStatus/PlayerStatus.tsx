@@ -4,6 +4,7 @@ import {PlayerAudio} from '../PlayerAudio';
 import {PlayerState, LibraryState} from 'definitions';
 import StoreView from '../../../store/components/StoreView';
 import SettingsLink from '../../../settings/components/SettingsLink';
+import session from 'app/session';
 import * as classnames from 'classnames';
 
 require('./PlayerStatus.scss');
@@ -65,6 +66,13 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
       <div className="player-actions">
         <StoreView />
         <SettingsLink />
+        <div className="logout-button">
+          <span className="pt-icon-log-out pt-icon" onClick={() => {
+            session.destroy().then(() =>{
+              window.location.reload();
+            });
+          }}></span>
+        </div>
       </div>
     </div>
   }

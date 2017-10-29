@@ -1,4 +1,5 @@
 import * as jwt from 'jwt-decode';
+import PouchDB from 'pouchdb';
 
 class SessionManager {
   private storage: Storage;
@@ -65,6 +66,14 @@ class SessionManager {
   }
   logout () {
     this.storage.removeItem(this.tokenName);
+  }
+  destroy () {
+    this.logout();
+    const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers'];
+    return Promise.all(dbs.map((db) => {
+      const database = new PouchDB(db);
+      return database.destroy();
+    }));
   }
 }
 
