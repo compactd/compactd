@@ -4,6 +4,7 @@ import {PlayerAudio} from '../PlayerAudio';
 import {PlayerState, LibraryState} from 'definitions';
 import StoreView from '../../../store/components/StoreView';
 import SettingsLink from '../../../settings/components/SettingsLink';
+import {HotkeysTarget, Hotkey, Hotkeys} from '@blueprintjs/core';
 import session from 'app/session';
 import * as classnames from 'classnames';
 
@@ -13,8 +14,47 @@ interface PlayerStatusProps {
   actions: PlayerActions;
   player: PlayerState;
 }
-
+@HotkeysTarget
 export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
+  renderHotkeys () {
+    const {actions, player} = this.props;
+   return <Hotkeys>
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="k"
+      label="Toggle playback"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        this.handlePlaybackButton();
+      }}
+     />
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="j"
+      label="Play previous track"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        if (player.prevStack.length){
+          actions.playPrevious();
+        }
+      }}
+     />
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="l"
+      label="Play next track"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        if (player.stack.length - 1){
+          actions.playNext();
+        }
+      }}
+     />
+   </Hotkeys> 
+  }
   handlePlaybackButton () {
     const {actions, player} = this.props;
     if (player.stack.length > 0) this.props.actions.togglePlayback();

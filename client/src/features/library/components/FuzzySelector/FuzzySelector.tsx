@@ -42,9 +42,23 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
       <Hotkey 
         allowInInput={false} 
         global={true} 
-        combo="meta + k" 
+        combo="ctrl + p" 
         label="Show omnibox" 
-        onKeyDown={() => {
+        onKeyDown={(evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          this.setState({
+            isOpen: true
+          })
+        }}/>
+      <Hotkey 
+        allowInInput={false} 
+        global={true} 
+        combo="meta + p" 
+        label="Show omnibox" 
+        onKeyDown={(evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
           this.setState({
             isOpen: true
           })
