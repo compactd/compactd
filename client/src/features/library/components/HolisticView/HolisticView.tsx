@@ -9,6 +9,7 @@ import ScrollableDiv from 'components/ScrollableDiv';
 import {match} from 'react-router';
 import * as fuzzy from 'fuzzy';
 import {artistURI} from 'compactd-models';
+import {FuzzySelector} from '../FuzzySelector'; 
 import * as classnames from "classnames";
 
 const {Flex, Box} = require('reflexbox');
@@ -84,6 +85,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               } counter={library.counters[artist._id]}/>
     })
     return <div className="holistic-view">
+      <FuzzySelector library={library} actions={actions} />
       <Flex>
         <Box col={2} className={classnames("pt-dark artists-list", {
           minimal: !library.expandArtists

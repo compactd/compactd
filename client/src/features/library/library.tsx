@@ -13,6 +13,7 @@ const trickle = require('timetrickle');
 
 const RESOLVE_ARTIST = 'compactd/library/RESOLVE_ARTIST';
 const RESOLVE_ALL_ARTISTS = 'compactd/library/RESOLVE_ALL_ARTISTS';
+const RESOLVE_ALL_TRACKS = 'compactd/library/RESOLVE_ALL_TRACKS';
 const RESOLVE_ALL_ALBUMS = 'compactd/library/RESOLVE_ALL_ALBUMS';
 const RESOLVE_ALBUM  = 'compactd/library/RESOLVE_ALBUM';
 const RESOLVE_TRACK  = 'compactd/library/RESOLVE_TRACK';
@@ -132,6 +133,10 @@ export function reducer (state: Defs.LibraryState = initialState,
     case RESOLVE_ALL_ARTISTS:
       return Object.assign({}, state, {
         artists: action.artists
+      });
+    case RESOLVE_ALL_TRACKS:
+      return Object.assign({}, state, {
+        tracks: action.tracks
       });
     case RESOLVE_ALL_ALBUMS:
       return Object.assign({}, state, {
@@ -256,6 +261,19 @@ function fetchAllAlbums () {
     Toaster.error(err);
   });
 }
+function fetchAllTracks () {
+  return Promise.resolve().then(() => {
+    const tracks = new PouchDB<Defs.Track>('tracks');
+    return tracks.allDocs({include_docs: true});
+  }).then((docs) => {
+    return {
+      type: RESOLVE_ALL_TRACKS,
+      tracks: docs.rows.map(res => res.doc)
+    }
+  }).catch((err) => {
+    Toaster.error(err);
+  });
+}
 
 async function fetchArtist (slug: string): Promise<LibraryAction> {
   if (slug.startsWith('library/')) {
@@ -367,5 +385,5 @@ export const actions = {
   fetchArtist, fetchAllArtists, fetchAllAlbums,
   toggleExpandArtist, fetchAlbum, fetchRecommendations,
   fetchTrack, toggleHideTrack, offerRemove, doRemove,
-  setTrackArtist
+  setTrackArtist, fetchAllTracks
 };

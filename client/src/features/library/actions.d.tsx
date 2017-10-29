@@ -19,6 +19,10 @@ interface ActionResolveAllArtists {
   type: 'compactd/library/RESOLVE_ALL_ARTISTS';
   artists: Artist[];
 }
+interface ActionResolveAllTracks {
+  type: 'compactd/library/RESOLVE_ALL_TRACKS';
+  tracks: Track[];
+}
 
 interface ActionResolveAllAlbums {
   type: 'compactd/library/RESOLVE_ALL_ALBUMS';
@@ -61,17 +65,19 @@ interface DoRemoveAction {
   track: string
 }
 
-export type LibraryAction = ActionResolveAllAlbums |
-                            ActionResolveArtist |
-                            ActionResolveAlbum |
-                            ActionResolveAllArtists |
-                            ActionToggleExpandArtist |
-                            ActionResolveCounter |
-                            ActionResolveRecommendations |
-                            ActionResolveTrack |
-                            ToggleHiddenAction |
-                            DoRemoveAction |
-                            OfferRemoveAction;
+export type LibraryAction =
+  ActionResolveAllAlbums |
+  ActionResolveAllTracks |
+  ActionResolveArtist |
+  ActionResolveAlbum |
+  ActionResolveAllArtists |
+  ActionToggleExpandArtist |
+  ActionResolveCounter |
+  ActionResolveRecommendations |
+  ActionResolveTrack |
+  ToggleHiddenAction |
+  DoRemoveAction |
+  OfferRemoveAction;
 
 export type LibraryActions = {
   fetchArtistCounter: (id: string) => void;
@@ -81,6 +87,7 @@ export type LibraryActions = {
   fetchAlbum: (album: string) => void;
   fetchAllArtists: () => void;
   fetchAllAlbums: () => void;
+  fetchAllTracks: () => void;
   toggleExpandArtist: () => void;
   toggleHideTrack: (track: string) => void;
   fetchRecommendations: () => void;
