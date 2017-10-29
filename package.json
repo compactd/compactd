@@ -11,6 +11,7 @@
   "author": "vinz243",
   "license": "MIT",
   "scripts": {
+    "build": "npm run build:server && npm run build:client",
     "build:server": "tsc -p ./server",
     "build:client": "webpack --config ./config/webpack.production.js --progress"
   },
