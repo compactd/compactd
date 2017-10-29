@@ -162,7 +162,7 @@ export default class Authenticator {
       const user = await appUsers.get(`users/${username}`);
       if (await this.verifyPassword(pass, user.password)) {
         const pwd = await this.generatePassword();
-        const dbUser = this.getDatabaseUser(username, pass);
+        const dbUser = this.getDatabaseUser(username, pwd);
         await this.createDatabaseUser(dbUser);
         this.passwords[username] = pwd;
         setTimeout(() => {
