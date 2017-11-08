@@ -96,6 +96,8 @@ export interface Album extends Document {
   _id: string;
   name: string;
   artist: string;
+  year?: number;
+  dateAdded: number;
 }
 
 export interface AlbumParams extends RouteParams {

@@ -4,22 +4,44 @@ import PouchDB from '../../database';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
+import * as sharp from 'sharp';
+import * as mime from 'mime';
 import config from '../../config';
+import * as md5 from 'md5';
+import {mainStory} from 'storyboard';
 
 function getCacheEntry (id: string) {
   return path.join(config.get('dataDirectory'), 'aquarelle', new Buffer(id).toString('base64'));
 }
 
-function saveToFile(promise: Promise<Buffer>, id: string) {
-  return new Promise((resolve, reject) => {
-    promise.then((buffer) => {
-      const target = getCacheEntry(id);
-      mkdirp.sync(path.dirname(target));
-      fs.writeFile(target, buffer, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+async function saveToFile(promise: Promise<Buffer>, id: string) {
+  const buffer = await promise;
+  const image = sharp(buffer);
+
+  const metadata = await image.metadata();
+  const mimeType = mime.getType(metadata.format);
+
+  mainStory.info('aquarelle', `Saving artwork for ${id} (width=${metadata.width}, mime=${mimeType})`)
+
+  const artworks = new PouchDB('artworks');
+  const docId = 'artworks/' + id;
+  const smallImage = await image.resize(64).toBuffer();
+  await artworks.put({
+    _id: docId,
+    owner: id,
+    date: Date.now(),
+    _attachments: {
+      'large': {
+        content_type: mimeType,
+        data: buffer,
+        digest: 'md5-' + md5(buffer)
+      },
+      'small': {
+        content_type: mimeType,
+        data: smallImage,
+        digest: 'md5-' + md5(smallImage)
+      }
+    }
   });
 }
 

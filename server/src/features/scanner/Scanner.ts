@@ -144,6 +144,22 @@ export class Scanner extends events.EventEmitter {
       }
     }
   }
+  getAlbumYear (file: string, tags: any) {
+    const date = tags.date || tags.DATE;
+
+    if (!date) {
+      const folder = path.basename(path.dirname(file));
+      const year = folder.match(/(20(0|1)\d|19\d\d)/);
+      if (year !== null && year.length) {
+        return Number(year[0]);
+      }
+    }
+
+    const year = date.match(/(\d\d\d\d)/);
+    if (year !== null && year.length) {
+      return Number(year[0]);
+    }
+  }
   async databaseEntryCreator (pouchDB: typeof PouchDB, [op, file, entry]: FSTree.PatchEntry) {
     switch (op) {
       case 'mkdir':
@@ -182,6 +198,7 @@ export class Scanner extends events.EventEmitter {
             artist: artistID
           }));
 
+
           const trackName = tags.title || tags.TITLE;
           const trackNumber = (tags.track || tags.TRACK) ?
             (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
@@ -216,7 +233,9 @@ export class Scanner extends events.EventEmitter {
             albums: {
               _id: albumID,
               name: albumName,
-              artist: artistID
+              artist: artistID,
+              year: this.getAlbumYear(source, tags),
+              dateAdded: Date.now()
             },
             tracks: {
               _id: trackID,

@@ -6,6 +6,7 @@ import {TrackListItem} from '../TrackListItem';
 import {albumURI} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
+import Artwork from 'app/Artwork';
 
 require('./AlbumDetailsView.scss');
 
@@ -73,11 +74,14 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     return <div className="album-details-view">
       <div className="album-header">
         <div className="album-image" onClick={this.handleClick.bind(this)}>
-          <BetterImage src={`/api/aquarelle/${p.artist}/${p.name}?s=128`} size={128} />
+          <BetterImage src={Artwork.get(album._id, 'large')} size={128} />
           <span className="dark-overlay"></span>
           <span className="play-overlay pt-icon pt-icon-play"></span>
         </div>  
-        <div className="album-title">{album.name}</div>
+        <div className="album-infos">
+          <div className="album-title">{album.name}</div>
+          <div className="album-year">{album.year}</div>
+        </div>
       </div>
       <div className="album-content">
         <ScrollableDiv offset={0} binding={album}>

@@ -6,13 +6,16 @@ div.album-details-view{
     display:  inline-block;
     vertical-align: top;
   }
-
+  div.album-infos {
+    margin: .2em 0.8em;
+  }
   div.album-title {
-    margin: .2em 0.6em;
     font-weight: 500;
     font-size: 24px;
   }
-
+  div.album-year {
+    margin: 0.4em 0.1em;
+  }
   div.album-header {
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
     padding: 1.6em;

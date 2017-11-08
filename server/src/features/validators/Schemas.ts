@@ -39,6 +39,8 @@ export const ArtistSchema: ISchema = {
 export const AlbumSchema: ISchema = {
   name: types.string.required,
   artist: types.string.required,
+  year: types.number,
+  dateAdded: types.number
 }
 
 export const TrackSchema: ISchema = {

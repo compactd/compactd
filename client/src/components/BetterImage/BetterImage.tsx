@@ -11,7 +11,7 @@ interface BetterImageProps {
   width?: number;
   size?: number;
   key?: string | number;
-  src: string;
+  src: string | Blob | Promise<Blob>;
 }
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
 
@@ -35,25 +35,32 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
   }
   fetchImage (current = this.props.src, check = true) {
     this.setState({loading: true});
-    
-    fetch(current, {
-      headers: current.startsWith('http') ? {} : Session.headers()}).then((res) => {
-      return res.blob();
-    }).then((blob) => {
-      if (!this.image) return;
-      if (blob.size < 10) throw new Error();
-      // Then the src prop has changed during the request - dont udpate!
-      if (current !== this.props.src && check) return;
-      let url = URL.createObjectURL(blob);
-      // blobs[this.props.src] = url;
-      this.image.src = url;
-
-      this.setState({loading: false});
-    }).catch((err) => {
-      const fallback = this.props.fallback || '/api/assets/no-album.jpg';
-      this.fetchImage(fallback, false);
-      this.setState({loading: false});
-    });
+    if (typeof current === 'string') {
+      fetch(current, {
+        headers: current.startsWith('http') ? {} : Session.headers()}).then((res) => {
+        return res.blob();
+      }).then((blob) => {
+        if (!this.image) return;
+        if (blob.size < 10) throw new Error();
+        // Then the src prop has changed during the request - dont udpate!
+        if (current !== this.props.src && check) return;
+        let url = URL.createObjectURL(blob);
+        // blobs[this.props.src] = url;
+        this.image.src = url;
+  
+        this.setState({loading: false});
+      }).catch((err) => {
+        const fallback = this.props.fallback || '/api/assets/no-album.jpg';
+        this.fetchImage(fallback, false);
+        this.setState({loading: false});
+      });
+    } else {
+      Promise.resolve(current).then((blob) => {
+        this.image.src = URL.createObjectURL(blob);
+        
+        this.setState({loading: false});
+      });
+    }
   }
   componentWillUnmount () {
     URL.revokeObjectURL(this.image.src);

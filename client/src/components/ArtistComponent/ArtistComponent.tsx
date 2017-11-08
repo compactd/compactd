@@ -4,6 +4,7 @@ import {Artist, DSArtist, artistURI} from 'compactd-models';
 import BetterImage from '../BetterImage';
 import * as pluralize from 'pluralize';
 import './ArtistComponent.scss';
+import Artwork from 'app/Artwork';
 
 interface ArtistComponentProps {
   artist: {
@@ -27,7 +28,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
   getLargeCover (size = 64) {
     const {artist} = this.props;
 
-    if (artist._id) return `/api/aquarelle/${artistURI(artist._id).name}?s=${size}`;
+    if (artist._id) return Artwork.getInstance().get(artist._id, 'small');
     if (artist.largeCover) return artist.largeCover;
     if (artist.cover) return artist.cover;
     return '';
@@ -35,7 +36,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
   getSmallCover (size = 32) {
     const {artist} = this.props;
 
-    if (artist._id) return `/api/aquarelle/${artistURI(artist._id).name}?s=${size}`;
+    if (artist._id) return Artwork.getInstance().get(artist._id, 'small');
     if (artist.cover) return artist.cover;
     if (artist.largeCover) return artist.largeCover;
     return '';

@@ -6,6 +6,7 @@ import * as jwt from 'jwt-decode';
 import {getDatabase} from 'app/database';
 import Toaster from 'app/toaster';
 import Socket from 'app/socket';
+import Artwork from 'app/Artwork';
 import Session from 'app/session';
 
 const RESOLVE_STATE = 'compactd/app/RESOLVE_STATE';
@@ -65,6 +66,7 @@ function fetchState () {
     setTimeout(resolve, 400);
   }).then(() => {
     if (Session.isSignedIn()) {
+      Artwork.createInstance(PouchDB);
       return {
         type: RESOLVE_STATE,
         configured: true,
@@ -117,7 +119,7 @@ function sync (): thunk.ThunkAction<void, Defs.CompactdState, void>  {
     if (getState().app.syncing) {
       return;
     }
-    const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers'];
+    const dbs = [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers'];
 
     (syncDB(dbs, dbs.length) as any)(dispatch, getState);
     Socket.connect();

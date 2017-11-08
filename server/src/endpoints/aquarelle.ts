@@ -2,6 +2,7 @@ import * as Express from 'express';
 import * as Agent from '../features/aquarelle/AquarelleAgent';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
+import PouchDB from '../database';
 import {artistURI, albumURI} from 'compactd-models';
 import {mainStory} from 'storyboard';
 
@@ -21,53 +22,47 @@ export default function(app: Express.Application) {
     res.status(201).send({ok: true});
   });
   app.get('/api/aquarelle/:artist', (req, res) => {
-    limit(() => {
+    limit(async () => {
       const {artist} = req.params;
-      const file = Agent.getCacheEntry(artistURI({name: artist}));
-
-      if (!fs.existsSync(file) || fs.lstatSync(file).size < 10)
-        return res.status(404).send({error: 'File not found'});''
+      const size = /^\d+$/.test(req.query.s) ? +req.query.s : 300;
+      const arts = new PouchDB('artworks');
+      const file = await arts.getAttachment('artworks/library/' + artist,
+        size > 64 ? 'large' : 'small') as Buffer;
 
       res.contentType('image/png');
       res.setHeader('Cache-Control', 'max-age=900');
 
-      if (req.query.s) {
-        const s = +req.query.s;
-        if (!isNaN(s)) {
-          return sharp(file).resize(s, s).toBuffer().then((buffer) => {
-            res.send(buffer);
-          });
-        }
+      if (size !== 300) {
+        return sharp(file).resize(size).toBuffer().then((buffer) => {
+          res.send(buffer);
+        });
       }
 
       res.writeHead(200, {});
-      fs.createReadStream(file).pipe(res);
+      res.send(file);
     });
   });
 
   app.get('/api/aquarelle/:artist/:album', (req, res) => {
-    limit(() => {
+    limit(async () => {
 
       const {artist, album} = req.params;
-      const file = Agent.getCacheEntry(albumURI({name: album, artist}));
-
-      if (!fs.existsSync(file) || fs.lstatSync(file).size < 10)
-        return res.status(404).send({error: 'File not found'});
+      const size = /^\d+$/.test(req.query.s) ? +req.query.s : 300;
+      const arts = new PouchDB('artworks');
+      const file = await arts.getAttachment('artworks/library/' + artist + '/' + album,
+        size > 64 ? 'large' : 'small') as Buffer;
 
       res.contentType('image/png');
       res.setHeader('Cache-Control', 'max-age=900');
 
-      if (req.query.s) {
-        const s = +req.query.s;
-        if (!isNaN(s)) {
-          return sharp(file).resize(s, s).toBuffer().then((buffer) => {
-            res.send(buffer);
-          });
-        }
+      if (size !== 300) {
+        return sharp(file).resize(size).toBuffer().then((buffer) => {
+          res.send(buffer);
+        });
       }
 
       res.writeHead(200, {});
-      fs.createReadStream(file).pipe(res);
+      res.send(file);
     });
-    })
+  });
 }

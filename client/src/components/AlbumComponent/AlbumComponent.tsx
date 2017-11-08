@@ -3,6 +3,7 @@ import * as classnames from 'classnames';
 import {Album, DSAlbum, albumURI, Artist, DSArtist, artistURI} from 'compactd-models';
 import BetterImage from '../BetterImage';
 import * as pluralize from 'pluralize';
+import Artwork from 'app/Artwork';
 import './AlbumComponent.scss';
 
 interface AlbumComponentProps {
@@ -33,7 +34,7 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const {album} = this.props;
     const p = albumURI(album._id);
 
-    if (album._id) return `/api/aquarelle/${p.artist}/${p.name}?s=${size}`;
+    if (album._id) return Artwork.getInstance().get(album._id, 'small');
     if (album.largeCover) return album.largeCover;
     if (album.cover) return album.cover;
     return '';
@@ -42,7 +43,7 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const {album} = this.props;
     const p = albumURI(album._id);
 
-    if (album._id) return `/api/aquarelle/${p.artist}/${p.name}?s=${size}`;
+    if (album._id) return Artwork.getInstance().get(album._id, 'small');
     if (album.cover) return album.cover;
     if (album.largeCover) return album.largeCover;
     return '';

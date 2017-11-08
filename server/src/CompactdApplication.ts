@@ -39,6 +39,7 @@ export class CompactdApplication {
       
       const headers = await this.auth.proxyRequestDecorator()({headers: {...req.headers}}, req);
       const remoteUrl = req.url.slice(10);
+      console.log(remoteUrl.split('/'));
       
       const opts = Object.assign({
         method: req.method,
