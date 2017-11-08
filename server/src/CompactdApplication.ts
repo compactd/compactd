@@ -15,6 +15,8 @@ import {mainStory} from 'storyboard';
 import * as request from 'request';
 import httpEventEmitter from './http-event';
 import * as http from 'http';
+const pkg = require('../../package.json');
+const modelsPkg = require('../../node_modules/compactd-models/package.json');
 
 export class CompactdApplication {
   private auth: Authenticator;
@@ -94,6 +96,27 @@ export class CompactdApplication {
     this.app.use(bodyParser.json());
     this.app.post('/api/sessions', this.auth.signinUser());
     this.app.post('/api/users', this.auth.signupUser());
+    this.app.get('/api/status', (req, res) => {
+      
+      const status = {
+        versions: {
+          server: pkg.version,
+          models: modelsPkg.version
+        },
+        user: undefined as string
+      };
+
+      try {
+        const [bearer, token] = req.header('Authorization').split(' ');
+        const user = this.auth.verifySession(token);
+        const unused = user.toLowerCase(); // Check is user isnt undefined, otherwise throw error
+        status.user = user;
+      } catch (err) {
+        status.user = null;
+      } finally {
+        res.send(status);
+      }
+    })
 
     this.unprotectedEndpoints();
 

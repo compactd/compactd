@@ -37,6 +37,19 @@ class SessionManager {
     }
     return true;
   }
+  getStatus (): Promise<{
+    versions: {
+      server: string,
+      models: string,
+    },
+    user?: string
+  }> {
+    const init: RequestInit = {};
+    if (this.isSignedIn()) {
+      init.headers = this.headers();
+    }
+    return fetch('/api/status', init).then((res) => res.json());
+  }
   signIn (username: string, password: string) {
     return fetch('/api/sessions', {
       method: 'POST',
@@ -69,7 +82,7 @@ class SessionManager {
   }
   destroy () {
     this.logout();
-    const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers'];
+    const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers', 'artworks'];
     return Promise.all(dbs.map((db) => {
       const database = new PouchDB(db);
       return database.destroy();

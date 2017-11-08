@@ -65,7 +65,9 @@ function fetchState () {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, 400);
   }).then(() => {
-    if (Session.isSignedIn()) {
+    return Session.getStatus();
+  }).then((status) => {
+    if (status.user) {
       Artwork.createInstance(PouchDB);
       return {
         type: RESOLVE_STATE,
