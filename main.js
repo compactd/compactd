@@ -31,11 +31,14 @@ const PouchDB       = require('./server/dist/database').default;
 const Models        = require('compactd-models');
 const {Scanner}     = require('./server/dist/features/scanner/Scanner');
 
+const {runUpgrade, resetLibraries, rescanAll}  = require('./server/dist/upgrader');
+
 const capabilities = require('fluent-ffmpeg/lib/capabilities');
 const Agent        = require('./server/dist/features/aquarelle/AquarelleAgent');
 const pm2          = require('pm2')
 
-const AVAILABLE_MODES = ['serve', 'configure', 'recover', 'reset', 'clean'];
+const LAST_VERSION_WITHOUT_UPGRADER = '1.2.0-4';
+const AVAILABLE_MODES = ['serve', 'configure', 'recover', 'reset', 'clean', 'upgrade'];
 
 const mode = getMode();
 
@@ -73,6 +76,45 @@ async function checkFile() {
 }
 
 switch (mode) {
+  case 'upgrade': {
+    const versionFile = path.join(config.get('dataDirectory'), '_version');
+
+    let oldOne = LAST_VERSION_WITHOUT_UPGRADER;
+
+    if (fs.existsSync(versionFile)) {
+      oldOne = fs.readFileSync(versionFile).toString();
+    }
+
+    console.log(chalk.yellow(`\n  Thanks for downloading compactd ${pkg.version} !`));
+    console.log(chalk.grey(`\n  Trying to upgrade database from version ${oldOne}...`));
+
+    const spin = new Spinner('Running upgrade...', [ '⠁','⠂','⠄','⡀','⢀','⠠','⠐','⠈']);
+    runUpgrade(oldOne, pkg.version).then((shouldReset) => {
+      if (shouldReset) {
+        return resetLibraries().then(() => true);
+      }
+      return false;
+    }).then((shouldRescan) => {
+      if (!shouldRescan) {
+        spin.stop();
+        console.log('\n  ' + chalk.bgGreen.black(' Successfully upgraded compactd') + '\n');
+        process.exit(0);
+      }
+      spin.message('Rescanning media content');
+      return rescanAll((name) => {
+        spin.message('Scanning ' + name);
+      });
+    }).then(() => {
+      return fetchArtworks(spin);
+    }).then(() => {
+      fs.writeFileSync(versionFile, pkg.version);
+      spin.stop();
+      console.log('\n  ' + chalk.bgGreen.black(' Successfully upgraded compactd') + '\n');
+    }).catch((err) => {
+      console.log(err);
+    });
+    return;
+  }
   case 'serve':
     console.log(chalk.yellow(`\n  Thanks for downloading compactd ${pkg.version} !`));
     console.log(chalk.grey('\n  Trying to start compactd in the background...'));

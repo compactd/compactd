@@ -23,7 +23,7 @@ function deleteLibraryTree (libraryId: string) {
   return new Promise((resolve, reject) => {
     const scanner = new Scanner(libraryId);
     fs.unlink(scanner.treePath, (err) => {
-      if (err) return reject(err);
+      // if (err) return reject(err);
       resolve();
     })
   })
