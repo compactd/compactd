@@ -50,16 +50,22 @@ class HttpEventEmitter extends events.EventEmitter {
     this.io.on('connection', (socket: SocketIO.Socket & {auth?: string}) => {
       mainStory.info('socket', `Connected to ${socket.handshake.address} via ${socket.handshake.url} [${socket.id}]`);
       socket.on('authenticate', (data: {token: string}) => {
-        
-        const user = auth.verifySession(data.token);
-        if (user && user !== '') {
-          mainStory.info('socket', `Socket ${socket.id} authenticated as ${user}`);
-          socket.auth = user;
-          Object.keys(this.io.nsps).forEach((namespace) => {
-            mainStory.info('socket', `Retablishing socket ${socket.id} for ${namespace}`);
-            const nsp = this.io.nsps[namespace];
-            nsp.connected[socket.id] = nsp.sockets[socket.id];
-          });      
+        try {
+          const user = auth.verifySession(data.token);
+          if (user && user !== '') {
+            mainStory.info('socket', `Socket ${socket.id} authenticated as ${user}`);
+            socket.auth = user;
+            Object.keys(this.io.nsps).forEach((namespace) => {
+              mainStory.info('socket', `Retablishing socket ${socket.id} for ${namespace}`);
+              const nsp = this.io.nsps[namespace];
+              nsp.connected[socket.id] = nsp.sockets[socket.id];
+            });      
+          }
+        } catch (err) {
+          mainStory.warn('socket', `Could not verify session [${socket.id}]`, {
+            attach: err
+          });
+          return;
         }
       });
     
