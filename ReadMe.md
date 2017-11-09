@@ -2,6 +2,10 @@
 
 (pronounce compact-ed)
 
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/Fwnbp4ySbyNYR6BaX1f9y4zQ/compactd/compactd'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/Fwnbp4ySbyNYR6BaX1f9y4zQ/compactd/compactd.svg' />
+</a>
+
 Just as a Compact Disc is the evolution of tapes, Compactd is an evolution of
 cassette. It aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
