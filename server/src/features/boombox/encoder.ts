@@ -54,7 +54,7 @@ export const ENCODER_PRESETS: {
     format: 'mp3',
     quality: 4,
     name: 'low',
-    cache_size: 64,
+    cache_size: 128,
   },
   normal: {
     format: 'mp3',
@@ -65,7 +65,7 @@ export const ENCODER_PRESETS: {
   high: {
     format: 'mp3',
     quality: 0,
-    cache_size: 24,
+    cache_size: 16,
     name: 'high'
   },
   original: {
