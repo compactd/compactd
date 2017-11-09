@@ -1,5 +1,5 @@
 import * as Defs from './definitions';
-import PouchDB from 'pouchdb';
+import * as PouchDB from 'pouchdb';
 import * as Database from '../../database';
 import * as path from "path";
 import { readFile, writeFile, existsSync } from "fs";

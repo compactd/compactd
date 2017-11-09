@@ -1,6 +1,6 @@
 import test from 'ava';
 import clean from './library-cleaner';
-import Pouch from 'pouchdb';
+import * as Pouch from 'pouchdb';
 
 const PouchDB: typeof Pouch = require('pouchdb').defaults({adapter: 'memory'});
 

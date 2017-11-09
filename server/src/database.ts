@@ -1,8 +1,8 @@
-import Pouch from 'pouchdb';
+import * as PouchDB from 'pouchdb';
 import * as PouchDBFind from 'pouchdb-find';
 import config from './config';
 
-const PouchDB: typeof Pouch = require('pouchdb');
+// const PouchDB: typeof Pouch = require('pouchdb');
 
 PouchDB.plugin(PouchDBFind);
 

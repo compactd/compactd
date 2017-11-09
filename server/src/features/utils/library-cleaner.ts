@@ -1,4 +1,4 @@
-import PouchDB from 'pouchdb';
+import * as PouchDB from 'pouchdb';
 import {File, Track, Album, Artist} from 'compactd-models';
 import {mainStory} from 'storyboard';
 
