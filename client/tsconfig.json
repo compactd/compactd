@@ -9,11 +9,16 @@
     "baseUrl": "./src/",
     "experimentalDecorators": true,
     "types": ["node"],
+    "allowSyntheticDefaultImports": true,
     "typeRoots": [
-      "../node_modules/@types/"
+      "../node_modules/@types/",
+      "../types/",
+      "../../types/",
+      "types/"
     ]
   },
   "include": [
     "./src/**/*"
-  ]
+  ],
+  "typeRoots": ["./types/"]
 }

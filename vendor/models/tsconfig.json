@@ -6,6 +6,7 @@
     "module": "commonjs",
     "target": "es6",
     "declaration": true,
+    "allowSyntheticDefaultImports": true,
     "typeRoots" : ["./node_modules/@types"]
   },
   "include": [
