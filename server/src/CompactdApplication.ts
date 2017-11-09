@@ -17,6 +17,12 @@ import httpEventEmitter from './http-event';
 import * as http from 'http';
 const pkg = require('../../package.json');
 const modelsPkg = require('../../node_modules/compactd-models/package.json');
+const Ddos = require('ddos');
+
+const ddos = new Ddos({
+  burst: 10,
+  limit: 31
+});
 
 export class CompactdApplication {
   private auth: Authenticator;
@@ -77,6 +83,7 @@ export class CompactdApplication {
    * Configure express app by adding middlewares
    */
   configure () {
+    this.app.use(ddos.express);
 
     class MorganStream extends Stream.Writable {
       _write(chunk: string, enc: string, next: Function) {

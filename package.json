@@ -28,6 +28,7 @@
     "compactd-models": "file:vendor/models",
     "convict": "^3.0.0",
     "cookie-parser": "^1.4.3",
+    "ddos": "^0.1.24",
     "express": "^4.15.2",
     "fluent-ffmpeg": "^2.1.2",
     "fs-promise": "^2.0.3",
