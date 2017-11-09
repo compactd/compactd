@@ -37,8 +37,9 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     this.setState({loading: true});
     if (typeof current === 'string') {
       fetch(current, {
-        headers: current.startsWith('http') ? {} : Session.headers()}).then((res) => {
-        return res.blob();
+        headers: current.startsWith(window.location.origin) ? new Headers() : Session.headers()
+      }).then((res) => {
+          return res.blob();
       }).then((blob) => {
         if (!this.image) return;
         if (blob.size < 10) throw new Error();

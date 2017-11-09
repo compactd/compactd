@@ -4,6 +4,7 @@ import PouchDB from 'pouchdb';
 class SessionManager {
   private storage: Storage;
   private tokenName = 'session_token';
+
   constructor(storage = window.localStorage) {
     this.storage = storage;
   }
@@ -53,7 +54,7 @@ class SessionManager {
   signIn (username: string, password: string) {
     return fetch('/api/sessions', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: new Headers({'content-type': 'application/json'}),
       body: JSON.stringify({username, password})
     }).then((res) => res.json()).then((res) => {
       
@@ -64,13 +65,22 @@ class SessionManager {
       return Promise.reject('Invalid username or password');
     });
   }
-  fetch (input: RequestInfo, init?: RequestInit) {
-    return fetch(input, this.init(init));
+  fetch (input: RequestInfo, init?: {
+    method: string,
+    body: string, 
+    headers?: {
+      [name: string]: string
+    }
+  }) {
+    return fetch(input, this.init({
+      ...init,
+      headers: new Headers(init.headers)
+    }));
   }
   headers (headers: any = {}) {
-    return Object.assign({}, headers, {
+    return new Headers(Object.assign({}, headers, {
       Authorization: `Bearer ${this.getToken()}`
-    });
+    }));
   }
   init (init: RequestInit = {}) {
     return Object.assign({}, init, {
@@ -82,7 +92,7 @@ class SessionManager {
   }
   destroy () {
     this.logout();
-    const dbs = [ 'artists', 'albums', 'tracks', 'files', 'trackers', 'artworks'];
+    const dbs =  [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers', 'libraries'];
     return Promise.all(dbs.map((db) => {
       const database = new PouchDB(db);
       return database.destroy();

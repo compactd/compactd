@@ -121,7 +121,7 @@ function sync (): thunk.ThunkAction<void, Defs.CompactdState, void>  {
     if (getState().app.syncing) {
       return;
     }
-    const dbs = [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers'];
+    const dbs = [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers', 'libraries'];
 
     (syncDB(dbs, dbs.length) as any)(dispatch, getState);
     Socket.connect();

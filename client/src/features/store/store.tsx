@@ -213,7 +213,9 @@ function downloadResult (release: Release, album: DSAlbum) {
   return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
     
     const res = await Session.fetch(`/api/cascade/${release._id}/download`, {
-      method: 'POST'
+      method: 'POST',
+      body: null,
+      headers: {}
     });
     
     const data = await res.json();
