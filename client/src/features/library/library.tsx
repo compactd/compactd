@@ -320,7 +320,7 @@ async function toggleHideTrack (trackId: string) {
     body: JSON.stringify({
       track: trackId
     }),
-    headers: {'content-type': 'application/json'}
+    headers: {'Content-Type': 'application/json'}
   });
   return {
     type: TOGGLE_HIDDEN,

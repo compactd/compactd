@@ -7,7 +7,8 @@
     "module": "commonjs",
     "target": "es6",
     "allowJs": true,
-    "lib": ["es2016", "dom", "es7", "es6"]
+    "lib": ["es2016", "dom", "es7", "es6"],
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "./src/**/*",

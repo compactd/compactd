@@ -67,17 +67,22 @@ class SessionManager {
   }
   fetch (input: RequestInfo, init?: {
     method: string,
-    body: string, 
+    body: any, 
     headers?: {
       [name: string]: string
     }
   }) {
+
     return fetch(input, this.init({
       ...init,
       headers: new Headers(init.headers)
     }));
   }
   headers (headers: any = {}) {
+    if (headers instanceof Headers) {
+      headers.set('Authorization', `Bearer ${this.getToken()}`);
+      return headers;
+    }
     return new Headers(Object.assign({}, headers, {
       Authorization: `Bearer ${this.getToken()}`
     }));

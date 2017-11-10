@@ -139,7 +139,8 @@ export async function changeTrackArtist (trackId: string, artistId: string) {
   } catch (err) {
     const albumProps = {
       artist: newTrack.artist,
-      name: originalAlbum.name
+      name: originalAlbum.name,
+      dateAdded: Date.now()
     }
     const album = {
       _id: albumURI(mapAlbumToParams(albumProps)),
