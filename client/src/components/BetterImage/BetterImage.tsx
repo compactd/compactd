@@ -11,7 +11,7 @@ interface BetterImageProps {
   width?: number;
   size?: number;
   key?: string | number;
-  src: string | Blob | Promise<Blob>;
+  src: string | Blob | Promise<Blob | string>;
 }
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
 
@@ -35,7 +35,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
   }
   fetchImage (current = this.props.src, check = true) {
     this.setState({loading: true});
-    if (typeof current === 'string') {
+    if (typeof current === 'string' && !current.startsWith('blob:')) {
       fetch(current, {
         headers: current.startsWith(window.location.origin) ? new Headers() : Session.headers()
       }).then((res) => {
@@ -57,6 +57,14 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
       });
     } else {
       Promise.resolve(current).then((blob) => {
+        console.log(blob);
+        
+        if (typeof blob === 'string') {
+          this.image.src = blob;
+          
+          this.setState({loading: false});
+          return;
+        }
         this.image.src = URL.createObjectURL(blob);
         
         this.setState({loading: false});
