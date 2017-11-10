@@ -4,6 +4,7 @@ import {Track, LibraryState} from 'definitions';
 import * as classnames from 'classnames';
 import { ContextMenuTarget, Menu, MenuItem, MenuDivider, Dialog, Button, Popover, Position } from "@blueprintjs/core";
 import ArtistComponent from 'components/ArtistComponent';
+import {trackURI} from 'compactd-models';
 
 require('./TrackListItem.scss');
 
@@ -49,7 +50,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
   handleClick () {
     const {actions, track, library} = this.props;
     if (this.props.track.offerRemove) return;
-    actions.replacePlayerStack([track.album, track.number], !this.props.playHidden);
+    actions.replacePlayerStack([track.album, trackURI(track._id).number], !this.props.playHidden);
   }
   renderArtistSelectContent () {
     const {actions, track, library} = this.props;

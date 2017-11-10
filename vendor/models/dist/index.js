@@ -50,7 +50,7 @@ function mapTrackToParams(track) {
         name: slug(track.name).toLowerCase(),
         artist: exports.artistURI(track.artist).name,
         album: exports.albumURI(track.album).name,
-        number: track.number <= 9 ? `0${track.number}` : `${track.number}`
+        number: (track.disc || 0) + '.' + (track.number <= 9 ? `0${track.number}` : `${track.number}`)
     };
 }
 exports.mapTrackToParams = mapTrackToParams;

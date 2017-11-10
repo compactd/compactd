@@ -58,8 +58,6 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     if (locks === 1) {
       delete AlbumComponent.blobCache[entryId];
       url.then((uri) => {
-        console.log('decreaseCacheLocks: revoke ' + entryId, 
-          AlbumComponent.blobCache[entryId], uri);
         URL.revokeObjectURL(uri);
       });
       return;
@@ -102,7 +100,6 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
   getLargeCover (size = 64) {
     const {album} = this.props;
     const entryId = album._id + '!large';
-    console.log(entryId, AlbumComponent.blobCache[entryId]);
     
     if (album._id) {
       if (!AlbumComponent.blobCache[entryId]) {

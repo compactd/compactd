@@ -90,7 +90,7 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
     const db = new PouchDB(dbName);
     const remote = getDatabase(dbName);
 
-    db.sync(remote).on('complete', (info) => {
+    db.replicate.from(remote).on('complete', (info) => {
       dispatch({
         type: UPDATE_SYNC,
         progress: (max - dbs.length + 1) / max

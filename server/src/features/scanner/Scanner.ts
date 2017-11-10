@@ -202,14 +202,23 @@ export class Scanner extends events.EventEmitter {
           const trackName = tags.title || tags.TITLE;
           const trackNumber = (tags.track || tags.TRACK) ?
             (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
-          const disc = (tags.disc || tags.DISC) ?
-            (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
+          
+          const disc = (tags.disc || tags.DISC);
           const trackID = Models.trackURI(Models.mapTrackToParams({
             name: trackName,
             artist: artistID,
             album: albumID,
-            number: trackNumber
+            number: trackNumber,
+            disc: disc
           }));
+          console.log(trackID, {
+            name: trackName,
+            artist: artistID,
+            album: albumID,
+            number: trackNumber,
+            disc: disc
+          });
+          
           const fileProps = {
             _id: '',
             artist: artistID,

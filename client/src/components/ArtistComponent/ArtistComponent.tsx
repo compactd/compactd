@@ -52,7 +52,6 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const [locks, url] = ArtistComponent.blobCache[entryId];
     if (locks === 1) {
       url.then((uri) => {
-        console.log('decreaseCacheLocks: revoke ' + entryId);
         URL.revokeObjectURL(uri);
         delete ArtistComponent.blobCache[entryId];
       });

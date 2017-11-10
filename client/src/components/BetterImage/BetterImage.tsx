@@ -57,7 +57,6 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
       });
     } else {
       Promise.resolve(current).then((blob) => {
-        console.log(blob);
         
         if (typeof blob === 'string') {
           this.image.src = blob;

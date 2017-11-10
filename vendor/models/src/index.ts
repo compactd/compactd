@@ -180,7 +180,7 @@ export function mapTrackToParams (track: Track | TrackParams): TrackParams {
     name: slug(track.name).toLowerCase(),
     artist: artistURI(track.artist).name,
     album: albumURI(track.album).name,
-    number: (track.disc ? track.disc : '') + (track.number <= 9 ? `0${track.number}` : `${track.number}`)
+    number: (track.disc || 0) + '.' + (track.number <= 9 ? `0${track.number}` : `${track.number}`)
   };
 }
 

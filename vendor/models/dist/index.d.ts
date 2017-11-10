@@ -65,6 +65,8 @@ export interface Album extends Document {
     _id: string;
     name: string;
     artist: string;
+    year?: number;
+    dateAdded: number;
 }
 export interface AlbumParams extends RouteParams {
     name: string;
@@ -85,6 +87,7 @@ export interface TrackParams extends RouteParams {
     artist: URI<ArtistParams>;
     album: URI<AlbumParams>;
     number: string;
+    disc?: string;
 }
 export interface File extends Document {
     _id: string;

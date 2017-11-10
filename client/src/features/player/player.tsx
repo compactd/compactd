@@ -85,13 +85,13 @@ async function playAfter (stack: PlayerStack): Promise<PlayerAction> {
   const tracks = new PouchDB<Defs.Track>('tracks');
 
   if (Array.isArray(stack)) {
-    if (stack.length === 2 && Number.isInteger(stack[1] as any)) {
+    if (stack.length === 2 && !Number.isNaN(Number(stack[1] as any))) {
       const [album, index] = stack as [string, number];
-      const num = `00${index || 0}`.slice(-2);
+      const num = index;// `00${index || 0}`.slice(-2);
       const base = album;
       const docs = await tracks.allDocs({
         include_docs: true,
-        startkey: path.join(base, num),
+        startkey: path.join(base, '' + num),
         endkey: path.join(base, '99')
       });
       return {
@@ -159,6 +159,8 @@ function jumpTo (target: string | number | Defs.Track) {
 }
 
 async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Promise<PlayerAction> {
+  console.log(stack);
+  
   await Promise.resolve();
   const tracks = new PouchDB<Defs.Track>('tracks');
   const filterHiddenFunc = (doc: Defs.Track) => {
@@ -166,14 +168,14 @@ async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Pro
   };
 
   if (Array.isArray(stack)) {
-    if (stack.length === 2 && Number.isInteger(stack[1] as any)) {
+    if (stack.length === 2 && !Number.isNaN(Number(stack[1] as any))) {
       const [album, index] = stack as [string, number];
-      const num = `00${index || 0}`.slice(-2);
+      const num = index;// `00${index || 0}`.slice(-2);
       const base = album;
       const docs = await tracks.allDocs({
         include_docs: true,
-        startkey: path.join(base, num),
-        endkey: path.join(base, '99')
+        startkey: path.join(base, '' + num),
+        endkey: path.join(base, '\uffff')
       });
       return {
         type: REPLACE_PLAYER_STACK_ACTION,

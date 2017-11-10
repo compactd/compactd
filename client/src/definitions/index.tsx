@@ -13,3 +13,7 @@ export type SettingsState = SettingsState;
 export type StoreState = StoreState;
 
 export type AudioSource = string;
+
+export interface Dict<T> {
+  [key: string]: T; 
+}

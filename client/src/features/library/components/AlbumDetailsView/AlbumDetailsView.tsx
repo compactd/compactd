@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {Actions} from 'definitions/actions';
-import {LibraryState, PlayerState} from 'definitions';
+import {LibraryState, PlayerState, Dict} from 'definitions';
 import ScrollableDiv from 'components/ScrollableDiv';
-import {TrackListItem} from '../TrackListItem';
-import {albumURI} from 'compactd-models';
+import {TrackList} from '../TrackList';
+import {albumURI, Track} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
 import Artwork from 'app/Artwork';
+import { Tab2, Tabs2 } from "@blueprintjs/core";
 
 require('./AlbumDetailsView.scss');
 
@@ -19,10 +20,6 @@ interface AlbumDetailsViewProps {
 }
 
 export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {showHidden: boolean}>{
-  constructor() {
-    super();
-    this.state = {showHidden: false};
-  }
   getAlbumId (props: AlbumDetailsViewProps = this.props) {
     
     return albumURI({name: props.album, artist: props.artist});
@@ -42,6 +39,42 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     const album = library.albumsById[id];
     this.props.actions.replacePlayerStack(album, !this.state.showHidden);
   }
+  renderAlbumContent () {
+    const {actions, library, artist, player} = this.props;
+    const id = this.getAlbumId();
+    const album = library.albumsById[id];
+    
+    const hasMultipleDisc = !!album.tracks.find((val) => {
+      return !!val.disc;
+    });
+    if (hasMultipleDisc) {
+      const albumsByDisc = album.tracks.reduce((acc, val) => {
+        return {
+          ...acc,
+          [val.disc]: [].concat(...[acc[val.disc] || []], val)
+        }
+      }, {} as Dict<Track[]>);
+  
+      const content = Object.keys(albumsByDisc).map((disc) => {
+        const tracks = albumsByDisc[disc];
+  
+        return <Tab2 id={disc} title={'Disc ' + disc} panel={
+          <TrackList
+            actions={actions}
+            tracks={tracks}
+            library={library}
+            player={player} />
+        }/>
+      });
+      return <Tabs2 id="discs">{content}</Tabs2>;
+    } else {
+      return <TrackList
+        actions={actions}
+        tracks={album.tracks}
+        library={library}
+        player={player} />;
+    }
+  }
   render (): JSX.Element {
     const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
@@ -50,27 +83,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
       return <SuggestionsView library={library} actions={actions} />;
     }
     const p = albumURI(album._id);
-
-    const content = album.tracks.map((track, index) => {
-      const el = <TrackListItem track={track} actions={actions} library={library} key={track._id}
-      playing={player.stack.length && player.stack[0]._id === track._id} playHidden={this.state.showHidden} />;
-      
-      if (track.hidden && !this.state.showHidden) {
-        if (index > 0 && album.tracks[index - 1].hidden) return;
-        return <div className="missing-track" onClick={() => {
-          this.setState({showHidden: true})
-        }}><div className="ellipsis">•••</div><div className="separator"></div></div>
-      }
-      if (track.hidden && this.state.showHidden) {
-        if (index > 0 && album.tracks[index - 1].hidden) {
-          return el;
-        };
-        return <div><div className="missing-track" onClick={() => {
-          this.setState({showHidden: false})
-        }}><div className="ellipsis">-</div><div className="separator"></div></div>{el}</div>
-      }
-      return el;
-    })
+    
     return <div className="album-details-view">
       <div className="album-header">
         <div className="album-image" onClick={this.handleClick.bind(this)}>
@@ -85,7 +98,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
       </div>
       <div className="album-content">
         <ScrollableDiv offset={0} binding={album}>
-          {content}
+          {this.renderAlbumContent()}
         </ScrollableDiv>
       </div>
     </div>
