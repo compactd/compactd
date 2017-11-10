@@ -144,6 +144,18 @@ export class Scanner extends events.EventEmitter {
       }
     }
   }
+
+  getDisc(disc: any): number {
+    if (disc.match(/\d+/)) {
+      return Number(disc);
+    }
+    const xOnX = disc.match(/(\d+)\/\d+/);
+    if (xOnX) {
+      return Number(xOnX[1]);
+    }
+    return 0;
+  }
+
   getAlbumYear (file: string, tags: any) {
     const date = tags.date || tags.DATE;
 
@@ -203,21 +215,14 @@ export class Scanner extends events.EventEmitter {
           const trackNumber = (tags.track || tags.TRACK) ?
             (tags.track || tags.TRACK).match(/^0*(\d+)(\/\d+)?$/)[1] : undefined;
           
-          const disc = (tags.disc || tags.DISC);
+          const disc = this.getDisc(tags.disc || tags.DISC);
           const trackID = Models.trackURI(Models.mapTrackToParams({
             name: trackName,
             artist: artistID,
             album: albumID,
             number: trackNumber,
-            disc: disc
+            disc: '' + disc
           }));
-          console.log(trackID, {
-            name: trackName,
-            artist: artistID,
-            album: albumID,
-            number: trackNumber,
-            disc: disc
-          });
           
           const fileProps = {
             _id: '',
