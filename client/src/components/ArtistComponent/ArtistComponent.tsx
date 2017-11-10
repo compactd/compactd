@@ -60,6 +60,14 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     }
     ArtistComponent.blobCache[entryId] = [locks - 1, url];
   }
+  componentWillUnmount () {
+    const {artist, layout} = this.props;
+    if (artist) {
+      if (layout !== 'minimal') {
+        this.decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+      }
+    }
+  }
 
   getLargeCover (size = 64) {
     const {artist} = this.props;
@@ -102,7 +110,6 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     }
   }
   componentWillReceiveProps (nextProps: ArtistComponentProps) {
-    console.log(nextProps, this.props);
     
     const {artist, layout} = this.props;
     if (!nextProps.artist && artist) {
