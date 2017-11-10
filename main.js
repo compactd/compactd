@@ -76,6 +76,27 @@ async function checkFile() {
 }
 
 switch (mode) {
+  case 'reset': {
+    console.log(chalk.yellow(`\n  Thanks for downloading compactd ${pkg.version} !`));
+    console.log(chalk.grey(`\n  Trying reset library...`));
+
+    const spin = new Spinner('Running scan...', [ '⠁','⠂','⠄','⡀','⢀','⠠','⠐','⠈']);
+    spin.start();
+    resetLibraries().then(() => {
+      return rescanAll((name) => {
+        spin.message('Scanning ' + name);
+      });
+    }).then(() => {
+      return fetchArtworks(spin);
+    }).then(() => {
+      spin.stop();
+      console.log('\n  ' + chalk.bgGreen.black(' Successfully reset compactd ') + '\n');
+      process.exit(0);
+    }).catch((err) => {
+      console.log(err);
+    });
+    return;
+  }
   case 'upgrade': {
     const versionFile = path.join(config.get('dataDirectory'), '_version');
 
@@ -89,6 +110,8 @@ switch (mode) {
     console.log(chalk.grey(`\n  Trying to upgrade database from version ${oldOne}...`));
 
     const spin = new Spinner('Running upgrade...', [ '⠁','⠂','⠄','⡀','⢀','⠠','⠐','⠈']);
+    spin.start();
+
     runUpgrade(oldOne, pkg.version).then((shouldReset) => {
       if (shouldReset) {
         return resetLibraries().then(() => true);
@@ -96,6 +119,7 @@ switch (mode) {
       return false;
     }).then((shouldRescan) => {
       if (!shouldRescan) {
+        fs.writeFileSync(versionFile, pkg.version);
         spin.stop();
         console.log('\n  ' + chalk.bgGreen.black(' Successfully upgraded compactd') + '\n');
         process.exit(0);
@@ -110,6 +134,7 @@ switch (mode) {
       fs.writeFileSync(versionFile, pkg.version);
       spin.stop();
       console.log('\n  ' + chalk.bgGreen.black(' Successfully upgraded compactd') + '\n');
+      process.exit(0);
     }).catch((err) => {
       console.log(err);
     });
@@ -213,6 +238,8 @@ switch (mode) {
 }
 
 async function fetchArtworks (spin) {
+  await Agent.reset();
+
   spin.message('Downloading album covers');
   spin.start();
   await Agent.processAlbums().catch((err) => {
