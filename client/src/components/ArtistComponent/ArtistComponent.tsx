@@ -25,45 +25,11 @@ interface ArtistComponentProps {
 }
 
 export default class ArtistComponent extends React.Component<ArtistComponentProps, {}> {
-  private static blobCache: {
-    [id: string]: [number, Promise<string>]
-  } = {};
-
-  increaseCacheLocks (id: string, size: 'large' | 'small') {
-    const entryId = id + '!' + size;
-    
-    if (!ArtistComponent.blobCache[entryId]) {
-      if (size === 'large') {
-        this.getLargeCover();
-      } else {
-        this.getSmallCover();
-      }
-      return;
-    }
-    const [locks, url] = ArtistComponent.blobCache[entryId];
-    ArtistComponent.blobCache[entryId] = [locks + 1, url];
-  }
-
-  decreaseCacheLocks (id: string, size: 'large' | 'small') {
-    const entryId = id + '!' + size;
-    if (!ArtistComponent.blobCache[entryId]) {
-      throw new Error('Entry missing');
-    }
-    const [locks, url] = ArtistComponent.blobCache[entryId];
-    if (locks === 1) {
-      url.then((uri) => {
-        URL.revokeObjectURL(uri);
-        delete ArtistComponent.blobCache[entryId];
-      });
-      return;
-    }
-    ArtistComponent.blobCache[entryId] = [locks - 1, url];
-  }
   componentWillUnmount () {
     const {artist, layout} = this.props;
     if (artist) {
       if (layout !== 'minimal') {
-        this.decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+        Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
       }
     }
   }
@@ -72,13 +38,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const {artist} = this.props;
     const entryId = artist._id + '!large';
     if (artist._id) {
-      if (!ArtistComponent.blobCache[entryId]) {
-        const url = Artwork.getInstance().get(artist._id, 'large')
-          .then((blob) => URL.createObjectURL(blob));
-        ArtistComponent.blobCache[entryId] = [1, url];
-        return url;
-      }
-      return ArtistComponent.blobCache[entryId][1];
+      return Artwork.getInstance().getLargeCover(artist._id, size);
     }
     if (artist.largeCover) return artist.largeCover;
     if (artist.cover) return artist.cover;
@@ -89,13 +49,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const entryId = artist._id + '!small';
 
     if (artist._id) {
-      if (!ArtistComponent.blobCache[entryId]) {
-        const url = Artwork.getInstance().get(artist._id, 'small')
-          .then((blob) => URL.createObjectURL(blob));
-        ArtistComponent.blobCache[entryId] = [1, url];
-        return url;
-      }
-      return ArtistComponent.blobCache[entryId][1];
+      return Artwork.getInstance().getLargeCover(artist._id, size);
     }
 
     if (artist.cover) return artist.cover;
@@ -104,8 +58,12 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
   }
   componentDidMount () {
     const {artist, layout} = this.props;
-    if (artist && artist._id) {
-      this.increaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+    if (artist && artist._id && layout !== 'minimal') {
+      if (layout === 'compact') {
+        Artwork.getInstance().getSmallCover(artist._id);
+      } else {
+        Artwork.getInstance().getLargeCover(artist._id);
+      }
     }
   }
   componentWillReceiveProps (nextProps: ArtistComponentProps) {
@@ -113,17 +71,17 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const {artist, layout} = this.props;
     if (!nextProps.artist && artist) {
       if (layout !== 'minimal') {
-        this.decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+        Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
       }
       return;
     }
     if (nextProps.artist && (!artist || artist._id !== nextProps.artist._id)) {
       if (artist && artist._id) {
         if (layout !== 'minimal') {
-          this.decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+          Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
         }
       }
-      this.increaseCacheLocks(nextProps.artist._id, nextProps.layout === 'compact' ? 'small' : 'large');
+      Artwork.getInstance().increaseCacheLocks(nextProps.artist._id, nextProps.layout === 'compact' ? 'small' : 'large');
     }
   }
   renderImage (): JSX.Element {

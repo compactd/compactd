@@ -30,52 +30,19 @@ interface AlbumComponentProps {
 }
 
 export default class AlbumComponent extends React.Component<AlbumComponentProps, {}> {
-  private static blobCache: {
-    [id: string]: [number, Promise<string>]
-  } = {};
 
-  increaseCacheLocks (id: string, size: 'large' | 'small') {
-    const entryId = id + '!' + size;
-    
-    if (!AlbumComponent.blobCache[entryId]) {
-      if (size === 'large') {
-        this.getLargeCover();
-      } else {
-        this.getSmallCover();
-      }
-      return;
-    }
-    const [locks, url] = AlbumComponent.blobCache[entryId];
-    AlbumComponent.blobCache[entryId] = [locks + 1, url];
-  }
-
-  decreaseCacheLocks (id: string, size: 'large' | 'small') {
-    const entryId = id + '!' + size;
-    if (!AlbumComponent.blobCache[entryId]) {
-      throw new Error('Entry missing');
-    }
-    const [locks, url] = AlbumComponent.blobCache[entryId];
-    if (locks === 1) {
-      delete AlbumComponent.blobCache[entryId];
-      url.then((uri) => {
-        URL.revokeObjectURL(uri);
-      });
-      return;
-    }
-    AlbumComponent.blobCache[entryId] = [locks - 1, url];
-  }
   componentWillUnmount () {
     const {album, layout} = this.props;
     if (album) {
       if (layout !== 'minimal') {
-        this.decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
+        Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
       }
     }
   }
   componentDidMount () { 
     const {artist, layout} = this.props;
     if (artist && artist._id) {
-      this.increaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+      Artwork.getInstance().increaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
     }
   }
   componentWillReceiveProps (nextProps: AlbumComponentProps) {
@@ -83,17 +50,17 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const {album, layout} = this.props;
     if (!nextProps.album && album) {
       if (layout !== 'minimal') {
-        this.decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
+        Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
       }
       return;
     }
     if (nextProps.album && (!album || album._id !== nextProps.album._id)) {
       if (album && album._id) {
         if (layout !== 'minimal') {
-          this.decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
+          Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
         }
       }
-      this.increaseCacheLocks(nextProps.album._id, nextProps.layout === 'compact' ? 'small' : 'large');
+      Artwork.getInstance().increaseCacheLocks(nextProps.album._id, nextProps.layout === 'compact' ? 'small' : 'large');
     }
   }
   
@@ -102,13 +69,7 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const entryId = album._id + '!large';
     
     if (album._id) {
-      if (!AlbumComponent.blobCache[entryId]) {
-        const url = Artwork.getInstance().get(album._id, 'large')
-          .then((blob) => URL.createObjectURL(blob));
-        AlbumComponent.blobCache[entryId] = [1, url];
-        return url;
-      }
-      return AlbumComponent.blobCache[entryId][1];
+      return Artwork.getInstance().getLargeCover(album._id, size);
     }
     if (album.largeCover) return album.largeCover;
     if (album.cover) return album.cover;
@@ -120,13 +81,7 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const entryId = album._id + '!small';
 
     if (album._id) {
-      if (!AlbumComponent.blobCache[entryId]) {
-        const url = Artwork.getInstance().get(album._id, 'small')
-          .then((blob) => URL.createObjectURL(blob));
-        AlbumComponent.blobCache[entryId] = [1, url];
-        return url;
-      }
-      return AlbumComponent.blobCache[entryId][1];
+      return Artwork.getInstance().getSmallCover(album._id, size);
     }
 
     if (album.cover) return album.cover;

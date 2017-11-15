@@ -24,14 +24,26 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     
     return albumURI({name: props.album, artist: props.artist});
   }
+  componentWillUnmount () {
+    const id = this.getAlbumId();
+    if (id) {
+      Artwork.getInstance().decreaseCacheLocks(id, 'large');
+    }
+  }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
     if (this.getAlbumId() !== this.getAlbumId(nextProps)) {
-
+      Artwork.getInstance().decreaseCacheLocks(this.getAlbumId(), 'large');
+      Artwork.getInstance().increaseCacheLocks(this.getAlbumId(nextProps), 'large');
+    
       this.props.actions.fetchAlbum(this.getAlbumId(nextProps));
     }
   }
   componentDidMount () {
-    this.props.actions.fetchAlbum(this.getAlbumId());
+    const id = this.getAlbumId();
+    if (id) {
+      this.props.actions.fetchAlbum(id);
+      Artwork.getInstance().increaseCacheLocks(id, 'large');
+    }
   }
   handleClick () {
     const {actions, library, artist, player} = this.props;
@@ -87,7 +99,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     return <div className="album-details-view">
       <div className="album-header">
         <div className="album-image" onClick={this.handleClick.bind(this)}>
-          <BetterImage src={Artwork.get(album._id, 'large')} size={128} />
+          <BetterImage src={Artwork.getInstance().getLargeCover(album._id, 128)} size={128} />
           <span className="dark-overlay"></span>
           <span className="play-overlay pt-icon pt-icon-play"></span>
         </div>  
