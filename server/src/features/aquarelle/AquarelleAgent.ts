@@ -53,26 +53,28 @@ async function saveToFile(promise: Promise<Buffer>, id: string) {
   }
 }
 
-async function processAlbums (replace: boolean = false) {
+async function processAlbums (onFetchAlbum: Function = new Function()) {
   const albums  = new PouchDB<Album>('albums');
   const artists = new PouchDB<Album>('artists');
   const source  = new MediaSource(config.get('datasourceKey'));
 
   await Promise.all((await albums.allDocs({include_docs: true}))
     .rows.map(async ({doc}) => {
-    // if (fs.existsSync(getCacheEntry(doc._id)) && !replace) return;
-    const artist = await artists.get(doc.artist);
-    await saveToFile(source.getAlbumCover(artist.name, doc.name), doc._id);
+      // if (fs.existsSync(getCacheEntry(doc._id)) && !replace) return;
+      const artist = await artists.get(doc.artist);
+      onFetchAlbum(doc.name);
+      await saveToFile(source.getAlbumCover(artist.name, doc.name), doc._id);
   }));
 }
 
-async function processArtists (replace: boolean = false) {
+async function processArtists (onFetchArtist: Function = new Function()) {
   const artists = new PouchDB<Album>('artists');
   const source  = new MediaSource(config.get('datasourceKey'));
 
   await Promise.all((await artists.allDocs({include_docs: true}))
     .rows.map(async ({doc}) => {
     // if (fs.existsSync(getCacheEntry(doc._id)) && !replace) return;
+    onFetchArtist(doc.name);
     try {
       await saveToFile(source.getArtistArtwork(doc.name), doc._id);
     } catch (err) {

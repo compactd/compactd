@@ -242,11 +242,14 @@ async function fetchArtworks (spin) {
 
   spin.message('Downloading album covers');
   spin.start();
-  await Agent.processAlbums().catch((err) => {
+  const displayName = (name) => {
+    spin.message(`Downloading cover for ${name}`)
+  };
+  await Agent.processAlbums(displayName).catch((err) => {
     if (verbose) console.log(err);
   });
   spin.message('Downloading artist artworks');
-  await Agent.processArtists().catch((err) => {
+  await Agent.processArtists(displayName).catch((err) => {
     if (verbose) console.log(err);
   });
   spin.stop();
