@@ -143,6 +143,20 @@ switch (mode) {
   case 'serve':
     console.log(chalk.yellow(`\n  Thanks for downloading compactd ${pkg.version} !`));
     console.log(chalk.grey('\n  Trying to start compactd in the background...'));
+
+    const versionFile = path.join(config.get('dataDirectory'), '_version');
+    if (!fs.existsSync(versionFile)) {
+      console.log('\n  Please upgrade your database to the latest version')
+      console.log('  You may want to use compactd --upgrade\n');
+      process.exit(1);
+    }
+    const version = fs.readFileSync(versionFile).toString();
+    if (version !== pkg.version) {
+      console.log('\n  Please upgrade your database to the latest version')
+      console.log('  You may want to use compactd --upgrade\n');
+      process.exit(1);
+    }
+
     pm2.connect(function (err) {
       if (err) {
         console.error(err);
