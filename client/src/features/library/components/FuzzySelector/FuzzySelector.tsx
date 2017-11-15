@@ -2,7 +2,7 @@ import * as React from 'react';
 import {LibraryActions} from '../../actions.d';
 import {Omnibox, ISelectItemRendererProps} from '@blueprintjs/labs';
 import {HotkeysTarget, Hotkey, Hotkeys, MenuItem} from '@blueprintjs/core';
-import {Artist, Album, Track, artistURI, albumURI} from 'compactd-models';
+import {Artist, Album, Track, artistURI, albumURI, trackURI} from 'compactd-models';
 import AlbumComponent from 'components/AlbumComponent';
 import ArtistComponent from 'components/ArtistComponent';
 import {filter} from 'fuzzaldrin';
@@ -92,7 +92,7 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
     if (item.album) {
       const track = item as Track;
       
-      this.props.actions.replacePlayerStack([track.album, track.number]);
+      this.props.actions.replacePlayerStack([track.album, trackURI(track._id).number]);
       return
     }
     if (item.artist) {
