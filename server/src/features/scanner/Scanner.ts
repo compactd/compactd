@@ -146,6 +146,7 @@ export class Scanner extends events.EventEmitter {
   }
 
   getDisc(disc: any): number {
+    if (!disc) return 0;
     if (disc.match(/\d+/)) {
       return Number(disc);
     }
