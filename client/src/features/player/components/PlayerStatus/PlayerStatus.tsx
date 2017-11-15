@@ -77,10 +77,20 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
   }
   render (): JSX.Element {
     const {actions, player} = this.props;
+    const track = player.stack[0];
+    const date = new Date(null);
+    
+    if (track) {
+      date.setSeconds(track.duration || 0);
+    }
+
+    const duration = date.toISOString().substr(14, 5);
+
     const content = player.stack.length > 0 ?
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
         <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
+        <span className="track-duration">{duration}</span>
       </div> : <div className="player-name">
       </div>
     return <div className="player-status">
