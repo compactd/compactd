@@ -13,6 +13,7 @@ import config from '../../config';
 import Models = require('compactd-models');
 import Ffmpeg = require('fluent-ffmpeg');
 import FSTree = require('fs-tree-diff');
+import { log } from 'util';
 
 const walkSync = require('walk-sync');
 
@@ -147,10 +148,10 @@ export class Scanner extends events.EventEmitter {
 
   getDisc(disc: any): number {
     if (!disc) return 0;
-    if (disc.match(/\d+/)) {
+    if (disc.match(/^\d+$/)) {
       return Number(disc);
     }
-    const xOnX = disc.match(/(\d+)\/\d+/);
+    const xOnX = disc.match(/^(\d+)\/\d+$/);
     if (xOnX) {
       return Number(xOnX[1]);
     }
