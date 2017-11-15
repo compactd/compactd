@@ -97,7 +97,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
       <div className="player-controls">
         <span className={classnames("pt-icon-step-backward play-previous", {
           enabled: player.prevStack.length > 0
-        })}></span>
+        })} onClick={() => actions.playPrevious()}></span>
         <span className={classnames("toggle-playback", {
           'pt-icon-pause': player.playing,
           'pt-icon-play': !player.playing,
@@ -105,7 +105,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
         })} onClick={this.handlePlaybackButton.bind(this)}></span>
         <span className={classnames("pt-icon-step-forward play-previous", {
           enabled: player.stack.length > 1
-        })}></span>
+        })} onClick={() => actions.playNext()}></span>
       </div>
       <div className="player-track">
         {content}
