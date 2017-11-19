@@ -14,8 +14,11 @@ music onto your server just like headphones does.
 
 ## Features
 
+ - Scan any download folder (no neeed for a specific format like Plex)
  - Finder-like columns for browsing library
  - Fuzzy finder for searching library
+ - Library reorganization (moving an album to a different artist)
+ - Hidding and removing track (only from the database) from library
  - Streaming music 
  - Music transcoding on-the-fly
  - Hotkey controls (J, K, L, Ctrl+P)
@@ -23,7 +26,7 @@ music onto your server just like headphones does.
  - Gazelle-based trackers support
  - Deluge torrent client supported
 
-## Stack
+## Stack
 
 Redux, React, PouchDB, Webpack, Typescript, Socket.io...
 
