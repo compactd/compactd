@@ -126,7 +126,10 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
             (evt) => this.setState({
               query: evt.target.value
             })
-          } />
+          } onKeyPress={(evt) => {
+            if(evt.key === 'Enter')
+              this.props.actions.searchDatasource(this.state.query)
+          }} autoFocus />
         </div>
       </div>
       <div className="dialog-content">
@@ -146,7 +149,8 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
 
     const content = results.map((res) => {
       return <div className="cascade-result" key={res._id} onClick={() => {
-          actions.downloadResult(res, album)
+          actions.toggleSearch();
+          actions.downloadResult(res, album);
         }}><span className="result-name">{res.name}</span> <span className="tags">
         <span className={classnames("pt-tag pt-minimal format", {
           'pt-intent-success': res.format === 'flac'
@@ -201,10 +205,10 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
 
     switch (this.props.store.scope) {
       case 'artist': return <div className="footer">
-        <Button text="Cancel" />
+        <Button text="Cancel" onClick={() => actions.toggleSearch()} />
       </div>;
       case 'search': return <div className="footer">
-          <Button text="Cancel" />
+          <Button text="Cancel" onClick={() => actions.toggleSearch()} />
           <Button
             intent={Intent.PRIMARY}
             onClick={() => actions.searchDatasource(this.state.query)}
@@ -212,7 +216,7 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
           />
         </div>;
       case 'album': return <div className="footer">
-        <Button text="Cancel" />
+        <Button text="Cancel" onClick={() => actions.toggleSearch()}/>
         <Button
           intent={Intent.PRIMARY}
           onClick={() => actions.loadResults(album.artist, album.name)}
