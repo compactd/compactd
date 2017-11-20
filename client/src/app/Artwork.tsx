@@ -59,9 +59,9 @@ export default class Artwork {
     }
     const [locks, url] = this.blobCache[entryId];
     if (locks === 1) {
+      delete this.blobCache[entryId];
       url.then((uri) => {
         URL.revokeObjectURL(uri);
-        delete this.blobCache[entryId];
       });
       return;
     }

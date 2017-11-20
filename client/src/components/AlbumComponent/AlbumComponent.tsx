@@ -42,11 +42,11 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
       Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
     }
   }
-  componentDidMount () { 
+  componentWillMount () { 
     const {album, layout} = this.props;
     
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().increaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
+      Artwork.getInstance().get(album._id, layout === 'compact' ? 'small' : 'large');
     }
   }
   componentWillReceiveProps (nextProps: AlbumComponentProps) {

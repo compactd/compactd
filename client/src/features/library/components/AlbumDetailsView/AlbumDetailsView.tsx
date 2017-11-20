@@ -26,12 +26,12 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
   }
   componentWillUnmount () {
     const id = this.getAlbumId();
-    if (id) {
+    if (this.props.album && id) {
       Artwork.getInstance().decreaseCacheLocks(id, 'large');
     }
   }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
-    if (this.getAlbumId() !== this.getAlbumId(nextProps)) {
+    if (this.props.album && nextProps.album && this.getAlbumId() !== this.getAlbumId(nextProps)) {
       Artwork.getInstance().decreaseCacheLocks(this.getAlbumId(), 'large');
       Artwork.getInstance().increaseCacheLocks(this.getAlbumId(nextProps), 'large');
     
@@ -40,7 +40,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
   }
   componentDidMount () {
     const id = this.getAlbumId();
-    if (id) {
+    if (this.props.album && id) {
       this.props.actions.fetchAlbum(id);
       Artwork.getInstance().increaseCacheLocks(id, 'large');
     }

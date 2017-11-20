@@ -57,14 +57,10 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     if (artist.largeCover) return artist.largeCover;
     return '';
   }
-  componentDidMount () {
+  componentWillMount () {
     const {artist, layout} = this.props;
     if (this.isUsingEmbeddedArtworks()) {
-      if (layout === 'compact') {
-        Artwork.getInstance().getSmallCover(artist._id);
-      } else {
-        Artwork.getInstance().getLargeCover(artist._id);
-      }
+      Artwork.getInstance().get(artist._id, layout === 'compact' ? 'small' : 'large');
     }
     
   }
