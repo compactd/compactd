@@ -6,25 +6,27 @@
   <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/Fwnbp4ySbyNYR6BaX1f9y4zQ/compactd/compactd.svg' />
 </a>
 
-Just as a Compact Disc is the evolution of tapes, Compactd is an evolution of
-cassette. It aims to be a self-hosted remote music player in your browser,
+Compactd aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
 music onto your server just like headphones does.
 
 [![https://i.imgur.com/dzdT26k.jpg](https://i.imgur.com/dzdT26km.jpg)](https://i.imgur.com/dzdT26k.jpg)
 
-## Why?
+## Features
 
-I felt like the next version of cassette (1.0), while full of new features, began to be
-cluttered and slow, relying on outdated technologies when new exciting
-things are up. Since I'm not trying to be profitable, but rather I code for the
-fun, and I like to discover new things and new patterns I decided to go for
-PouchDB which looks really interesting and promising!
+ - Scan any download folder (no neeed for a specific format like Plex)
+ - Finder-like columns for browsing library
+ - Fuzzy finder for searching library
+ - Library reorganization (moving an album to a different artist)
+ - Hidding and removing track (only from the database) from library
+ - Streaming music 
+ - Music transcoding on-the-fly
+ - Hotkey controls (J, K, L, Ctrl+P)
+ - Artist and album downloading
+ - Gazelle-based trackers support
+ - Deluge torrent client supported
 
-Also, I've been relying a lot on boilerplates, and I'd like to learn to
-implement all of this myself :D
-
-## Stack
+## Stack
 
 Redux, React, PouchDB, Webpack, Typescript, Socket.io...
 
@@ -33,42 +35,17 @@ Redux, React, PouchDB, Webpack, Typescript, Socket.io...
  - Node v8 and npm v5. I recommend using https://github.com/creationix/nvm
  - CouchDB v2. You can install it following [this guide](https://github.com/apache/couchdb/blob/master/INSTALL.Unix.md) for linux . Windows is quite straightforward, on Debian, you will need to build it from source following the tutorial. Just make sure you don't configure anything or any password.
  - Latest Ffmpeg. Installation varies from OS, you might wanna follow [this guide](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg)
- - rTorrent with XML-RPC support (optional). Only needed if you wanna download new stuff.
+ - deluge with deluge-web are optionnal (for downloading new content)
  
 ## Installation
 
 ```
 $ npm install --global compactd
+$ compactd --configure
 ```
-
-And that's all!
-
-## Configuring
-
-Before starting anything, you need to create a directory in your home directory named `.compactd`. In that file create a new file `config.json`. This is the minimal content for this file
-
-```json
-{
-  "secret": "make sure to input a really really long random string as this will enforce the security of your server",
-  "couchPassword": "this is the password that will secure couchdb installation. make it long (but it doesn't need to be as long as secret)"
- }
- ```
+Follow the steps. Once it is down everything is configured!
  
- You may set other values, such as `scgiPort` for rtorrent. You may see all possible options by running
- 
- ```
- $ compactd --print-config
- ```
- 
- Once this is done, save the file and run from anywhere:
- 
- ```
- $ compactd --configure
- ```
- 
- Follow the steps. Once it is down everything is configured!
- 
- ## Starting
+## Starting
  
  Just run
  
@@ -81,7 +58,7 @@ Before starting anything, you need to create a directory in your home directory 
  ## Stopping, restarting
  
  ```
- $ compactd --stop
- $ compactd --restart
+ $ pm2 restart compactd
+ $ pm2 stop compactd
  ```
  
