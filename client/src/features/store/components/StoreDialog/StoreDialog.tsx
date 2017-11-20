@@ -23,9 +23,10 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     if (!store.search) return <div></div>;
     const results = store.searchResultsByQuery[store.search];
     if (!results)
-      return <Spinner />;
+      return <div className="loading-ds"><Spinner /></div>
     
-    if (!results.artist.length && !results.album.length && !results.track.length) {
+    if (!results.artist || !results.album || !results.track ||
+      (!results.artist.length && !results.album.length && !results.track.length)) {
       return <div className="pt-non-ideal-state">
         <div className="pt-non-ideal-state-visual pt-non-ideal-state-icon">
           <span className="pt-icon pt-icon-cross"></span>
