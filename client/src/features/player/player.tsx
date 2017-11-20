@@ -159,8 +159,6 @@ function jumpTo (target: string | number | Defs.Track) {
 }
 
 async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Promise<PlayerAction> {
-  console.log(stack);
-  
   await Promise.resolve();
   const tracks = new PouchDB<Defs.Track>('tracks');
   const filterHiddenFunc = (doc: Defs.Track) => {

@@ -26,14 +26,14 @@ interface CompactdApplicationProps {
 }
 
 const doNothing = (...args: any[]) =>{
-  return console.log(args);
+  return (args);
 }
 
 export class CompactdApplication extends
   React.Component<CompactdApplicationProps, {}> {
 
   render (): JSX.Element {
-    console.log(ConnectedRouter);
+    // console.log(ConnectedRouter);
     // Inexplicable bug where i need to log these avoid undefined errors
     doNothing(Route, LibraryView, HolisticView, PlayerView, PlaylistView, PlayerStatus, Sandbox);
 

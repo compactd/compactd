@@ -31,36 +31,40 @@ interface AlbumComponentProps {
 
 export default class AlbumComponent extends React.Component<AlbumComponentProps, {}> {
 
+  isUsingEmbeddedArtworks (props = this.props) {
+    const {album, layout} = props;
+    return (album && layout !== 'minimal' ) && album._id;
+  }
+
   componentWillUnmount () {
     const {album, layout} = this.props;
-    if (album) {
-      if (layout !== 'minimal') {
-        Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
-      }
+    if (this.isUsingEmbeddedArtworks()) {
+      Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
     }
   }
   componentDidMount () { 
-    const {artist, layout} = this.props;
-    if (artist && artist._id) {
-      Artwork.getInstance().increaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
+    const {album, layout} = this.props;
+    
+    if (this.isUsingEmbeddedArtworks()) {
+      Artwork.getInstance().increaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
     }
   }
   componentWillReceiveProps (nextProps: AlbumComponentProps) {
     
     const {album, layout} = this.props;
     if (!nextProps.album && album) {
-      if (layout !== 'minimal') {
+      if (this.isUsingEmbeddedArtworks()) {
         Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
       }
       return;
     }
     if (nextProps.album && (!album || album._id !== nextProps.album._id)) {
-      if (album && album._id) {
-        if (layout !== 'minimal') {
-          Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
-        }
+      if (this.isUsingEmbeddedArtworks()) {
+        Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
       }
-      Artwork.getInstance().increaseCacheLocks(nextProps.album._id, nextProps.layout === 'compact' ? 'small' : 'large');
+      if (this.isUsingEmbeddedArtworks(nextProps)) {
+        Artwork.getInstance().increaseCacheLocks(nextProps.album._id, nextProps.layout === 'compact' ? 'small' : 'large');
+      }
     }
   }
   

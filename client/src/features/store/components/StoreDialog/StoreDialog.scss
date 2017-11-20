@@ -1,3 +1,5 @@
+@import '../../../../styles/_utils';
+
 div.dialog-content {
   margin: 2em auto;
   .artist-results {
@@ -182,6 +184,8 @@ div.ds-artist-view {
       font-size: 24px;
       vertical-align: top;
       cursor: pointer;
+      width: 250px;
+      @include ellipsis();
 
     }
   }

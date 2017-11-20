@@ -27,13 +27,14 @@ interface ArtistComponentProps {
 export default class ArtistComponent extends React.Component<ArtistComponentProps, {}> {
   componentWillUnmount () {
     const {artist, layout} = this.props;
-    if (artist) {
-      if (layout !== 'minimal') {
-        Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
-      }
+    if (this.isUsingEmbeddedArtworks()) {
+      Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large'); 
     }
   }
-
+  isUsingEmbeddedArtworks (props = this.props) {
+    const {artist, layout} = props;
+    return (artist && layout !== 'minimal' ) && artist._id;
+  }
   getLargeCover (size = 64) {
     const {artist} = this.props;
     const entryId = artist._id + '!large';
@@ -58,30 +59,31 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
   }
   componentDidMount () {
     const {artist, layout} = this.props;
-    if (artist && artist._id && layout !== 'minimal') {
+    if (this.isUsingEmbeddedArtworks()) {
       if (layout === 'compact') {
         Artwork.getInstance().getSmallCover(artist._id);
       } else {
         Artwork.getInstance().getLargeCover(artist._id);
       }
     }
+    
   }
   componentWillReceiveProps (nextProps: ArtistComponentProps) {
     
     const {artist, layout} = this.props;
     if (!nextProps.artist && artist) {
-      if (layout !== 'minimal') {
+      if (this.isUsingEmbeddedArtworks()) {
         Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
       }
       return;
     }
     if (nextProps.artist && (!artist || artist._id !== nextProps.artist._id)) {
-      if (artist && artist._id) {
-        if (layout !== 'minimal') {
-          Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
-        }
+      if (this.isUsingEmbeddedArtworks()) {
+        Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
       }
-      Artwork.getInstance().increaseCacheLocks(nextProps.artist._id, nextProps.layout === 'compact' ? 'small' : 'large');
+      if (this.isUsingEmbeddedArtworks(nextProps)) {
+        Artwork.getInstance().increaseCacheLocks(nextProps.artist._id, nextProps.layout === 'compact' ? 'small' : 'large');
+      }
     }
   }
   renderImage (): JSX.Element {

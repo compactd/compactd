@@ -35,26 +35,28 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
   }
   fetchImage (current = this.props.src, check = true) {
     this.setState({loading: true});
-    if (typeof current === 'string' && !current.startsWith('blob:')) {
-      fetch(current, {
-        headers: current.startsWith(window.location.origin) ? new Headers() : Session.headers()
-      }).then((res) => {
-          return res.blob();
-      }).then((blob) => {
-        if (!this.image) return;
-        if (blob.size < 10) throw new Error();
-        // Then the src prop has changed during the request - dont udpate!
-        if (current !== this.props.src && check) return;
-        let url = URL.createObjectURL(blob);
-        // blobs[this.props.src] = url;
-        this.image.src = url;
+    if (typeof current === 'string' && !current.startsWith('blob:')) {      
+      this.image.src = current;
+      // fetch(current, {
+      //   method: 'GET',
+      //   headers: current.startsWith(window.location.origin) ? new Headers() : Session.headers()
+      // }).then((res) => {
+      //     return res.blob();
+      // }).then((blob) => {
+      //   if (!this.image) return;
+      //   if (blob.size < 10) throw new Error();
+      //   // Then the src prop has changed during the request - dont udpate!
+      //   if (current !== this.props.src && check) return;
+      //   let url = URL.createObjectURL(blob);
+      //   // blobs[this.props.src] = url;
+      //   this.image.src = url;
   
-        this.setState({loading: false});
-      }).catch((err) => {
-        const fallback = this.props.fallback || '/api/assets/no-album.jpg';
-        this.fetchImage(fallback, false);
-        this.setState({loading: false});
-      });
+      //   this.setState({loading: false});
+      // }).catch((err) => {
+      //   const fallback = this.props.fallback || '/api/assets/no-album.jpg';
+      //   this.fetchImage(fallback, false);
+      //   this.setState({loading: false});
+      // });
     } else {
       Promise.resolve(current).then((blob) => {
         

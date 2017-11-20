@@ -5,6 +5,7 @@ import {StoreState} from 'definitions';
 import {ResultItem} from '../ResultItem';
 import BetterImage from 'components/BetterImage';
 import * as classnames from 'classnames'; 
+import { AlbumComponent } from 'components';
 
 require('./StoreDialog.scss');
 
@@ -41,7 +42,7 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     return <div className="results">
       <div className="artist-results">
         <span className="result-header">ARTISTS</span>
-        {results.artist.map((el) => <ResultItem actions={actions} item={el} />)}
+        {results.artist.slice(0, 6).map((el) => <ResultItem actions={actions} item={el} />)}
       </div>
       <div className="album-results">
         <span className="result-header">ALBUMS</span>
@@ -93,14 +94,12 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
   renderArtist(): JSX.Element {
     const {actions, store} = this.props;
     const artist = store.artistsById[store.artist];
+    
     if (!artist || !artist.id) {
       return <div className="loading-ds"><Spinner /></div>
     }
-    const albums = artist.topAlbums.map((album) => {
-      return <div className="album-item" key={album.id}>
-        <BetterImage src={album.cover} size={32} />
-        <div className="album-title" onClick={() => actions.selectDSAlbum(album.id)}>{album.name}</div>
-      </div>
+    const albums = artist.topAlbums.slice(0, 19).map((album) => {
+      return <AlbumComponent album={album} layout="compact"  onClick={() => actions.selectDSAlbum(album.id)}/>
     });
 
     return <div className="ds-artist-view">
@@ -192,6 +191,7 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
     </div>
   }
   renderContent(): JSX.Element {
+    
     switch (this.props.store.scope) {
       case 'artist': return this.renderArtist();
       case 'search': return this.renderSearch();

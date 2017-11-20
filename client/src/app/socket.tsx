@@ -23,7 +23,6 @@ class SocketEventEmitter {
     (window as any).socket = this.socket;
 
     this.socket.on('connect', () => {
-      console.log('connect');
       setTimeout(() => {
 
         this.socket.emit('authenticate', {token: Session.getToken()});
@@ -63,7 +62,6 @@ class SocketEventEmitter {
 
   }
   listen (event: string, token: string | Function, callback?: Function): void {
-    console.log(event, token, callback);
     if (typeof token === 'function') {;
       
       return this.listen((jwtDecode(event) as any).event, event, token);
