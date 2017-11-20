@@ -6,7 +6,7 @@ import { render } from "react-dom";
 import { Provider } from 'react-redux';
 import * as Redux from 'redux';
 import { CompactdState } from 'definitions';
-import { Route, Switch} from 'react-router-dom';
+import { Route, Switch, Redirect} from 'react-router-dom';
 import { ConnectedRouter } from 'react-router-redux';
 import { history } from './CompactdStore';
 import AppView from 'features/app/components/AppView';
@@ -44,6 +44,7 @@ export class CompactdApplication extends
           <Flex>
             <Box col={10}>
               <Switch>
+                <Route exact path="/" children={<Redirect to="/library"/>} />
                 <Route path="/library/all/:artist?/:album?" children={(props: any) =>
                   <LibraryView component={HolisticView} all={true} {...props}/>} />
                 <Route path="/library/:artist?/:album?" children={(props: any) =>
