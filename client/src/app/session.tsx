@@ -65,14 +65,13 @@ class SessionManager {
       return Promise.reject('Invalid username or password');
     });
   }
-  fetch (input: RequestInfo, init?: {
+  fetch (input: RequestInfo, init: {
     method: string,
     body: any, 
     headers?: {
       [name: string]: string
     }
-  }) {
-
+  } = {method: 'GET', body: {}}) {
     return fetch(input, this.init({
       ...init,
       headers: new Headers(init.headers)
