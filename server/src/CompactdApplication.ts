@@ -25,6 +25,8 @@ const ddos = new Ddos({
 });
 
 export class CompactdApplication {
+  private static ALLOWED_DATABASES = ['libraries', 'artworks', 'tracks', 'files', 'artists', 'albums', 'trackers'];
+
   private auth: Authenticator;
   protected app: express.Application;
   private port: number;
@@ -47,7 +49,13 @@ export class CompactdApplication {
       
       const headers = await this.auth.proxyRequestDecorator()({headers: {...req.headers}}, req);
       const remoteUrl = req.url.slice(10);
-      console.log(remoteUrl.split('/'));
+      const [db] = remoteUrl.split('/');
+
+      if (!CompactdApplication.ALLOWED_DATABASES.includes(db)) {
+        return res.status(403).send({
+          error: 'Database ' + db + ' not allowed'
+        })
+      }
       
       const opts = Object.assign({
         method: req.method,
