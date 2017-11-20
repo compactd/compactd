@@ -42,7 +42,7 @@ export class TrackersView extends React.Component<TrackersViewProps, {editing?: 
           <td><EditableText defaultValue={tracker.host} onConfirm={(host) => actions.editTracker(tracker._id, {host})} /></td>
           <td><div className="pt-button-group">
             <a className="pt-button pt-icon-asterisk" role="button" onClick={() => this.editTrackerPassword(tracker._id)}></a>
-            <a className="pt-button pt-icon-delete" role="button"></a>
+            <a className="pt-button pt-icon-delete" role="button" onClick={() => actions.removeTracker(tracker._id)}></a>
           </div></td>
         </tr>
       })

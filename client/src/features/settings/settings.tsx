@@ -46,6 +46,21 @@ export function reducer (state: Defs.SettingsState = initialState,
 function toggleSettingsPage (state?: boolean) {
   return {type: TOGGLE_SETTINGS_PAGE};
 }
+
+
+function removeTracker (id: string) {
+  return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
+    try {
+      const Tracker = getDatabase<Tracker>('trackers');
+      const doc = await Tracker.get(id);
+      await Tracker.remove(doc._id, doc._rev);
+      loadTrackers()(dispatch, getState);
+    } catch (err) {
+      Toaster.error(err);
+    }
+  }  
+}
+
 function loadTrackers () {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
@@ -79,17 +94,27 @@ function editTracker (id: string, props: Partial<Tracker>) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
       const Tracker = getDatabase<Tracker>('trackers');
-  
-      const doc = Object.assign({}, await Tracker.get(id, {revs: false, attachments: false, revs_info: false}), props);
+      const old = await Tracker.get(id, {revs: false, attachments: false, revs_info: false});
+      const doc = Object.assign({}, old, props);
+      if (old.name !== props.name && props.name) {
+        doc._id = trackerURI({
+          name: doc.name,
+          type: doc.type
+        });
+        
+        await Tracker.remove(id, doc._rev);
+      }
       await Tracker.put({
         _id: doc._id,
-        _rev: doc._rev,
         type: doc.type,
         name: doc.name,
         host: doc.host,
         username: doc.username,
         boost: doc.boost,
-        ...props
+        ...props,
+        ...(doc._id !== id ? {} : {
+          _rev: doc._rev
+        })
       });
   
       return loadTrackers()(dispatch, getState);
@@ -167,7 +192,7 @@ function scan (id: string, full = false) {
     
     Socket.listen(finish, () => {
       Toaster.update(toast, {message: 'Scan sucessfully finished', intent: Intent.SUCCESS});
-      dispatch({type: SET_SCANNING, scanning: false, timeoout: 2000});
+      dispatch({type: SET_SCANNING, scanning: false, timeout: 2000});
     });
 
     Socket.listen(open_folder, (evt: any) => {
@@ -182,5 +207,5 @@ function scan (id: string, full = false) {
 }
 
 export const actions = {
-  toggleSettingsPage, loadTrackers, editTracker, editTrackerPassword, addTracker, loadLibraries, scan
+  toggleSettingsPage, loadTrackers, editTracker, editTrackerPassword, addTracker, loadLibraries, scan, removeTracker
 }

@@ -31,4 +31,5 @@ export type SettingsActions = {
   editTrackerPassword: (id: string, newPassword: string) => void;
   addTracker: (name: string, type: 'gazelle', username: string, host?: string) => void;
   scan: (id: string) => void;
+  removeTracker: (id: string) => void;
 }
