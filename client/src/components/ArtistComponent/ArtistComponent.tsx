@@ -25,10 +25,14 @@ interface ArtistComponentProps {
 }
 
 export default class ArtistComponent extends React.Component<ArtistComponentProps, {}> {
-  componentWillUnmount () {
-    const {artist, layout} = this.props;
-    if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large'); 
+  private cover: Promise<Blob>;
+  componentWillReceiveProps (nextProps: ArtistComponentProps) {
+    const props = this.props;
+    if (this.isUsingEmbeddedArtworks(nextProps) &&
+      nextProps.artist._id !== props.artist._id) {
+      this.cover = Artwork.getInstance().get(nextProps.artist._id,
+        nextProps.layout === 'compact' ? 'small' : 'large');
+      return;
     }
   }
   isUsingEmbeddedArtworks (props = this.props) {
@@ -39,7 +43,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const {artist} = this.props;
     const entryId = artist._id + '!large';
     if (artist._id) {
-      return Artwork.getInstance().getLargeCover(artist._id, size);
+      return this.cover;
     }
     if (artist.largeCover) return artist.largeCover;
     if (artist.cover) return artist.cover;
@@ -50,7 +54,7 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
     const entryId = artist._id + '!small';
 
     if (artist._id) {
-      return Artwork.getInstance().getLargeCover(artist._id, size);
+      return this.cover;
     }
 
     if (artist.cover) return artist.cover;
@@ -60,28 +64,10 @@ export default class ArtistComponent extends React.Component<ArtistComponentProp
   componentWillMount () {
     const {artist, layout} = this.props;
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().get(artist._id, layout === 'compact' ? 'small' : 'large');
-    }
-    
-  }
-  componentWillReceiveProps (nextProps: ArtistComponentProps) {
-    
-    const {artist, layout} = this.props;
-    if (!nextProps.artist && artist) {
-      if (this.isUsingEmbeddedArtworks()) {
-        Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
-      }
-      return;
-    }
-    if (nextProps.artist && (!artist || artist._id !== nextProps.artist._id)) {
-      if (this.isUsingEmbeddedArtworks()) {
-        Artwork.getInstance().decreaseCacheLocks(artist._id, layout === 'compact' ? 'small' : 'large');
-      }
-      if (this.isUsingEmbeddedArtworks(nextProps)) {
-        Artwork.getInstance().increaseCacheLocks(nextProps.artist._id, nextProps.layout === 'compact' ? 'small' : 'large');
-      }
+      this.cover = Artwork.getInstance().get(artist._id, layout === 'compact' ? 'small' : 'large');
     }
   }
+
   renderImage (): JSX.Element {
     const {artist} = this.props;
     

@@ -24,16 +24,8 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     
     return albumURI({name: props.album, artist: props.artist});
   }
-  componentWillUnmount () {
-    const id = this.getAlbumId();
-    if (this.props.album && id) {
-      Artwork.getInstance().decreaseCacheLocks(id, 'large');
-    }
-  }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
     if (this.props.album && nextProps.album && this.getAlbumId() !== this.getAlbumId(nextProps)) {
-      Artwork.getInstance().decreaseCacheLocks(this.getAlbumId(), 'large');
-      Artwork.getInstance().increaseCacheLocks(this.getAlbumId(nextProps), 'large');
     
       this.props.actions.fetchAlbum(this.getAlbumId(nextProps));
     }
@@ -42,7 +34,6 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     const id = this.getAlbumId();
     if (this.props.album && id) {
       this.props.actions.fetchAlbum(id);
-      Artwork.getInstance().increaseCacheLocks(id, 'large');
     }
   }
   handleClick () {

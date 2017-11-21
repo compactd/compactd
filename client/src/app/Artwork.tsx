@@ -15,57 +15,15 @@ export default class Artwork {
   }
 
   getLargeCover (id: string, size = 64) {
-    const entryId = id + '!large';
-    if (!this.blobCache[entryId]) {
-      const url = this.get(id, 'large')
-        .then((blob) => URL.createObjectURL(blob));
-      this.blobCache[entryId] = [1, url];
-      return url;
-    }
-    return this.blobCache[entryId][1];
+    return this.get(id, 'large').then((blob) => {
+      return URL.createObjectURL(blob);
+    });
   }
 
   getSmallCover (id: string, size = 32) {
-    const entryId = id + '!small';
-
-    if (!this.blobCache[entryId]) {
-      const url = this.get(id, 'small')
-        .then((blob) => URL.createObjectURL(blob));
-      this.blobCache[entryId] = [1, url];
-      return url;
-    }
-    return this.blobCache[entryId][1];
-  }
-
-  increaseCacheLocks (id: string, size: 'large' | 'small') {
-    const entryId = id + '!' + size;
-    
-    if (!this.blobCache[entryId]) {
-      if (size === 'large') {
-        this.getLargeCover(id);
-      } else {
-        this.getSmallCover(id);
-      }
-      return;
-    }
-    const [locks, url] = this.blobCache[entryId];
-    this.blobCache[entryId] = [locks + 1, url];
-  }
-
-  decreaseCacheLocks (id: string, size: 'large' | 'small') {
-    const entryId = id + '!' + size;
-    if (!this.blobCache[entryId]) {
-      throw new Error('Entry missing');
-    }
-    const [locks, url] = this.blobCache[entryId];
-    if (locks === 1) {
-      delete this.blobCache[entryId];
-      url.then((uri) => {
-        URL.revokeObjectURL(uri);
-      });
-      return;
-    }
-    this.blobCache[entryId] = [locks - 1, url];
+    return this.get(id, 'small').then((blob) => {
+      return URL.createObjectURL(blob);
+    });
   }
 
   /**
@@ -77,7 +35,11 @@ export default class Artwork {
     if (!docId.startsWith('artworks/')) {
       docId = 'artworks/' + docId;
     }
-    return this.artworks.getAttachment(docId, size) as Promise<Blob>; 
+    return this.artworks.getAttachment(docId, size).catch((err) => {
+      console.log('No attachment for:' + docId);
+      
+      return Promise.resolve(new Blob());
+    }) as Promise<Blob>; 
   }
   public static getInstance (pouch?: typeof PouchDB) {
     if (!Artwork.sInstance) {

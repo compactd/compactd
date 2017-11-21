@@ -31,41 +31,28 @@ interface AlbumComponentProps {
 
 export default class AlbumComponent extends React.Component<AlbumComponentProps, {}> {
 
+  private cover: Promise<Blob>;
+
+  componentWillMount () {
+    const {album, layout} = this.props;
+    if (this.isUsingEmbeddedArtworks()) {
+      this.cover = Artwork.getInstance().get(album._id, layout === 'compact' ? 'small' : 'large');
+    }
+  }
+
+  componentWillReceiveProps (nextProps: AlbumComponentProps) {
+    const props = this.props;
+    if (this.isUsingEmbeddedArtworks(nextProps) &&
+      nextProps.album._id !== props.album._id) {
+      this.cover = Artwork.getInstance().get(nextProps.album._id,
+        nextProps.layout === 'compact' ? 'small' : 'large');
+      return;
+    }
+  }
+
   isUsingEmbeddedArtworks (props = this.props) {
     const {album, layout} = props;
     return (album && layout !== 'minimal' ) && album._id;
-  }
-
-  componentWillUnmount () {
-    const {album, layout} = this.props;
-    if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
-    }
-  }
-  componentWillMount () { 
-    const {album, layout} = this.props;
-    
-    if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().get(album._id, layout === 'compact' ? 'small' : 'large');
-    }
-  }
-  componentWillReceiveProps (nextProps: AlbumComponentProps) {
-    
-    const {album, layout} = this.props;
-    if (!nextProps.album && album) {
-      if (this.isUsingEmbeddedArtworks()) {
-        Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
-      }
-      return;
-    }
-    if (nextProps.album && (!album || album._id !== nextProps.album._id)) {
-      if (this.isUsingEmbeddedArtworks()) {
-        Artwork.getInstance().decreaseCacheLocks(album._id, layout === 'compact' ? 'small' : 'large');
-      }
-      if (this.isUsingEmbeddedArtworks(nextProps)) {
-        Artwork.getInstance().increaseCacheLocks(nextProps.album._id, nextProps.layout === 'compact' ? 'small' : 'large');
-      }
-    }
   }
   
   getLargeCover (size = 64) {
@@ -73,7 +60,7 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const entryId = album._id + '!large';
     
     if (album._id) {
-      return Artwork.getInstance().getLargeCover(album._id, size);
+      return this.cover;
     }
     if (album.largeCover) return album.largeCover;
     if (album.cover) return album.cover;
@@ -85,7 +72,7 @@ export default class AlbumComponent extends React.Component<AlbumComponentProps,
     const entryId = album._id + '!small';
 
     if (album._id) {
-      return Artwork.getInstance().getSmallCover(album._id, size);
+      return this.cover;
     }
 
     if (album.cover) return album.cover;

@@ -80,7 +80,11 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     }
   }
   componentWillUnmount () {
-    URL.revokeObjectURL(this.image.src);
+    Promise.resolve(this.props.src).then((res) => {
+      if (typeof res === 'string' && res.startsWith('blob:')) {
+        URL.revokeObjectURL(res);
+      }
+    });
   }
   componentDidMount () {
     this.image.onerror = () => {
@@ -88,6 +92,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
       const fallback = this.props.fallback || '/api/assets/no-album.jpg';
       this.fetchImage(fallback, false);
     }
+    
     if (this.props.src) {
       this.fetchImage();
     }
