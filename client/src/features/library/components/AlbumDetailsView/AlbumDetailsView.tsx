@@ -7,7 +7,7 @@ import {albumURI, Track} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
 import Artwork from 'app/Artwork';
-import { Tab2, Tabs2, Spinner } from "@blueprintjs/core";
+import { Tab2, Tabs2, Spinner, HotkeysTarget, Hotkeys, Hotkey } from "@blueprintjs/core";
 
 require('./AlbumDetailsView.scss');
 
@@ -19,10 +19,29 @@ interface AlbumDetailsViewProps {
   player: PlayerState;
 }
 
+@HotkeysTarget
 export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {showHidden: boolean}>{
   getAlbumId (props: AlbumDetailsViewProps = this.props) {
     
     return albumURI({name: props.album, artist: props.artist});
+  }
+
+  renderHotkeys () {
+    const {actions, library, artist, player} = this.props;
+    const id = this.getAlbumId();
+    const album = library.albumsById[id];
+    return (<Hotkeys>
+      <Hotkey 
+        allowInInput={false} 
+        global={true} 
+        combo="i" 
+        label="Play current album" 
+        onKeyDown={(evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          actions.replacePlayerStack(album);
+        }}/>
+    </Hotkeys>)
   }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
     if (nextProps.album && this.getAlbumId() !== this.getAlbumId(nextProps)) {
