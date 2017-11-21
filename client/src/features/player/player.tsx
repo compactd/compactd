@@ -58,7 +58,7 @@ export const reducer = decorator.createReducer(initialState, (state: Defs.Player
       });
     case PLAY_AFTER_ACTION:
       return Object.assign({}, state, {
-        stack: state.stack.length > 0 ? [state.stack[0], ...action.stack, state.stack.slice(1)]: [...action.stack],
+        stack: state.stack.length > 0 ? [state.stack[0], ...action.stack, ...state.stack.slice(1)]: [...action.stack],
         playing: true,
         prevStack: state.stack[0] ? state.prevStack.concat(state.stack[0]) : state.prevStack
       });
