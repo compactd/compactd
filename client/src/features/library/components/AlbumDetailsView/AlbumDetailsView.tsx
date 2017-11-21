@@ -55,6 +55,9 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
     const album = library.albumsById[id];
+    if (!album) {
+       return 'loading';
+    }
     
     const hasMultipleDisc = !!album.tracks.find((val) => {
       return !!val.disc;

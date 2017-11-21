@@ -4,7 +4,7 @@ import {PlayerAudio} from '../PlayerAudio';
 import {PlayerState, LibraryState} from 'definitions';
 import StoreView from '../../../store/components/StoreView';
 import SettingsLink from '../../../settings/components/SettingsLink';
-import {HotkeysTarget, Hotkey, Hotkeys} from '@blueprintjs/core';
+import {HotkeysTarget, Hotkey, Hotkeys, Slider} from '@blueprintjs/core';
 import session from 'app/session';
 import * as classnames from 'classnames';
 
@@ -15,7 +15,15 @@ interface PlayerStatusProps {
   player: PlayerState;
 }
 @HotkeysTarget
-export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
+export class PlayerStatus extends React.Component<PlayerStatusProps, {
+  volume: number
+}>{
+  private player: PlayerAudio;
+  private trackTimeDiv: HTMLSpanElement;
+  constructor () {
+    super();
+    this.state = {volume: 10};
+  }
   renderHotkeys () {
     const {actions, player} = this.props;
    return <Hotkeys>
@@ -53,6 +61,26 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
         }
       }}
      />
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="up"
+      label="Increase volume"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        this.handleVolumeChange(Math.min(this.state.volume + 0.1, 1));
+      }}
+     />
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="down"
+      label="Decrease volume"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        this.handleVolumeChange(Math.max(this.state.volume - 0.1, 0));
+      }}
+     />
    </Hotkeys> 
   }
   handlePlaybackButton () {
@@ -75,6 +103,10 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
       this.props.actions.fetchDatabaseArtist(nextProps.player.stack[0].artist);
     }
   }
+  handleVolumeChange (val: number) {
+    this.setState({volume: val});
+    this.player.setVolume(val / 10);
+  }
   render (): JSX.Element {
     const {actions, player} = this.props;
     const track = player.stack[0];
@@ -90,7 +122,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
         <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
-        <span className="track-duration">{duration}</span>
+        <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>00:00 / {duration}</span>
       </div> : <div className="player-name">
       </div>
     return <div className="player-status">
@@ -111,9 +143,20 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {}>{
         {content}
         <PlayerAudio source={player.stack[0] ? player.stack[0]._id : undefined}
           playing={player.playing} onEnd={this.onAudioEnd.bind(this)}
+          timeUpdate={(time) => {
+              window.requestAnimationFrame(() => {
+                if (track) {
+                  const current = new Date(null);
+                  current.setSeconds(time || 0);
+                  this.trackTimeDiv.innerHTML = current.toISOString().substr(14, 5) + ' / ' + duration
+                }
+              })
+          }}
+          ref={(ref) => this.player = ref}
           nextSource={player.stack[1] ? player.stack[1]._id : undefined} />
       </div>
       <div className="player-actions">
+        <Slider renderLabel={(val: number) => null} value={this.state.volume} onChange={this.handleVolumeChange.bind(this)}/>
         <StoreView />
         <SettingsLink />
         <div className="logout-button">

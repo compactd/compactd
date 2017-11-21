@@ -10,6 +10,7 @@ interface PlayerAudioProps {
   nextSource?: AudioSource;
   playing: boolean;
   onEnd?: () => void;
+  timeUpdate?: (time: number) => void;
 }
 
 const tokens: {[id: string]: string}  = {};
@@ -70,6 +71,9 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     }
     this.audio.addEventListener('timeupdate', () => {
       this.updateRange();
+      if (this.props.timeUpdate) {
+        this.props.timeUpdate(this.audio.currentTime);
+      }
     });
 
   }
@@ -103,7 +107,9 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       }
     }
   }
-
+  setVolume (val: number) {
+    this.audio.volume = val;
+  }
   render (): JSX.Element {
     return <div className="player-audio">
       <div className="player-range" ref={(ref) => this.range = ref}
