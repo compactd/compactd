@@ -122,7 +122,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
         <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
-        <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>00:00 / {duration}</span>
+        <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>
       </div> : <div className="player-name">
       </div>
     return <div className="player-status">
@@ -145,10 +145,10 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
           playing={player.playing} onEnd={this.onAudioEnd.bind(this)}
           timeUpdate={(time) => {
               window.requestAnimationFrame(() => {
-                if (track) {
+                if (track && this.trackTimeDiv) {
                   const current = new Date(null);
                   current.setSeconds(time || 0);
-                  this.trackTimeDiv.innerHTML = current.toISOString().substr(14, 5) + ' / ' + duration
+                  this.trackTimeDiv.textContent = current.toISOString().substr(14, 5) + ' / ' + duration
                 }
               })
           }}
