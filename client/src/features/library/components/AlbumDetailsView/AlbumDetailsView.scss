@@ -1,5 +1,10 @@
 @import '../../../../styles/_utils';
+div.album-details-loader {
+  .pt-spinner {
+    margin: 4em 5em;
+  } 
 
+}
 div.album-details-view{
 
   div.album-header > div {

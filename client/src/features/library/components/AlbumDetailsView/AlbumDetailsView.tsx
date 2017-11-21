@@ -7,7 +7,7 @@ import {albumURI, Track} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
 import Artwork from 'app/Artwork';
-import { Tab2, Tabs2 } from "@blueprintjs/core";
+import { Tab2, Tabs2, Spinner } from "@blueprintjs/core";
 
 require('./AlbumDetailsView.scss');
 
@@ -25,7 +25,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     return albumURI({name: props.album, artist: props.artist});
   }
   componentWillReceiveProps (nextProps: AlbumDetailsViewProps) {
-    if (this.props.album && nextProps.album && this.getAlbumId() !== this.getAlbumId(nextProps)) {
+    if (nextProps.album && this.getAlbumId() !== this.getAlbumId(nextProps)) {
     
       this.props.actions.fetchAlbum(this.getAlbumId(nextProps));
     }
@@ -85,8 +85,14 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
     const album = library.albumsById[id];
-    if (!album) {
+    
+    if (!id || !id.split('/')[2]) {
       return <SuggestionsView library={library} actions={actions} />;
+    }
+    if (!album) {
+      return <div className="album-details-loader">
+        <Spinner />
+      </div>
     }
     const p = albumURI(album._id);
     

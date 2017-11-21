@@ -68,7 +68,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       label="Increase volume"
       onKeyDown={(evt) => {
         evt.preventDefault();
-        this.handleVolumeChange(Math.min(this.state.volume + 0.1, 1));
+        this.handleVolumeChange(Math.min(this.state.volume + 1, 10));
       }}
      />
      <Hotkey 
@@ -78,7 +78,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       label="Decrease volume"
       onKeyDown={(evt) => {
         evt.preventDefault();
-        this.handleVolumeChange(Math.max(this.state.volume - 0.1, 0));
+        this.handleVolumeChange(Math.max(this.state.volume - 1, 0));
       }}
      />
    </Hotkeys> 
