@@ -10,7 +10,7 @@ Compactd aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
 music onto your server just like headphones does.
 
-[![https://i.imgur.com/dzdT26k.jpg](https://i.imgur.com/dzdT26km.jpg)](https://i.imgur.com/dzdT26k.jpg)
+[![https://i.imgur.com/CeDJZim.jpg](https://i.imgur.com/CeDJZimm.jpg)](https://i.imgur.com/CeDJZim.jpg)
 
 ## Features
 
