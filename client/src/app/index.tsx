@@ -8,7 +8,7 @@ import { AppContainer } from "react-hot-loader";
 const compactdStore = new CompactdStore();
 const store = compactdStore.configureStore();
 
-const rootEl = document.getElementById("compactd-root");
+const rootEl = document.getElementById("root");
 render(
   <AppContainer>
     <CompactdApplication store={store} />

@@ -19,7 +19,7 @@ export class DevApplication extends CompactdApplication {
   configure () {
     super.configure();
     if (this.compiler) {
-      this.app.use(webpackDevMiddleware(this.compiler, {
+      const devMiddleware = webpackDevMiddleware(this.compiler, {
         noInfo: true,
         publicPath: '/',
         stats: {
@@ -28,7 +28,26 @@ export class DevApplication extends CompactdApplication {
         log: (data) => {
           mainStory.info('webpack', data);
         }
-      }));
+      });
+      this.app.use(devMiddleware);
+      this.app.get('*', (req, res, next) => {
+        if (!req.url.startsWith('/database') && !req.url.startsWith('/api')) {
+          var filename = path.join((this.compiler as any).outputPath, 'index.html');
+          //  See https://github.com/jantimon/html-webpack-plugin/issues/145#issuecomment-312911903
+          devMiddleware.waitUntilValid(() => {
+            this.compiler.outputFileSystem.readFile(filename, (err: any, result: Buffer) => {
+              if (err) {
+                return next(err);
+              }
+              res.set('content-type','text/html');
+              res.send(result);
+              res.end();
+            });
+          })
+          return;
+        }
+        next();
+      });
       this.app.use((require("webpack-hot-middleware"))(this.compiler, {
         log: mainStory.info.bind(mainStory.info.prototype, 'hmr')
       }));
@@ -39,10 +58,6 @@ export class DevApplication extends CompactdApplication {
 
     this.app.all('/api/*', function (req, res) {
       res.status(404).send({error: 'This is not the endpoint you are looking for'});
-    });
-
-    this.app.get('*', function (req: express.Request, res: express.Response) {
-      res.sendFile(path.join(__dirname, '../../client/index.html'));
     });
   }
 

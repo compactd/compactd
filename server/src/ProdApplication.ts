@@ -4,6 +4,7 @@ import * as express from 'express';
 import {mainStory} from 'storyboard';
 import * as fs from 'fs';
 import config from './config';
+import * as serveStatic from 'serve-static';
 
 const pkg = require('../../package.json');
 
@@ -29,24 +30,12 @@ export class ProdApplication extends CompactdApplication {
   route () {
     super.route();
 
-    this.app.get('/vendor.bundle.js', function (req: express.Request, res: express.Response) {
-      res.sendFile(path.join(__dirname, '../../client/dist/vendor.bundle.js'));
-    });
-
-    this.app.get('/app.js', function (req: express.Request, res: express.Response) {
-      res.sendFile(path.join(__dirname, '../../client/dist/application.js'));
-    });
-    
-    this.app.get('/app.js.map', function (req: express.Request, res: express.Response) {
-      res.sendFile(path.join(__dirname, '../../client/dist/application.js.map'));
-    });
-    
-    this.app.all('/api/*', function (req, res) {
-      res.status(404).send({error: 'This is not the endpoint you are looking for'});
-    });
+    this.app.use(serveStatic(path.join(__dirname, '../../client/dist'), {
+      dotfiles: 'ignore'
+    }));
 
     this.app.get('*', function (req: express.Request, res: express.Response) {
-      res.sendFile(path.join(__dirname, '../../client/index.html'));
+      res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
     });
 
 

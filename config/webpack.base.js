@@ -1,5 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const ReactRootPlugin = require('html-webpack-react-root-plugin');
+const pkg = require('../package.json');
+const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plugin');
+
 module.exports = {
   entry: {
     application: ["./client/src/index.tsx"],
@@ -7,7 +13,8 @@ module.exports = {
   },
   output: {
     filename: "[name].js",
-    path: path.join(__dirname, "../client/dist")
+    path: path.join(__dirname, "../client/dist"),
+    publicPath: '/'
   },
 
   // Enable sourcemaps for debugging webpack's output.
@@ -29,7 +36,20 @@ module.exports = {
       name: 'vendor',
       filename: 'vendor.bundle.js',
       minChunks: Infinity
-    })
+    }),
+    new HtmlWebpackPlugin({
+      title: `Compactd v${pkg.version}`,
+      filename: path.join(__dirname, '../client/dist/index.html'),
+      hash: true
+    }),
+    new ReactRootPlugin(),
+    new FaviconsWebpackPlugin(path.join(__dirname, '../client/logo.png')),
+    new HtmlWebpackIncludeAssetsPlugin({ assets: [
+      {path: 'https://fonts.googleapis.com/css?family=Fira+Sans', type: 'css'},
+      {path: 'https://unpkg.com/normalize.css@^4.1.1', type: 'css'},
+      'https://unpkg.com/@blueprintjs/core@^1.26.0/dist/blueprint.css',
+      'https://unpkg.com/@blueprintjs/labs@0.7.0/dist/blueprint-labs.css'
+    ], append: false, publicPath: '' })
   ],
   module: {
     rules: [
