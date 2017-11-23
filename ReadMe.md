@@ -1,10 +1,12 @@
 # Compactd
 
-(pronounce compact-ed)
+(pronounce compact-D)
 
 <a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/Fwnbp4ySbyNYR6BaX1f9y4zQ/compactd/compactd'>
   <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/Fwnbp4ySbyNYR6BaX1f9y4zQ/compactd/compactd.svg' />
 </a>
+
+<a href="https://liberapay.com/compactd/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
 
 Compactd aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
