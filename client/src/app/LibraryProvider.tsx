@@ -31,6 +31,27 @@ export default class LibraryProvider {
   getAlbum (id: string) {
     return this.getDocument<Album>('albums', id);
   }
+  getAlbumCounters (id: string) {
+    const tracks = new PouchDB<Artist>('tracks');
+    const opts = {
+      startkey: id,
+      endkey: id + '\uffff'
+    };
+    return Promise.all([tracks.allDocs(opts)]).then((docs) => {
+      return docs.map((doc) => doc.rows.length);
+    });
+  }
+  getArtistCounters (id: string) {
+    const albums = new PouchDB<Artist>('albums');
+    const tracks = new PouchDB<Artist>('tracks');
+    const opts = {
+      startkey: id,
+      endkey: id + '\uffff'
+    };
+    return Promise.all([albums.allDocs(opts), tracks.allDocs(opts)]).then((docs) => {
+      return docs.map((doc) => doc.rows.length);
+    });
+  }
   onDocumentChanged<T>(db: string, id: string, callback: ChangeCallback<T>) {
     const database = new PouchDB<T>(db);
     database.changes({

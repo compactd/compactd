@@ -45,11 +45,20 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
       Artwork.getInstance().load(this.props.id, this.getImageSizings(), this.image);
     }
   }
+  loadCounters () {
+    if (this.props.subtitle === 'counters') {
+      const provider = LibraryProvider.getInstance();
+      provider.getAlbumCounters(this.props.id).then(([counters]) => {
+        this.setState({counters: [counters]});
+      })
+    }
+  }
   loadItem(): void {
     const provider = LibraryProvider.getInstance();
     this.feeds = [
       provider.liveFeed<Artist>('artists', path.dirname(this.props.id), (artist) => {
         this.setState({artist});
+        this.loadCounters();
       }),
       provider.liveFeed<Album>('albums', this.props.id, (album) => {
         this.setState({album})

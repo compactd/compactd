@@ -1,8 +1,10 @@
 import PouchDB from 'pouchdb';
 import * as PQueue from 'p-queue';
+import Session from 'app/session';
 
 export default class Artwork {
   private queue: PQueue;
+
   private blobCache: {
     [id: string]: [number, Promise<string>]
   } = {};
@@ -46,13 +48,17 @@ export default class Artwork {
       if (!docId.startsWith('artworks/')) {
         docId = 'artworks/' + docId;
       }
-      return this.artworks.getAttachment(docId, size).then((res: Blob) => {
+      return this.artworks.getAttachment(docId, size).catch((err) => {
+        console.log('No attachment for: ' + docId);
+        return fetch('/api/assets/no-album.jpg', {
+          method: 'GET',
+          headers: Session.headers()
+        }).then((res) => {
+            return res.blob();
+        });
+      }).then((res: Blob) => {
         return this.attach(res, target);
-      }).catch((err) => {
-        console.log('No attachment for:' + docId);
-        
-        return Promise.resolve(new Blob());
-      }); 
+      });
     });
   }
   public static getInstance (pouch?: typeof PouchDB) {

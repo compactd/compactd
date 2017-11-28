@@ -47,9 +47,6 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
 
   }
   componentDidMount () {
-    setTimeout(() => {
-      this.props.actions.fetchArtistCounter(this.props.artist._id);
-    }, 50);
   }
   render (): JSX.Element {
     const {

@@ -17,16 +17,17 @@ interface ArtistComponentProps {
 
 export default class ArtistComponent extends LibraryItemComp<ArtistComponentProps, {
   artist: Artist,
-  counters: [number]
+  counters: number[]
 }> {
   private feeds: number[];
+
   renderSubtitle(): JSX.Element | string{
     const {id, subtitle} = this.props;
     const {counters, artist} = this.state;
     switch (subtitle) {
       case 'counters': 
-        if (counters && counters.length === 1) {
-          return `${counters[0]} tracks`
+        if (counters && counters.length === 2) {
+          return `${counters[0]} albums · ${counters[1]} tracks`
         }
         return <div className="pt-skeleton">00 albums · 00 tracks</div>
       case 'text': 
@@ -39,11 +40,20 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
       Artwork.getInstance().load(this.props.id, this.getImageSizings(), this.image);
     }
   }
+  loadCounters () {
+    if (this.props.subtitle === 'counters') {
+      const provider = LibraryProvider.getInstance();
+      provider.getArtistCounters(this.props.id).then((counters) => {
+        this.setState({counters});
+      })
+    }
+  }
   loadItem(): void {
     const provider = LibraryProvider.getInstance();
     this.feeds = [
       provider.liveFeed<Artist>('artists', this.props.id, (artist) => {
         this.setState({artist});
+        this.loadCounters();
       })
     ]
   }

@@ -10,9 +10,13 @@ interface LibraryItemComponentProps {
   active?: boolean;
   className?: string;
   monitor?: any;
+  id: string;
 }
 
+const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
+
 export default abstract class LibraryItemComponent<P, S> extends React.Component<LibraryItemComponentProps & P, S> {
+  private watcher: any;
 
   protected image: HTMLImageElement;
   
@@ -28,14 +32,28 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
 
   componentDidMount() {
-    if (!this.props.monitor) {
+    console.log(this.props.monitor, this.image, this.props.id)
+    if (!this.props.monitor || this.watcher.isInViewport()) {
       this.loadItem();
       this.loadImage(this.image);
     }
   }
 
+  componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
+    console.log('cwrp', this.props.id, nextProps.id, this.image);
+    if (nextProps.id !== this.props.id) {
+      if (nextProps.id && (!this.props.monitor || this.watcher.isInViewport())) {
+        this.loadItem();
+        this.loadImage(this.image);
+      }
+      if (this.props.id && (!this.props.monitor || this.watcher.isInViewport())) {
+        this.unloadItem();
+      }
+    }
+  }
+
   componentWillUnmount() {
-    if (!this.props.monitor) {
+    if (!this.props.monitor || this.watcher.isInViewport()) {
       this.unloadItem();
     }
   }
@@ -43,7 +61,7 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   handleContainerRef(ref: HTMLDivElement) {
     const monitor = this.props.monitor as any;
     if (monitor) {
-      const watcher = monitor.create(ref);
+      const watcher = this.watcher = monitor.create(ref);
       watcher.enterViewport(() => {
         this.loadItem();
         this.loadImage(this.image);
@@ -79,7 +97,8 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
   renderImage (): JSX.Element {
     const size = this.getImageSize();
-    return <img width={size} height={size} ref={(ref) => {
+    return <img width={size} height={size} 
+    src={BLANK_IMAGE} ref={(ref) => {
       this.image = ref;
     }} />;
   }
