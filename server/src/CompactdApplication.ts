@@ -32,7 +32,7 @@ export class CompactdApplication {
   private port: number;
   private host: string;
 
-  constructor(host: string = 'localhost', port: number = 9000) {
+  constructor(host: string = config.get('ip'), port: number = config.get('port')) {
     this.app = express();
     this.port = port;
     this.auth = new Authenticator('instance', config.get('secret'));

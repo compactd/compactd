@@ -5,3 +5,4 @@ server/dist
 *.log
 clearCouch.bat
 .vscode/launch.json
+.DS_Store
