@@ -37,7 +37,6 @@ export default function(app: Express.Application) {
     }
 
     const files = new PouchDB<File>('files');
-    console.log(id);
     
     const docs = await files.allDocs({
       include_docs: true,
@@ -49,8 +48,12 @@ export default function(app: Express.Application) {
 
     Encoder.INSTANCE.setEncoderOptions(ENCODER_PRESETS[preset]);
     const buffer = await Encoder.INSTANCE.run(file.path);
-    const type = mime.getType(audioType(buffer));
-    
+    let type = mime.getType(audioType(buffer));
+
+    // Owrkaround
+    if (type === 'audio/x-flac') {
+      type = 'audio/flac';
+    }
     res.setHeader('content-type', type);
     res.setHeader('transfer-encoding', 'chunked');
     res.setHeader('connection', 'chunked');
