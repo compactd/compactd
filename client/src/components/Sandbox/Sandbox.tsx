@@ -64,19 +64,14 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
     };
   }
   renderComponent() {
+    const {artist, album} = this.state;
     switch (this.state.type) {
       case 'artist': {
-        const artist = this.props.library.artists.find((el) => el._id === this.state.artist);
         return <ArtistComponent
-          artist={artist || {
-            name: 'Please select an artist'
-          }}
+          id={artist}
           layout={this.state.layout}
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
-          counter={!this.state.skeleton ? {
-            albums: 5, tracks: 42
-          } : {}}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
             this.setState({active: !this.state.active})
@@ -84,20 +79,11 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           subtitleText={LOREM} />;
         }
       case 'album': {
-        const album = this.props.library.albums.find((el) => el._id === this.state.album);
-        const artist = this.props.library.artists.find((el) => el._id === album.artist);
-        
         return <AlbumComponent
-          artist={artist}
-          album={album || {
-            name: 'please select an album'
-          }}
+          id={album}
           layout={this.state.layout}
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
-          counter={!this.state.skeleton ? {
-            tracks: 16  
-          } : {}}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
             this.setState({active: !this.state.active})

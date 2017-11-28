@@ -48,11 +48,6 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
     }
 
   }
-  componentDidMount () {
-    setTimeout(() => {
-      this.props.actions.fetchAlbumCounter(this.props.album._id);
-    }, 50);
-  }
   render (): JSX.Element {
     const {actions, album, filterMatch, active, counter = {tracks: 0}} = this.props;
     let name: JSX.Element = <span className="not-filtered">{album.name}</span>;
@@ -63,9 +58,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
           layout="medium" 
           theme="dark" 
           subtitle="counters"
-          counter={counter} 
-          album={album} 
-          fuzzyName={filterMatch && filterMatch.rendered} 
+          id={album._id} 
           onClick={this.handleClick.bind(this)}/>
       </div>
   }

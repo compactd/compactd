@@ -73,9 +73,9 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
     }
     if (item.artist) {
       const album = item as Album;
-      return <AlbumComponent album={album} active={isActive} layout="compact" onClick={handleClick as any} key={item._id} />;
+      return <AlbumComponent id={album._id} active={isActive} layout="compact" onClick={handleClick as any} key={item._id} />;
     }
-    return <ArtistComponent artist={item} active={isActive} layout="compact" onClick={handleClick} key={item._id} />;
+    return <ArtistComponent id={item._id} active={isActive} layout="compact" onClick={handleClick as any} key={item._id} />;
 
   }
   private filterLibraryContent (query: string, items: LibraryContent[]) {

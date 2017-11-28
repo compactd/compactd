@@ -91,7 +91,7 @@ export class CompactdApplication {
    * Configure express app by adding middlewares
    */
   configure () {
-    this.app.use(ddos.express);
+    // this.app.use(ddos.express);
 
     class MorganStream extends Stream.Writable {
       _write(chunk: string, enc: string, next: Function) {

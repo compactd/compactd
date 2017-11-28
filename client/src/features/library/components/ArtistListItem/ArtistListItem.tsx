@@ -65,9 +65,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
         active={active} 
         layout='medium' 
         theme='dark' 
-        artist={artist} 
-        fuzzyName={filterMatch && filterMatch.rendered} 
-        counter={counter} 
+        id={artist._id}
         subtitle='counters' 
         onClick={this.handleClick.bind(this)} />
     </div>

@@ -1,6 +1,8 @@
 import PouchDB from 'pouchdb';
+import * as PQueue from 'p-queue';
 
 export default class Artwork {
+  private queue: PQueue;
   private blobCache: {
     [id: string]: [number, Promise<string>]
   } = {};
@@ -9,21 +11,29 @@ export default class Artwork {
   private static sInstance: Artwork;
 
   private PouchDB: PouchDB.Static;
-  private constructor (pouch: typeof PouchDB) {
+  private constructor (pouch = PouchDB) {
     this.PouchDB = pouch;
     this.artworks = new pouch('artworks');
-  }
-
-  getLargeCover (id: string, size = 64) {
-    return this.get(id, 'large').then((blob) => {
-      return URL.createObjectURL(blob);
+    this.queue = new PQueue({
+      concurrency: 2,
     });
   }
 
-  getSmallCover (id: string, size = 32) {
-    return this.get(id, 'small').then((blob) => {
-      return URL.createObjectURL(blob);
-    });
+  loadLargeCover (id: string, size = 64, target: HTMLImageElement) {
+    return this.load(id, 'large', target);
+  }
+
+  loadSmallCover (id: string, size = 32, target: HTMLImageElement) {
+    return this.load(id, 'small', target);
+  }
+
+  attach (blob: Blob, target: HTMLImageElement): Promise<Blob> {
+    return new Promise((resolve) => {
+      target.src = URL.createObjectURL(blob);
+      target.addEventListener('load', () => {
+        resolve(blob);
+      });
+    })
   }
 
   /**
@@ -31,15 +41,19 @@ export default class Artwork {
    * @param docId the document id, starting with or without artowrks/
    * @param size the size, either large (300px) or small (64px)
    */
-  get (docId: string, size: 'large' | 'small'): Promise<Blob> {
-    if (!docId.startsWith('artworks/')) {
-      docId = 'artworks/' + docId;
-    }
-    return this.artworks.getAttachment(docId, size).catch((err) => {
-      console.log('No attachment for:' + docId);
-      
-      return Promise.resolve(new Blob());
-    }) as Promise<Blob>; 
+  load (docId: string, size: 'large' | 'small', target: HTMLImageElement): Promise<Blob> {
+    return this.queue.add(() => {
+      if (!docId.startsWith('artworks/')) {
+        docId = 'artworks/' + docId;
+      }
+      return this.artworks.getAttachment(docId, size).then((res: Blob) => {
+        return this.attach(res, target);
+      }).catch((err) => {
+        console.log('No attachment for:' + docId);
+        
+        return Promise.resolve(new Blob());
+      }); 
+    });
   }
   public static getInstance (pouch?: typeof PouchDB) {
     if (!Artwork.sInstance) {
@@ -52,8 +66,5 @@ export default class Artwork {
   }
   public static createInstance (pouch?: typeof PouchDB) {
     Artwork.sInstance = new Artwork(pouch);
-  }
-  public static get (docId: string, size: 'large' | 'small') {
-    return Artwork.getInstance().get(docId, size);
   }
 }

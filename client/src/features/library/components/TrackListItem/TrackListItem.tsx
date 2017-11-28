@@ -56,7 +56,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
     const {actions, track, library} = this.props;
     if (!this.state.openSetArtist) return <div className=""></div>;
     const artists = this.props.library.artists.map((artist) => {
-      return <ArtistComponent layout="compact" artist={artist} onClick={() => {
+      return <ArtistComponent layout="compact" id={artist._id} onClick={() => {
         this.setState({openSetArtist: false});
         actions.setTrackArtist(track._id, artist._id)
       }}

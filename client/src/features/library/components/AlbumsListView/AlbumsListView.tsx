@@ -75,7 +75,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
-          <ArtistComponent layout="compact" artist={artist} theme="dark" />
+          <ArtistComponent layout="compact" id={artist._id} theme="dark" />
         </div>  : <div className="pt-input-group">
           <span className="pt-icon pt-icon-search"></span>
           <input className="pt-input" type="search"
