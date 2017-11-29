@@ -8,6 +8,7 @@ import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
 import Artwork from 'app/Artwork';
 import { Tab2, Tabs2, Spinner, HotkeysTarget, Hotkeys, Hotkey } from "@blueprintjs/core";
+import { AlbumComponent } from 'components';
 
 require('./AlbumDetailsView.scss');
 
@@ -117,15 +118,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     
     return <div className="album-details-view">
       <div className="album-header">
-        <div className="album-image" onClick={this.handleClick.bind(this)}>
-          <BetterImage src={"/foo"} size={128} />
-          <span className="dark-overlay"></span>
-          <span className="play-overlay pt-icon pt-icon-play"></span>
-        </div>  
-        <div className="album-infos">
-          <div className="album-title">{album.name}</div>
-          <div className="album-year">{album.year}</div>
-        </div>
+        <AlbumComponent id={id} layout="large" subtitle={['artist', 'year']}/>
       </div>
       <div className="album-content">
         <ScrollableDiv offset={0} binding={album}>
