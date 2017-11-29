@@ -9,9 +9,11 @@ import './AlbumComponent.scss';
 import LibraryProvider from 'app/LibraryProvider';
 import * as path from 'path';
 
+type Subtitle = 'counters' | 'text' | 'none' | 'artist' | 'year';
+
 interface AlbumComponentProps {
   id: string,
-  subtitle?: 'counters' | 'text' | 'none' | 'artist';
+  subtitle?: Subtitle | Subtitle[];
   subtitleText?: string;
 }
 
@@ -21,10 +23,23 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
   counters: [number]
 }> {
   private feeds: number[];
-  renderSubtitle(): JSX.Element | string{
-    const {id, subtitle} = this.props;
-    const {counters, artist} = this.state;
+  renderSubtitle(subtitle = this.props.subtitle): JSX.Element | string{
+    const {id} = this.props;
+    const {counters, artist, album} = this.state;
+
+    if (Array.isArray(subtitle)) {
+      const subs = subtitle.map((sub) => {
+        return <div className="subtitle-item">{this.renderSubtitle(sub)}</div>
+      });
+      return <div className="multiple-subtitles">{subs}</div>;
+    }
+    
     switch (subtitle) {
+      case 'year':
+        if (album) {
+          return `${album.year}`;
+        }
+        return <div className="pt-skeleton">2000</div>
       case 'counters': 
         if (counters && counters.length === 1) {
           return `${counters[0]} tracks`
