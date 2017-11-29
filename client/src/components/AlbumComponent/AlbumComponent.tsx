@@ -18,19 +18,31 @@ interface AlbumComponentProps {
 }
 
 export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps, {
-  artist: Artist,
-  album: Album,
-  counters: [number]
+  artists: {[id: string]: Artist},
+  albums: {[id: string]: Album},
+  counters: {[id: string]: [number]}
 }> {
   private feeds: number[];
+  constructor () {
+    super();
+    this.state = {
+      artists: {},
+      albums: {},
+      counters: {}
+    };
+  }
   renderSubtitle(subtitle = this.props.subtitle): JSX.Element | string{
     const {id} = this.props;
-    const {counters, artist, album} = this.state;
+    const {counters, artists, albums} = this.state;
+    const artist = artists[id];
+    const album = albums[id];
 
     if (Array.isArray(subtitle)) {
+
       const subs = subtitle.map((sub) => {
-        return <div className="subtitle-item">{this.renderSubtitle(sub)}</div>
+        return <div className="subtitle-item" key={sub}>{this.renderSubtitle(sub)}</div>
       });
+
       return <div className="multiple-subtitles">{subs}</div>;
     }
     
@@ -41,43 +53,50 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
         }
         return <div className="pt-skeleton">2000</div>
       case 'counters': 
-        if (counters && counters.length === 1) {
-          return `${counters[0]} tracks`
+        if (counters[id] && counters[id].length === 1) {
+          return `${counters[id][0]} tracks`
         }
         return <div className="pt-skeleton">00 tracks</div>
       case 'text': 
         return this.props.subtitleText;
       case 'artist': 
         if (artist && artist.name) {
-          return artist.name
+          return artist.name;
         }
         return <div className="pt-skeleton">Artist name</div>
     }
   }
 
-  loadImage(img: HTMLImageElement): void {
+  loadImage(id: string, img: HTMLImageElement): void {
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().load(this.props.id, this.getImageSizings(), this.image);
+      Artwork.getInstance().load(id, this.getImageSizings(), this.image);
     }
   }
   
-  loadCounters () {
+  loadCounters (id: string) {
     if (this.props.subtitle === 'counters') {
       const provider = LibraryProvider.getInstance();
-      provider.getAlbumCounters(this.props.id).then(([counters]) => {
-        this.setState({counters: [counters]});
+
+      provider.getAlbumCounters(id).then(([counters]) => {
+        this.setState({
+          counters: {
+            ...this.state.counters,
+            [id]: [counters]
+          }
+        });
       })
     }
   }
-  loadItem(): void {
+  loadItem(id: string): void {
     const provider = LibraryProvider.getInstance();
+    
     this.feeds = [
-      provider.liveFeed<Artist>('artists', path.dirname(this.props.id), (artist) => {
-        this.setState({artist});
-        this.loadCounters();
+      provider.liveFeed<Artist>('artists', path.dirname(id), (artist) => {
+        this.setState({artists: {...this.state.artists, [id]: artist}});
       }),
-      provider.liveFeed<Album>('albums', this.props.id, (album) => {
-        this.setState({album})
+      provider.liveFeed<Album>('albums', id, (album) => {
+        this.setState({albums: {...this.state.albums, [id]: album}});
+        this.loadCounters(id);
       })
     ]
   }
@@ -92,8 +111,10 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
     return ['album-component'];
   }
   renderHeader(): string | JSX.Element {
-    if (this.state.album) {
-      return this.state.album.name;
+    const {albums} = this.state;
+    const album = albums[this.props.id];
+    if (album) {
+      return album.name;
     } else {
       return <div className="pt-skeleton">Artist name</div>
     }

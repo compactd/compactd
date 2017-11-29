@@ -29,8 +29,11 @@ export default class Artwork {
     return this.load(id, 'small', target);
   }
 
-  attach (blob: Blob, target: HTMLImageElement): Promise<Blob> {
+  attach (blob: Blob, target: HTMLImageElement, oldSrc: string): Promise<Blob> {
     return new Promise((resolve) => {
+      if (oldSrc !== target.src) {
+        return resolve(blob);
+      }
       target.src = URL.createObjectURL(blob);
       target.addEventListener('load', () => {
         resolve(blob);
@@ -44,6 +47,7 @@ export default class Artwork {
    * @param size the size, either large (300px) or small (64px)
    */
   load (docId: string, size: 'large' | 'small', target: HTMLImageElement): Promise<Blob> {
+    const oldSrc = target.src;
     return this.queue.add(() => {
       if (!docId.startsWith('artworks/')) {
         docId = 'artworks/' + docId;
@@ -54,10 +58,10 @@ export default class Artwork {
           method: 'GET',
           headers: Session.headers()
         }).then((res) => {
-            return res.blob();
+          return res.blob();
         });
       }).then((res: Blob) => {
-        return this.attach(res, target);
+        return this.attach(res, target, oldSrc);
       });
     });
   }

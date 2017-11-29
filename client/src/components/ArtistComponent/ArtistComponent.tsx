@@ -35,25 +35,27 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
     }
   }
 
-  loadImage(img: HTMLImageElement): void {
+  loadImage(id: string, img: HTMLImageElement): void {
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().load(this.props.id, this.getImageSizings(), this.image);
+      Artwork.getInstance().load(id, this.getImageSizings(), this.image);
     }
   }
-  loadCounters () {
+  loadCounters (id: string) {
     if (this.props.subtitle === 'counters') {
       const provider = LibraryProvider.getInstance();
-      provider.getArtistCounters(this.props.id).then((counters) => {
+      provider.getArtistCounters(id).then((counters) => {
         this.setState({counters});
       })
     }
   }
-  loadItem(): void {
+  loadItem(id: string): void {
     const provider = LibraryProvider.getInstance();
     this.feeds = [
-      provider.liveFeed<Artist>('artists', this.props.id, (artist) => {
-        this.setState({artist});
-        this.loadCounters();
+      provider.liveFeed<Artist>('artists', id, (artist) => {
+        if (id === this.props.id) {
+          this.setState({artist});
+          this.loadCounters(id);
+        }
       })
     ]
   }

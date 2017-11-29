@@ -84,7 +84,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
       const content = Object.keys(albumsByDisc).map((disc) => {
         const tracks = albumsByDisc[disc];
   
-        return <Tab2 id={disc} title={'Disc ' + disc} panel={
+        return <Tab2 id={disc} key={disc} title={'Disc ' + disc} panel={
           <TrackList
             actions={actions}
             tracks={tracks}

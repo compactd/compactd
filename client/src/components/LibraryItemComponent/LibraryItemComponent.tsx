@@ -20,9 +20,9 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
 
   protected image: HTMLImageElement;
   
-  abstract loadImage (img: HTMLImageElement): void;
+  abstract loadImage (id: string, img: HTMLImageElement): void;
 
-  abstract loadItem (): void;
+  abstract loadItem (id: string): void;
 
   abstract unloadItem (): void;
 
@@ -33,16 +33,16 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
 
   componentDidMount() {
     if (!this.props.monitor || this.watcher.isInViewport()) {
-      this.loadItem();
-      this.loadImage(this.image);
+      this.loadItem(this.props.id);
+      this.loadImage(this.props.id, this.image);
     }
   }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
     if (nextProps.id !== this.props.id) {
       if (nextProps.id && (!this.props.monitor || this.watcher.isInViewport())) {
-        this.loadItem();
-        this.loadImage(this.image);
+        this.loadItem(nextProps.id);
+        this.loadImage(nextProps.id, this.image);
       }
       if (this.props.id && (!this.props.monitor || this.watcher.isInViewport())) {
         this.unloadItem();
@@ -61,8 +61,8 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
     if (monitor) {
       const watcher = this.watcher = monitor.create(ref);
       watcher.enterViewport(() => {
-        this.loadItem();
-        this.loadImage(this.image);
+        this.loadItem(this.props.id);
+        this.loadImage(this.props.id, this.image);
       });
       watcher.exitViewport(() => {
         this.unloadItem();
