@@ -12,9 +12,7 @@ require('./ArtistListItem.scss');
 
 interface ArtistListItemProps {
   actions: LibraryActions;
-  artist: Artist;
-  filterMatch?: MatchResult;
-  counter: {albums?: number, tracks: number};
+  artist: string;
   active: boolean;
 }
 
@@ -41,7 +39,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       const { history } = this.context.router
 
       history.push(this.props.active ? '/library' : `/library/${
-        artistURI(this.props.artist._id).name
+        artistURI(this.props.artist).name
       }`);
     }
 
@@ -52,17 +50,15 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
     const {
       actions,
       artist,
-      filterMatch,
       active,
-      counter = {albums: 0, tracks: 0}
     } = this.props;
-    const slug = artistURI(artist._id).name;
+    const slug = artistURI(artist).name;
     return <div className="artist-list-item"> 
       <ArtistComponent 
         active={active} 
         layout='medium' 
         theme='dark' 
-        id={artist._id}
+        id={artist}
         subtitle='counters' 
         onClick={this.handleClick.bind(this)} />
     </div>

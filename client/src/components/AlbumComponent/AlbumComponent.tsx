@@ -45,6 +45,7 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
       Artwork.getInstance().load(this.props.id, this.getImageSizings(), this.image);
     }
   }
+  
   loadCounters () {
     if (this.props.subtitle === 'counters') {
       const provider = LibraryProvider.getInstance();

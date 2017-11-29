@@ -57,6 +57,7 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
       })
     ]
   }
+  
   unloadItem(): void {
     const provider = LibraryProvider.getInstance();
     provider.cancelFeeds(this.feeds);

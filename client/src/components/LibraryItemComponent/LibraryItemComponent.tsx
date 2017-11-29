@@ -32,7 +32,6 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
 
   componentDidMount() {
-    console.log(this.props.monitor, this.image, this.props.id)
     if (!this.props.monitor || this.watcher.isInViewport()) {
       this.loadItem();
       this.loadImage(this.image);
@@ -40,7 +39,6 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
-    console.log('cwrp', this.props.id, nextProps.id, this.image);
     if (nextProps.id !== this.props.id) {
       if (nextProps.id && (!this.props.monitor || this.watcher.isInViewport())) {
         this.loadItem();

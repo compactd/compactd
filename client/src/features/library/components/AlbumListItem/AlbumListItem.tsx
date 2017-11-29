@@ -13,11 +13,9 @@ require('./AlbumListItem.scss');
 
 interface AlbumListItemProps {
   actions: LibraryActions;
-  album: Album;
-  filterMatch?: MatchResult;
+  album: string;
   all: boolean;
   active?: boolean;
-  counter: {tracks: number};
 }
 
 export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
@@ -40,7 +38,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
       event.preventDefault()
 
       const { history } = this.context.router
-      const props = albumURI(this.props.album._id);
+      const props = albumURI(this.props.album);
       history.push(this.props.active ? '/library' : `/library/${
         this.props.all ? 'all/':  ''}${
         props.artist
@@ -49,8 +47,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
 
   }
   render (): JSX.Element {
-    const {actions, album, filterMatch, active, counter = {tracks: 0}} = this.props;
-    let name: JSX.Element = <span className="not-filtered">{album.name}</span>;
+    const {actions, album, active} = this.props;
     
     return <div className="album-list-item">
         <AlbumComponent
@@ -58,7 +55,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
           layout="medium" 
           theme="dark" 
           subtitle="counters"
-          id={album._id} 
+          id={album} 
           onClick={this.handleClick.bind(this)}/>
       </div>
   }

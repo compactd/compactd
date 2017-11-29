@@ -41,41 +41,20 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   }
   render (): JSX.Element {
     const {actions, library} = this.props;
+    const artistId = `library/${this.props.artist}`;
     const artist = this.props.artist ?
-      (library.artistsById[`library/${this.props.artist}`]
+      (library.artistsById[artistId]
         || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
 
-    const options = {
-      pre: '$', post: '',
-      extract: (el: Album) => el.name
-    };
-    const albums = artist.albums
-    .map(album => {
-      if (this.state.albumsFilter && !this.props.artist) {
-        return [
-          fuzzy.match(this.state.albumsFilter, album.name || '', options), album
-        ]
-      }
-      return [undefined, album];
-    }).filter(([matched, album]: [fuzzy.MatchResult, Album]) => {
-      return this.state.albumsFilter && !this.props.artist ? matched : true;
-    }).sort((a, b) => {
-      if (!this.state.albumsFilter || this.props.artist) {
-        if ((a[1] as Album).name > (b[1] as Album).name) return 1;
-        if ((a[1] as Album).name < (b[1] as Album).name) return -1;
-        return 0;
-      }
-      return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
-    }).map(([matched, album]: [fuzzy.MatchResult, Album]) => {
-      return  <AlbumListItem key={album._id} filterMatch={matched}
-                counter={library.counters[album._id]}
-                active={this.props.match.params.album === albumURI(album._id).name}
+    const albums = artist.albums.map((album) => {
+      return  <AlbumListItem key={album}
+                active={this.props.match.params.album === albumURI(album).name}
                 album={album} actions={actions} all={this.props.all}/>
     })
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
-          <ArtistComponent layout="compact" id={artist._id} theme="dark" />
+          <ArtistComponent layout="compact" id={artistId} theme="dark" />
         </div>  : <div className="pt-input-group">
           <span className="pt-icon pt-icon-search"></span>
           <input className="pt-input" type="search"

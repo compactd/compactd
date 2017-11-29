@@ -13,10 +13,10 @@ export interface LibraryState {
     }
   };
   artistsById: {
-    [id: string]: Compactd.Artist & {albums?: [Compactd.Album]}
+    [id: string]: Compactd.Artist & {albums?: string[]}
   };
-  albums: Compactd.Album[];
-  artists: Compactd.Artist[];
+  albums: string[];
+  artists: string[];
   tracks: Compactd.Track[];
   expandArtists: boolean;
   counters: {

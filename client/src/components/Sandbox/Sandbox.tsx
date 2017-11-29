@@ -199,10 +199,10 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
   }
   private renderSelects() {
     const artists = this.props.library.artists.map((artist) => {
-      return <option value={artist._id} key={artist._id}>{artist.name}</option>
+      return <option value={artist} key={artist}>{artist}</option>
     });
     const albums = this.props.library.albums.map((album) => {
-      return <option value={album._id} key={album._id}>{album.name}</option>
+      return <option value={album} key={album}>{album}</option>
     });
     return <div className="selects">
       <label className="artist pt-label">
