@@ -114,13 +114,13 @@ div.item-component {
     }
   }
   &.medium-layout  {
-    height: 82px;
+    height: 80px;
     div.item-image {
       float: left;
 
       position: relative;
       
-      margin: 0.8em 0.8em;
+      margin: 11px 12px 0 12px;
 
       img {
         border-radius: 4px;
@@ -129,8 +129,8 @@ div.item-component {
     div.item-props {
       vertical-align: top;
       
-      padding: 1.1em 0.5em 1em 0.5em;
-      margin-top: 2px;
+      padding: 1.2em 0.5em 0.8em 0.5em;
+      margin-top: 0px;
 
       div.item-name {
         font-size: 16px;
