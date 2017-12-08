@@ -72,6 +72,13 @@ class SessionManager {
       [name: string]: string
     }
   } = {method: 'GET', body: {}}) {
+    if (init.method === 'GET') {
+      return fetch(input, this.init({
+        method: 'GET',
+        headers: new Headers(init.headers)
+      }));
+    }
+
     return fetch(input, this.init({
       ...init,
       headers: new Headers(init.headers)
