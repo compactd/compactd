@@ -14,6 +14,9 @@ interface PlayerStatusProps {
   actions: PlayerActions;
   player: PlayerState;
 }
+
+const MAX_VOLUME = 20;
+
 @HotkeysTarget
 export class PlayerStatus extends React.Component<PlayerStatusProps, {
   volume: number
@@ -22,7 +25,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
   private trackTimeDiv: HTMLSpanElement;
   constructor () {
     super();
-    this.state = {volume: 10};
+    this.state = {volume: MAX_VOLUME};
   }
   renderHotkeys () {
     const {actions, player} = this.props;
@@ -68,7 +71,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       label="Increase volume"
       onKeyDown={(evt) => {
         evt.preventDefault();
-        this.handleVolumeChange(Math.min(this.state.volume + 1, 10));
+        this.handleVolumeChange(Math.min(this.state.volume + 1, MAX_VOLUME));
       }}
      />
      <Hotkey 
@@ -105,7 +108,8 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
   }
   handleVolumeChange (val: number) {
     this.setState({volume: val});
-    this.player.setVolume(val / 10);
+    const vol = val / MAX_VOLUME;
+    this.player.setVolume((Math.exp(vol) - 1)/(Math.E - 1));
   }
   render (): JSX.Element {
     const {actions, player} = this.props;
@@ -156,7 +160,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
           nextSource={player.stack[1] ? player.stack[1]._id : undefined} />
       </div>
       <div className="player-actions">
-        <Slider renderLabel={(val: number) => null} value={this.state.volume} onChange={this.handleVolumeChange.bind(this)}/>
+        <Slider renderLabel={(val: number) => null} max={MAX_VOLUME} value={this.state.volume} onChange={this.handleVolumeChange.bind(this)}/>
         <StoreView />
         <SettingsLink />
         <div className="logout-button">
