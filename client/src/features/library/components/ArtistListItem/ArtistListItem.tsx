@@ -14,6 +14,10 @@ interface ArtistListItemProps {
   actions: LibraryActions;
   artist: string;
   active: boolean;
+  emitter?: any;
+  hash?: string;
+  index?: number;
+  visible?: boolean;
 }
 
 export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
@@ -51,6 +55,10 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       actions,
       artist,
       active,
+      hash,
+      emitter,
+      index,
+      visible
     } = this.props;
     const slug = artistURI(artist).name;
     return <div className="artist-list-item"> 
@@ -59,6 +67,10 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
         layout='medium' 
         theme='dark' 
         id={artist}
+        index={index}
+        hash={hash}
+        emitter={emitter}
+        visible={visible}
         subtitle='counters' 
         onClick={this.handleClick.bind(this)} />
     </div>

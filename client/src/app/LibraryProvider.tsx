@@ -65,6 +65,7 @@ export default class LibraryProvider {
     });
   }
   cancelFeeds (keys: number[]) {
+    if (!keys) return;
     keys.forEach((k) => this.feeds[k] = false);
   }
   liveFeed<T> (db: string, id: string, callback: FeedCallback<T>): number {

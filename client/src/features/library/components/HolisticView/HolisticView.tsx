@@ -11,6 +11,7 @@ import * as fuzzy from 'fuzzy';
 import {artistURI} from 'compactd-models';
 import {FuzzySelector} from '../FuzzySelector'; 
 import * as classnames from "classnames";
+import {EventEmitter} from 'eventemitter3';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -28,6 +29,10 @@ interface HolisticViewState {
 }
 
 export class HolisticView extends React.Component<HolisticViewProps, HolisticViewState> {
+  private oldArtistScroll: [number, number];
+  private artistsHash: string;
+  private artistsDiv: HTMLDivElement;
+  private emitter: EventEmitter;
   static contextTypes = {
     router: PropTypes.shape({
       history: PropTypes.shape({
@@ -40,22 +45,91 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   constructor () {
     super();
     this.state = {artistsFilter: ''};
+    this.emitter = new EventEmitter();
   }
   componentDidMount () {
     this.props.actions.fetchAllArtists();
+
+    const div = this.artistsDiv;
+
+    this.oldArtistScroll = this.computeRange(div);
+
+    div.addEventListener('scroll', (event) => {
+      window.requestAnimationFrame(() => {
+        const id = this.artistsHash;
+
+        const [oldStart, oldEnd] = this.oldArtistScroll;
+        const [start, end] = this.computeRange(div);
+
+        if (start === oldStart) return;
+
+        if (start > oldStart) {
+          this.emitHideRange(id, oldStart, start);
+        } else {
+          this.emitHideRange(id, end, oldEnd);
+        }
+
+        if (start > oldStart) {
+          this.emitShowRange(id, oldEnd, end);
+        } else {
+          this.emitShowRange(id, start, oldStart);
+        }
+        
+        this.oldArtistScroll = [start, end];
+      })
+    });
   }
   handleArtistsFilterChange (evt: Event) {
     const target = evt.target as HTMLInputElement;
     this.setState({artistsFilter: target.value});
   }
+  handleArtistDivRef(id: string, div: HTMLDivElement) {
+    this.artistsDiv = div;
+  }
+  private emitShowRange(id: string, start: number, end: number) {
+    for (let i = start ; i < end ; i++) {
+      this.emitter.emit(`show-${id}-${i}`);
+    }
+  }
+  private emitHideRange(id: string, start: number, end: number) {
+    for (let i = start ; i < end ; i++) {
+      this.emitter.emit(`hide-${id}-${i}`);
+    }
+  }
+  componentWillReceiveProps (nextProps: HolisticViewProps) {
+    const artistsHash = (nextProps.library.artists.length * 420).toString(16).substr(0, 5);
+
+    if (this.artistsHash !== artistsHash) {
+      this.artistsHash = artistsHash;
+      this.oldArtistScroll = this.computeRange(this.artistsDiv);
+      this.emitShowRange(this.artistsHash, this.oldArtistScroll[0], this.oldArtistScroll[1]);
+    }
+  }
+  private computeRange(div: HTMLDivElement): [number, number] {
+    const top = div.scrollTop;
+    const height = div.getBoundingClientRect().height;
+    const childHeight = 80;
+    const length = (height - height % childHeight) / childHeight;
+    const start = (top - top % childHeight) / childHeight;
+    const end = start + length;
+    
+    return [start, end];
+  }
+
   render (): JSX.Element {
     const {actions, library, player} = this.props;
-    const artists = library.artists.map((artist) => {
+
+    const artists = library.artists.map((artist, index) => {
       return <ArtistListItem key={artist} actions={actions}
               artist={artist} active={
                 artistURI(artist).name === this.props.match.params.artist
-              }/>
-    })
+              } hash={this.artistsHash}
+              emitter={this.emitter}
+              index={index}
+              visible={index < this.oldArtistScroll[1]}
+              />
+    });
+
     return <div className="holistic-view">
       <FuzzySelector library={library} actions={actions} />
       <Flex>
@@ -75,7 +149,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               library.expandArtists ? 'pt-icon-caret-left' : 'pt-icon-caret-right')}></span>
             </div>
           </div>
-          <ScrollableDiv>
+          <ScrollableDiv divRef={(div) => this.handleArtistDivRef(this.artistsHash, div)}>
             {artists}
           </ScrollableDiv>
         </Box>

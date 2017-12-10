@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
 import './LibraryItemComponent.scss';
+import {EventEmitter} from 'eventemitter3';
 
 interface LibraryItemComponentProps {
   layout: 'minimal' | 'compact' | 'medium' | 'large';
@@ -9,8 +10,11 @@ interface LibraryItemComponentProps {
   theme?: 'dark' | 'light';
   active?: boolean;
   className?: string;
-  monitor?: any;
   id: string;
+  emitter?: EventEmitter;
+  hash?: string;
+  index?: number;
+  visible?: boolean;
 }
 
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
@@ -32,42 +36,34 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
 
   componentDidMount() {
-    if (!this.props.monitor || this.watcher.isInViewport()) {
+    if (!this.props.emitter || this.props.visible) {
       this.loadItem(this.props.id);
       this.loadImage(this.props.id, this.image);
+
+      return;
     }
+    this.props.emitter.on(`show-${this.props.hash}-${this.props.index}`, () => {
+      this.loadItem(this.props.id);
+      this.loadImage(this.props.id, this.image);
+    });
+    this.props.emitter.on(`hide-${this.props.hash}-${this.props.index}`, () => {
+      this.unloadItem();
+    });
   }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
     if (nextProps.id !== this.props.id) {
-      if (nextProps.id && (!this.props.monitor || this.watcher.isInViewport())) {
+      if (nextProps.id) {
         this.loadItem(nextProps.id);
         this.loadImage(nextProps.id, this.image);
       }
-      if (this.props.id && (!this.props.monitor || this.watcher.isInViewport())) {
+      if (this.props.id) {
         this.unloadItem();
       }
     }
   }
 
   componentWillUnmount() {
-    if (!this.props.monitor || this.watcher.isInViewport()) {
-      this.unloadItem();
-    }
-  }
-
-  handleContainerRef(ref: HTMLDivElement) {
-    const monitor = this.props.monitor as any;
-    if (monitor) {
-      const watcher = this.watcher = monitor.create(ref);
-      watcher.enterViewport(() => {
-        this.loadItem(this.props.id);
-        this.loadImage(this.props.id, this.image);
-      });
-      watcher.exitViewport(() => {
-        this.unloadItem();
-      });
-    }
   }
   
   getImageSizings (): 'large' | 'small' {
@@ -126,7 +122,6 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
           {active,
         'clickable': !!this.props.onClick
         })}
-        ref={this.handleContainerRef.bind(this)}
         onClick={onClick as any}>
       <div className="item-image">{this.renderImage()}</div>
       <div className="item-props">

@@ -6,6 +6,7 @@ class ScrollableDiv extends React.Component<{
   offset?: number;
   className?: string;
   binding?: any;
+  divRef?: (div: HTMLDivElement) => void;
 },{}> {
   private div: HTMLDivElement;
   componentDidMount () {
@@ -30,7 +31,10 @@ class ScrollableDiv extends React.Component<{
     this.updateHeight();
   }
   render () {
-    return <div ref={(ref) => this.div = ref} className={
+    return <div ref={(ref) =>{
+      this.div = ref;
+      if (this.props.divRef) this.props.divRef(ref);
+    }} className={
         classnames("scrollable-div", this.props.className || '')
       }>
       {this.props.children}
