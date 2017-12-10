@@ -77,7 +77,6 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   }
   private emitShowRange(id: string, start: number, end: number) {
     for (let i = start ; i < end ; i++) {
-      console.log('emit', `show-${id}-${i}`));
       this.emitter.emit(`show-${id}-${i}`);
     }
   }
