@@ -16,10 +16,7 @@ const passwords = path.join(config.get('dataDirectory'), 'credentials');
 const client = new DelugeClient({
   host: config.get('delugeHost'),
   port: config.get('delugePort'),
-  password: config.get('delugePassword'),
-  log: (level, msg, obj, objLevel = level) => {
-    // console.log('deluge', msg, obj);
-  }
+  password: config.get('delugePassword')
 });
 
 export async function createTracker (type: string, name: string, username: string) {

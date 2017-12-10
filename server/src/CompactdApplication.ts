@@ -17,7 +17,7 @@ import httpEventEmitter from './http-event';
 import * as http from 'http';
 const pkg = require('../../package.json');
 const modelsPkg = require('../../node_modules/compactd-models/package.json');
-const Ddos = require('ddos');
+// const Ddos = require('ddos');
 
 const ddos = new Ddos({
   burst: 10,

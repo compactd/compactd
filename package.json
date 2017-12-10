@@ -47,7 +47,7 @@
     "parse-torrent": "^5.8.3",
     "password-hash-and-salt": "^0.1.4",
     "pm2": "^2.7.2",
-    "polytorrent": "^1.1.10",
+    "polytorrent": "^1.1.11",
     "pouchdb": "^6.3.4",
     "pouchdb-find": "^6.3.4",
     "qs": "^6.4.0",
