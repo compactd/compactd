@@ -19,11 +19,6 @@ const pkg = require('../../package.json');
 const modelsPkg = require('../../node_modules/compactd-models/package.json');
 // const Ddos = require('ddos');
 
-const ddos = new Ddos({
-  burst: 10,
-  limit: 31
-});
-
 export class CompactdApplication {
   private static ALLOWED_DATABASES = ['libraries', 'artworks', 'tracks', 'files', 'artists', 'albums', 'trackers'];
 
