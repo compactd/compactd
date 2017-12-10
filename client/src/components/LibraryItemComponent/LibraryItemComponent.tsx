@@ -42,6 +42,7 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
 
       return;
     }
+
     this.props.emitter.on(`show-${this.props.hash}-${this.props.index}`, () => {
       this.loadItem(this.props.id);
       this.loadImage(this.props.id, this.image);
@@ -60,6 +61,16 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
       if (this.props.id) {
         this.unloadItem();
       }
+    }
+
+    if (nextProps.hash !== this.props.hash) {
+      this.props.emitter.on(`show-${nextProps.hash}-${nextProps.index}`, () => {
+        this.loadItem(this.props.id);
+        this.loadImage(this.props.id, this.image);
+      });
+      this.props.emitter.on(`hide-${nextProps.hash}-${nextProps.index}`, () => {
+        this.unloadItem();
+      });
     }
   }
 

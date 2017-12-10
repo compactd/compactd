@@ -16,6 +16,10 @@ interface AlbumListItemProps {
   album: string;
   all: boolean;
   active?: boolean;
+  emitter?: any;
+  hash?: string;
+  index?: number;
+  visible?: boolean;
 }
 
 export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
@@ -47,7 +51,15 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
 
   }
   render (): JSX.Element {
-    const {actions, album, active} = this.props;
+    const {
+      actions,
+      album,
+      active,
+      hash,
+      emitter,
+      index,
+      visible
+    } = this.props;
     
     return <div className="album-list-item">
         <AlbumComponent
@@ -56,6 +68,10 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
           theme="dark" 
           subtitle="counters"
           id={album} 
+          index={index}
+          hash={hash}
+          emitter={emitter}
+          visible={visible}
           onClick={this.handleClick.bind(this)}/>
       </div>
   }

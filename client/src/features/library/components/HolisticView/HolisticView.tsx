@@ -126,7 +126,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               } hash={this.artistsHash}
               emitter={this.emitter}
               index={index}
-              visible={index < this.oldArtistScroll[1]}
+              visible={index < this.oldArtistScroll[1] + 1}
               />
     });
 
