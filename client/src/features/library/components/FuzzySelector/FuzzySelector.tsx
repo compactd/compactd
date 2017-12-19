@@ -17,7 +17,7 @@ interface FuzzySelectorProps {
   library: LibraryState;
 }
 
-type  LibraryContent = Artist | Album | Track;
+type  LibraryContent = string;
 
 const ContentOmnibox = Omnibox.ofType<LibraryContent>();
 @HotkeysTarget
@@ -66,20 +66,18 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
     </Hotkeys>)
   }
   private renderLibraryContent ({ handleClick, isActive, item }: ISelectItemRendererProps<LibraryContent>) {
-    if (item.album) {
-      const track = item as Track;
+    // if (this.isTrack(item)) {
 
-      return <MenuItem className={isActive ? 'pt-active' : ''} iconName="music" text={track.name} onClick={handleClick} key={item._id}/>
+    //   return <MenuItem className={isActive ? 'pt-active' : ''} iconName="music" text={track.name} onClick={handleClick} key={item._id}/>
+    // }
+    if (this.isAlbum(item)) {
+      return <AlbumComponent id={item} active={isActive} layout="compact" onClick={handleClick as any} key={item} />;
     }
-    if (item.artist) {
-      const album = item as Album;
-      return <AlbumComponent id={album._id} active={isActive} layout="compact" onClick={handleClick as any} key={item._id} />;
-    }
-    return <ArtistComponent id={item._id} active={isActive} layout="compact" onClick={handleClick as any} key={item._id} />;
+    return <ArtistComponent id={item} active={isActive} layout="compact" onClick={handleClick as any} key={item} />;
 
   }
   private filterLibraryContent (query: string, items: LibraryContent[]) {
-    return filter(items, query, {key: 'name'});
+    return filter(items, query).slice(0, 15);
   }
   componentDidMount () {
     this.props.actions.fetchAllAlbums();
@@ -89,28 +87,34 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
   handleItemSelect (item: LibraryContent, event: React.SyntheticEvent<HTMLElement>) {
     const { history } = this.context.router;
     this.handleClose();
-    if (item.album) {
-      const track = item as Track;
+    if (this.isTrack(item)) {
       
-      this.props.actions.replacePlayerStack([track.album, trackURI(track._id).number]);
+      this.props.actions.replacePlayerStack([item, trackURI(item).number]);
       return
     }
-    if (item.artist) {
-      const album = item as Album;
+    if (this.isAlbum(item)) {
 
       history.push(`/library/${
-        albumURI(item._id).artist
+        albumURI(item).artist
       }/${
-        albumURI(item._id).name
+        albumURI(item).name
       }`);
       return
     }
 
     history.push(`/library/${
-      artistURI(item._id).name
+      artistURI(item).name
     }`);
 
   }
+  private isAlbum(item: string) {
+    return item.split('/').length === 3;
+  }
+
+  private isTrack(item: string) {
+    return item.split('/').length === 5;
+  }
+
   handleClose () {
     this.setState({isOpen: false});
   }
@@ -120,7 +124,7 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
     return <div className="fuzzy-selector">
       <ContentOmnibox
         resetOnSelect={true}
-        itemRenderer={this.renderLibraryContent}
+        itemRenderer={this.renderLibraryContent.bind(this)}
         isOpen={this.state.isOpen}
         items={items}
         noResults={<MenuItem disabled={true} text="No results." />}

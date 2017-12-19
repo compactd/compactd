@@ -213,11 +213,11 @@ function fetchAllAlbums () {
 function fetchAllTracks () {
   return Promise.resolve().then(() => {
     const tracks = new PouchDB<Defs.Track>('tracks');
-    return tracks.allDocs({include_docs: true});
+    return tracks.allDocs({include_docs: false});
   }).then((docs) => {
     return {
       type: RESOLVE_ALL_TRACKS,
-      tracks: docs.rows.map(res => res.doc)
+      tracks: docs.rows.map(res => res.id)
     }
   }).catch((err) => {
     Toaster.error(err);
