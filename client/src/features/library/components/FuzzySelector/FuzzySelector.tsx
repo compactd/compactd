@@ -120,7 +120,7 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
   }
   render (): JSX.Element {
     const {actions, library} = this.props;
-    const items = [].concat(library.albums).concat(library.artists).concat(library.tracks);
+    const items = [].concat(library.albums).concat(library.artists);
     return <div className="fuzzy-selector">
       <ContentOmnibox
         resetOnSelect={true}
