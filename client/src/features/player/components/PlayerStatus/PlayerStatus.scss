@@ -3,6 +3,7 @@ div.player-status{
   color: #fff;
   height: 4em;
   display: flex;
+  transition: all 250ms ease;
   div.player-track {
     // height: 3em;
     display: inline-block;
@@ -10,6 +11,7 @@ div.player-status{
     margin-left: 2em;
   }
   div.player-controls  {
+    transition: all 250ms ease;
     height: 4em;
     display: inline-block;
     /* vertical-align: middle; */
@@ -92,11 +94,13 @@ div.player-status{
 }
 
 div.player-status.expanded {
+  transition: all 250ms ease;
   height: 8em;
   display: flex;
   div.player-track {
   }
   div.player-controls  {
+    transition: all 250ms ease;
     height: 8em;
     display: inline-block;
     /* vertical-align: middle; */
@@ -113,9 +117,11 @@ div.player-status.expanded {
 
   .player-audio {
       margin-top: 0.3em;
+      transition: all 250ms ease;
   }
   .player-actions {
     margin-top:  3px;
+    transition: all 250ms ease;
   } 
   div.player-actions > div {
     vertical-align: middle;

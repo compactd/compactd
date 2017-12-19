@@ -19,13 +19,14 @@ const MAX_VOLUME = 20;
 
 @HotkeysTarget
 export class PlayerStatus extends React.Component<PlayerStatusProps, {
-  volume: number
+  volume: number,
+  waveform: boolean,
 }>{
   private player: PlayerAudio;
   private trackTimeDiv: HTMLSpanElement;
   constructor () {
     super();
-    this.state = {volume: MAX_VOLUME};
+    this.state = {volume: MAX_VOLUME, waveform: false};
   }
   renderHotkeys () {
     const {actions, player} = this.props;
@@ -84,6 +85,16 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
         this.handleVolumeChange(Math.max(this.state.volume - 1, 0));
       }}
      />
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="t"
+      label="Toggle wavesurfer"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        this.setState({waveform: !this.state.waveform});
+      }}
+     />
    </Hotkeys> 
   }
   handlePlaybackButton () {
@@ -129,7 +140,9 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
         <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>
       </div> : <div className="player-name">
       </div>
-    return <div className="player-status expanded">
+    return <div className={classnames("player-status", {
+      expanded: this.state.waveform
+    })}>
       <div className="player-controls">
         <span className={classnames("pt-icon-step-backward play-previous", {
           enabled: player.prevStack.length > 0
@@ -146,7 +159,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       <div className="player-track">
         {content}
         <PlayerAudio source={player.stack[0] ? player.stack[0]._id : undefined}
-          playing={player.playing} onEnd={this.onAudioEnd.bind(this)} expanded={true}
+          playing={player.playing} onEnd={this.onAudioEnd.bind(this)} expanded={this.state.waveform}
           timeUpdate={(time) => {
               window.requestAnimationFrame(() => {
                 if (track && this.trackTimeDiv) {
