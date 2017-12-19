@@ -129,7 +129,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
         <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>
       </div> : <div className="player-name">
       </div>
-    return <div className="player-status">
+    return <div className="player-status expanded">
       <div className="player-controls">
         <span className={classnames("pt-icon-step-backward play-previous", {
           enabled: player.prevStack.length > 0
@@ -146,7 +146,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       <div className="player-track">
         {content}
         <PlayerAudio source={player.stack[0] ? player.stack[0]._id : undefined}
-          playing={player.playing} onEnd={this.onAudioEnd.bind(this)}
+          playing={player.playing} onEnd={this.onAudioEnd.bind(this)} expanded={true}
           timeUpdate={(time) => {
               window.requestAnimationFrame(() => {
                 if (track && this.trackTimeDiv) {

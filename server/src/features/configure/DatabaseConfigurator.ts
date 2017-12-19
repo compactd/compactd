@@ -2,8 +2,6 @@ import fetch, {Response} from 'node-fetch';
 import * as assert from 'assert';
 import {Message} from './Configure.d';
 import {ChildProcess, fork} from 'child_process';
-import {dbs} from './dbs';
-import {createValidator} from '../validators';
 import {baseConfig} from './baseConfig';
 import PouchDB from '../../database';
 import * as Analytics from '../analytics/Analytics';

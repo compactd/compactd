@@ -90,3 +90,39 @@ div.player-status{
 
   span.pt-slider-handle {border-radius: 420px;height: 10px;width: 10px;/* top: 2px; */}
 }
+
+div.player-status.expanded {
+  height: 8em;
+  display: flex;
+  div.player-track {
+  }
+  div.player-controls  {
+    height: 8em;
+    display: inline-block;
+    /* vertical-align: middle; */
+    line-height: 8em;
+    margin: 0 1em;
+  }
+
+  div.player-controls > span {
+  }
+
+  .player-name {
+      margin-top: 1.5em;
+  }
+
+  .player-audio {
+      margin-top: 0.3em;
+  }
+  .player-actions {
+    margin-top:  3px;
+  } 
+  div.player-actions > div {
+    vertical-align: middle;
+  }
+  .logout-button {
+
+  }
+  
+  span.pt-slider-handle {border-radius: 420px;height: 10px;width: 10px;/* top: 2px; */}
+}
