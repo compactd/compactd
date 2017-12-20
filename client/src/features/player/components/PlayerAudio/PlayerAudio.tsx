@@ -152,8 +152,10 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       }
     }
     if (nextProps.expanded && !this.props.expanded) {
-      this.buildWaveform(null);
-      this.fetchWaveform(nextProps.source || this.props.source);
+      setTimeout(() => {
+        this.buildWaveform(null);
+        this.fetchWaveform(nextProps.source || this.props.source);
+      }, 250);
     }
     if (!nextProps.expanded && this.props.expanded) {
       if (this.props.source || nextProps.source) {
