@@ -47,8 +47,8 @@ async function fetchToken (source: string) {
 }
 
 export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
+  oldPos: number = 0;
   data: ArrayBuffer;
-  pSvg: SVGSVGElement;
   private svg: SVGSVGElement;
   private audio: HTMLAudioElement;
   private range: HTMLDivElement;
@@ -58,7 +58,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     (window as any).boombox = this.audio = new Audio();
   }
   updateRange () {
-    if (this.svg && this.pSvg) {
+    if (this.svg) {
       this.updateSvgWidths();
       return;
     }
@@ -108,17 +108,18 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
   }
 
   handleRangeClick (event: any) {
-    const {left, width} = (this.svg && this.pSvg) ? this.svg.parentElement.getBoundingClientRect() : this.range.getBoundingClientRect();
+    const {left, width} = (this.svg) ? this.svg.parentElement.getBoundingClientRect() : this.range.getBoundingClientRect();
     const x = event.nativeEvent.x;
     this.audio.currentTime = (x - left) / (width) * this.audio.duration;
   }
   fetchWaveform (src: string) {
+    this.buildWaveform(null);
     return Session.fetch(`/api/${src.replace(/^library/, 'tracks')}/waveform`).then((data) => {
       return data.arrayBuffer();
     }).then((data) => {
       this.data = data;
-      this.updateSvgWidths();
       this.buildWaveform(data);
+      this.updateSvgWidths();
     });
   }
   componentWillReceiveProps (nextProps: PlayerAudioProps) {
@@ -156,6 +157,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     }
     if (!nextProps.expanded && this.props.expanded) {
       if (this.props.source || nextProps.source) {
+        this.buildWaveform(null);
         this.showAndUpdateRange();
       }
     }
@@ -176,7 +178,6 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
   renderWaveform (): JSX.Element {
     return <div className="waveforms">
       <svg className="waveform" onClick={this.handleRangeClick.bind(this)} ref={(ref) => this.svg = ref} height="50px" ></svg>
-      <svg className="waveform" onClick={this.handleRangeClick.bind(this)} ref={(ref) => this.pSvg = ref} height="50px"   width="0px"></svg>
     </div>;
   }
   renderContent (): JSX.Element {
@@ -188,26 +189,58 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
   updateSvgWidths () {
     if (!this.svg) return;
     const {width} = this.svg.parentElement.getBoundingClientRect();
-    
-    this.svg.setAttribute("width", width + "px");
-    const duration = this.audio.duration;
-    // const {width} = this.range.getBoundingClientRect();
-    const current = this.audio.currentTime;
-    const pos = (current || 0) / (duration || 1);
 
-    this.pSvg.setAttribute("width", pos * width + "px");
+    const current = this.audio.currentTime;
+    const duration = this.audio.duration;
+
+    const pos = (current || 0) / (duration || 1);
+    const self = this;
+
+    const anim = 200 * 3 * duration / width;
+    
+    if (pos >= this.oldPos) {
+      d3.select(this.svg).selectAll('rect.bar.top').filter(function (g, d) {
+        const x  = +(this as HTMLElement).getAttribute('x');
+        const c = x / width
+        return  c <= pos && c >= self.oldPos;
+      }).style('fill', 'rgba(75, 154, 197, 0.7)').style('stroke', 'rgba(75, 154, 197, 0.7)');
+      
+      d3.select(this.svg).selectAll('rect.bar.bot').filter(function (g, d) {
+        const x  = +(this as HTMLElement).getAttribute('x');
+        const c = x / width
+        return  c <= pos && c >= self.oldPos;
+      }).style('fill', 'rgba(19, 127, 189, 0.5)').style('stroke', 'rgba(19, 127, 189, 0.5)');
+    } else {
+      d3.select(this.svg).selectAll('rect.bar.top').filter(function (g, d) {
+        const x  = +(this as HTMLElement).getAttribute('x');
+        const c = x / width
+        return  c > pos && c < self.oldPos;
+      }).style('fill', null).style('stroke', null);
+  
+      d3.select(this.svg).selectAll('rect.bar.bot').filter(function (g, d) {
+        const x  = +(this as HTMLElement).getAttribute('x');
+        const c = x / width
+        return  c > pos && c < self.oldPos;
+      }).style('fill', null).style('stroke', null);
+    }
+
+    this.oldPos = pos;
+
+    // this.pSvg.setAttribute("width", pos * width + "px");
   }
   buildWaveform (wf: ArrayBuffer, svge?: SVGSVGElement, barClass: string = "") {
     if (!this.svg) return;
     if (!svge) {
       this.buildWaveform(wf, this.svg);
-      this.buildWaveform(wf, this.pSvg, "progress");
+      return;
     }
     const transition = d3.transition().duration(500).ease();
     const svg = d3.select(svge);
     const x = d3.scaleLinear()
     const y = d3.scaleLinear();
-    const {height, width} = this.svg.getBoundingClientRect();
+    const {width} = this.svg.parentElement.getBoundingClientRect();
+    this.svg.setAttribute("width", `${width}`);
+    const {height} = this.svg.getBoundingClientRect();
     const gap = 1;
     const relativeGap = gap / width;
     if (!wf) {
@@ -243,7 +276,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
 
 
       g.append("rect")
-        .attr("class", cn("bar", barClass))
+        .attr("class", cn("bar", "top", barClass))
         .attr("width", barWidth)
         .attr("y", topHeight)
         .attr("x", (val, index) => x(index) * width)
@@ -264,8 +297,10 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
         .transition().duration(ANIMATION_DURATION).delay((d, i) => {
           return i * delayPerBar + 150;
         })
-        .attr("height", (val, index) => y(val) * botHeight)
+        .attr("height", (val, index) => y(val) * botHeight);
 
+    this.oldPos = 0;
+    this.updateSvgWidths();
   }
 
   render (): JSX.Element {
