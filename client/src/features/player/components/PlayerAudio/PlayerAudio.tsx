@@ -4,6 +4,7 @@ import {AudioSource} from 'definitions';
 import Session from 'app/session';
 import * as d3 from 'd3';
 import * as cn from 'classnames';
+import 'd3-transition';
 const debounce = require('debounce');
 
 const  WaveformData = require('waveform-data');
@@ -75,10 +76,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
   }
   componentDidMount () {
     this.audio.onloadedmetadata = (event) => {
-      if (this.range) {
-        this.range.style.display = 'block';
-        this.updateRange();
-      }
+      this.showAndUpdateRange();
     }
     this.audio.onended = (event) => {
       if (this.props.onEnd) {
@@ -102,6 +100,13 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       }, 420))
 
   }
+  private showAndUpdateRange() {
+    if (this.range) {
+      this.range.style.display = 'block';
+      this.updateRange();
+    }
+  }
+
   handleRangeClick (event: any) {
     const {left, width} = (this.svg && this.pSvg) ? this.svg.parentElement.getBoundingClientRect() : this.range.getBoundingClientRect();
     const x = event.nativeEvent.x;
@@ -124,6 +129,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       return;
     }
     if (nextProps.source !== this.props.source) {
+      this.buildWaveform(null);
       fetchToken(nextProps.source).then((token) => {
         this.audio.src = '/api/boombox/stream/' + token;
         this.audio.currentTime = 0;
@@ -145,11 +151,12 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       }
     }
     if (nextProps.expanded && !this.props.expanded) {
+      this.buildWaveform(null);
       this.fetchWaveform(nextProps.source || this.props.source);
     }
     if (!nextProps.expanded && this.props.expanded) {
       if (this.props.source || nextProps.source) {
-
+        this.showAndUpdateRange();
       }
     }
 
@@ -196,25 +203,37 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       this.buildWaveform(wf, this.svg);
       this.buildWaveform(wf, this.pSvg, "progress");
     }
+    const transition = d3.transition().duration(500).ease();
     const svg = d3.select(svge);
     const x = d3.scaleLinear()
     const y = d3.scaleLinear();
     const {height, width} = this.svg.getBoundingClientRect();
     const gap = 1;
     const relativeGap = gap / width;
-    const data = WaveformData.create(wf).resample({width: width / 2});
-    const barWidth = width / data.adapter.length - gap;
+    if (!wf) {
+      svg.selectAll('*').remove();
+      return;
+    }
+    const data = wf? WaveformData.create(wf).resample({width: width / 3}) :  null;
+    const samples = data? data.adapter.length : width / 3;
+
+    const barWidth = width / samples - gap;
 
     const middleGap = 1
     const topHeight = height * 2/3;
     const botHeight = height * 1/3 - middleGap;
-    
-    x.domain([0, data.adapter.length]);
+    const ANIMATION_LENGTH = 500;
+    const ANIMATION_DURATION = 250;
 
-    y.domain([0, d3.max<number>(data.max)]);
+    const delayPerBar = ANIMATION_LENGTH / samples;
+    
+    x.domain([0, samples]);
+
+    y.domain([0, d3.max<number>(data ? data.max : [20])]);
     svg.selectAll('*').remove();
-    const g = svg.append("g").selectAll('.bar')
-      .data(data.max as number[])
+    const g = svg.append("g")
+      .selectAll('g')
+      .data(data ? data.max as number[] : new Array(samples).fill(5))
       .enter()
       .append("g")
         .attr("x", (val, index) => x(index) * width)
@@ -225,16 +244,27 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
 
       g.append("rect")
         .attr("class", cn("bar", barClass))
+        .attr("width", barWidth)
+        .attr("y", topHeight)
         .attr("x", (val, index) => x(index) * width)
-        .attr("y", (val, index) => (1 - y(val)) * topHeight)
+        .attr("height", 1)
+        .transition().duration(ANIMATION_DURATION).delay((d, i) => {
+          return i * delayPerBar;
+        })
+        .attr("y", (val, index) => 
+          (1 - y(val)) * topHeight
+        )
         .attr("height", (val, index) => y(val) * topHeight)
-        .attr("width", barWidth);
       g.append("rect")
         .attr("class", cn("bar", "bot", barClass))
         .attr("x", (val, index) => x(index) * width)
         .attr("y", (val, index) => topHeight + middleGap)
+        .attr("height", 1)
+        .attr("width", barWidth)
+        .transition().duration(ANIMATION_DURATION).delay((d, i) => {
+          return i * delayPerBar + 150;
+        })
         .attr("height", (val, index) => y(val) * botHeight)
-        .attr("width", barWidth);
 
   }
 

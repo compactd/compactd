@@ -14,7 +14,7 @@ const WaveformData = require('waveform-data');
 const hashCash: {[name: string]: string} = {};
 
 function waveformCLI(mediaFile: string, imageFile: string) {
-  return `audiowaveform -i '${mediaFile}' -o '${imageFile}'`;
+  return `audiowaveform -i '${mediaFile}' -b 8 -z 256 -o '${imageFile}'`;
 }
  
 function generateWaveform(mediaFile: string, imagePath: string) {
