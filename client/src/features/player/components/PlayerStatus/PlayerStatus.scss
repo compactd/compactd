@@ -91,6 +91,25 @@ div.player-status{
   }
 
   span.pt-slider-handle {border-radius: 420px;height: 10px;width: 10px;/* top: 2px; */}
+
+  div.toggle-expand {
+    position: absolute;
+    top: 42px;
+    right: 16%;
+    z-index: 99;
+    color: black;
+    background-color: white;
+    padding: 6px 7px 4px 7px;
+    border-radius: 50px;
+    box-shadow: 0 0 3px black;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all ease 200ms;
+    &:hover {
+      opacity: 1;
+      transition: all ease 200ms;
+    }
+  }
 }
 
 div.player-status.expanded {
@@ -131,4 +150,9 @@ div.player-status.expanded {
   }
   
   span.pt-slider-handle {border-radius: 420px;height: 10px;width: 10px;/* top: 2px; */}
+  div.toggle-expand {
+    top: 98px;
+    transform: rotateZ(180deg);
+    transition: all 200ms ease;
+  }
 }
