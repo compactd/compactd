@@ -1,4 +1,6 @@
-# Compactd
+# Compactd 
+
+[![npm version](https://badge.fury.io/js/compactd.svg)](https://badge.fury.io/js/compactd) [![](https://tokei.rs/b1/github/compactd/compactd)](https://github.com/compactd/compactd).
 
 (pronounce compact-D)
 
@@ -7,6 +9,7 @@
 </a>
 
 <a href="https://liberapay.com/compactd/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
+
 
 Compactd aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
