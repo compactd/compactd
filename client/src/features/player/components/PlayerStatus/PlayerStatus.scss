@@ -46,6 +46,7 @@ div.player-status{
     margin-right: 28px;
   }
   .player-name {
+    transition: all 250ms ease;
       margin-top: 1.1em;
   }
 
@@ -131,7 +132,8 @@ div.player-status.expanded {
   }
 
   .player-name {
-      margin-top: 1.5em;
+    transition: all 250ms ease;
+    margin-top: 1.5em;
   }
 
   .player-audio {
