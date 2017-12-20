@@ -1,5 +1,7 @@
 # Compactd
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/compactd/compactd.svg)](https://greenkeeper.io/)
+
 (pronounce compact-D)
 
 <a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/Fwnbp4ySbyNYR6BaX1f9y4zQ/compactd/compactd'>
