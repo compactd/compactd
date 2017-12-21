@@ -257,14 +257,15 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     const middleGap = 1
     const topHeight = height * 2/3;
     const botHeight = height * 1/3 - middleGap;
-    const ANIMATION_LENGTH = 500;
-    const ANIMATION_DURATION = 250;
+    const ANIMATION_LENGTH = 400;
+    const ANIMATION_DURATION = 300;
 
     const delayPerBar = ANIMATION_LENGTH / samples;
     
     x.domain([0, samples]);
+    const max = d3.max<number>(data.max);
 
-    y.domain([0, d3.max<number>(data ? data.max : [20])]);
+    y.domain([-max / 50, max]);
     svg.selectAll('*').remove();
     const g = svg.append("g")
       .selectAll('g')
