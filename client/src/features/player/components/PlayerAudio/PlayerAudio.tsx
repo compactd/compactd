@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {PlayerActions} from '../../actions.d';
-import {AudioSource} from 'definitions';
+import AudioSource from 'models/AudioSource';
 import Session from 'app/session';
 import * as d3 from 'd3';
 import * as cn from 'classnames';
@@ -26,24 +26,6 @@ async function report (source: string) {
     method: 'POST'
   }));
   return;
-}
-async function fetchToken (source: string) {
-  if (tokens[source]) return tokens[source];
-
-  const {ok, token} = await (await fetch('/api/boombox/direct', {
-    method: 'POST',
-    body: JSON.stringify({track: source}),
-    headers: Session.headers({
-      'Content-Type': 'application/json'
-    })
-  })).json();
-
-  if (ok) {
-    tokens[source] = token;
-    return token;
-  } else {
-    throw new Error();
-  }
 }
 
 export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
@@ -131,17 +113,17 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     }
     if (nextProps.source !== this.props.source) {
       this.buildWaveform(null);
-      fetchToken(nextProps.source).then((token) => {
-        this.audio.src = '/api/boombox/stream/' + token;
+      nextProps.source.fetch().then((url) => {
+        this.audio.src = url;
         this.audio.currentTime = 0;
         if (nextProps.playing) {
           this.audio.play();
         }
         this.updateSvgWidths();
         
-        return this.fetchWaveform(nextProps.source);
+        return this.fetchWaveform(nextProps.source.getTrack());
       }).then(() => {
-        report(nextProps.source);
+        report(nextProps.source.getTrack());
       });
     }
     if (nextProps.playing !== this.props.playing && nextProps.source) {
@@ -154,7 +136,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     if (nextProps.expanded && !this.props.expanded) {
       setTimeout(() => {
         this.buildWaveform(null);
-        this.fetchWaveform(nextProps.source || this.props.source);
+        this.fetchWaveform((nextProps.source || this.props.source).getTrack());
       }, 250);
     }
     if (!nextProps.expanded && this.props.expanded) {
@@ -162,6 +144,9 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
         this.buildWaveform(null);
         this.showAndUpdateRange();
       }
+    }
+    if (nextProps.nextSource) {
+      nextProps.nextSource.prefetch();
     }
 
   }

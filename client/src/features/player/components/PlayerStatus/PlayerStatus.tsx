@@ -7,6 +7,7 @@ import SettingsLink from '../../../settings/components/SettingsLink';
 import {HotkeysTarget, Hotkey, Hotkeys, Slider} from '@blueprintjs/core';
 import session from 'app/session';
 import * as classnames from 'classnames';
+import XHRSource from 'models/XHRSource';
 
 require('./PlayerStatus.scss');
 
@@ -133,6 +134,9 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
 
     const duration = date.toISOString().substr(14, 5);
 
+    const source = XHRSource.from(player.stack[0] ? player.stack[0]._id : undefined);
+    const nextSource = XHRSource.from(player.stack[1] ? player.stack[1]._id : undefined);
+
     const content = player.stack.length > 0 ?
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
@@ -158,7 +162,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       </div>
       <div className="player-track">
         {content}
-        <PlayerAudio source={player.stack[0] ? player.stack[0]._id : undefined}
+        <PlayerAudio source={source}
           playing={player.playing} onEnd={this.onAudioEnd.bind(this)} expanded={this.state.waveform}
           timeUpdate={(time) => {
               window.requestAnimationFrame(() => {
@@ -170,7 +174,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
               })
           }}
           ref={(ref) => this.player = ref}
-          nextSource={player.stack[1] ? player.stack[1]._id : undefined} />
+          nextSource={nextSource} />
       </div>
       <div className="player-actions">
         <Slider renderLabel={(val: number) => null} max={MAX_VOLUME} value={this.state.volume} onChange={this.handleVolumeChange.bind(this)}/>
