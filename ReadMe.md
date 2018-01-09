@@ -27,6 +27,7 @@ music onto your server just like headphones does.
  - Artist and album downloading
  - Gazelle-based trackers support
  - Deluge torrent client supported
+ - Waveform vizualisation 
 
 ## Stack
 
@@ -38,6 +39,7 @@ Redux, React, PouchDB, Webpack, Typescript, Socket.io...
  - CouchDB v2. You can install it following [this guide](https://github.com/apache/couchdb/blob/master/INSTALL.Unix.md) for linux . Windows is quite straightforward, on Debian, you will need to build it from source following the tutorial. Just make sure you don't configure anything or any password.
  - Latest Ffmpeg. Installation varies from OS, you might wanna follow [this guide](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg)
  - deluge with deluge-web are optionnal (for downloading new content)
+ - [audiowaveform](https://github.com/bbc/audiowaveform) is optionnal, only  if you  want to use the waveform feature. Ubuntu, Arch, and Mac OS are straightforward, debian requires building from source; Windows doesn't work.
  
 ## Installation
 
