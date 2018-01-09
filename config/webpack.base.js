@@ -23,6 +23,7 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".json", ".scss"],
     alias: {
+      models: path.join(__dirname, '../client/src/models'),
       features: path.join(__dirname, '../client/src/features'),
       app: path.join(__dirname, '../client/src/app'),
       components: path.join(__dirname, '../client/src/components'),
