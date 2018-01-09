@@ -109,8 +109,8 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     const top = div.scrollTop;
     const height = div.getBoundingClientRect().height;
     const childHeight = 80;
-    const length = (height - height % childHeight) / childHeight;
-    const start = (top - top % childHeight) / childHeight;
+    const length = Math.ceil(height/ childHeight);
+    const start = Math.floor(top / childHeight);
     const end = start + length;
     
     return [start, end];
