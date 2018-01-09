@@ -65,7 +65,7 @@ export default class Artwork {
       });
     });
   }
-  public static getInstance (pouch?: typeof PouchDB) {
+  public static getInstance (pouch = PouchDB) {
     if (!Artwork.sInstance) {
       if (!pouch) {
         throw new Error("Missing pouch parameter for initialization");
