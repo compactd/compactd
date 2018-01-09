@@ -123,7 +123,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     });
   }
   componentWillReceiveProps (nextProps: PlayerAudioProps) {
-    if (!nextProps.source) {
+    if (!nextProps.source && this.range) {
       this.range.style.display = 'none';
       this.audio.src = '';
       this.audio.pause();
@@ -153,6 +153,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     }
     if (nextProps.expanded && !this.props.expanded) {
       setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
         this.buildWaveform(null);
         this.fetchWaveform(nextProps.source || this.props.source);
       }, 250);
@@ -162,6 +163,9 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
         this.buildWaveform(null);
         this.showAndUpdateRange();
       }
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 250);
     }
 
   }
@@ -257,8 +261,8 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
     const middleGap = 1
     const topHeight = height * 2/3;
     const botHeight = height * 1/3 - middleGap;
-    const ANIMATION_LENGTH = 400;
-    const ANIMATION_DURATION = 300;
+    const ANIMATION_LENGTH = 250;
+    const ANIMATION_DURATION = 250;
 
     const delayPerBar = ANIMATION_LENGTH / samples;
     
