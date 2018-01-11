@@ -12,8 +12,38 @@ import * as md5 from 'md5';
 import {mainStory} from 'storyboard';
 import {SchedulerFunc} from '../scheduler/Scheduler';
 import * as cheerio from 'cheerio';
+const cv = require('opencv');
+const smartcrop = require('smartcrop-sharp');
 
 const base = 'https://www.discogs.com';
+
+function faceDetect(input: Buffer) {
+  return new Promise(function(resolve, reject) {
+    cv.readImage(input, function(err: any, image: any) {
+      if (err) return reject(err);
+      image.detectObject(cv.FACE_CASCADE, {}, function(err: any, faces: any){
+        if (err) return reject(err);
+        resolve(faces.map(function(face: any){
+          return {
+            x: face.x,
+            y: face.y,
+            width: face.width,
+            height: face.height,
+            weight: 1.0
+          };
+        }));
+      });
+    });
+  });
+}
+
+async function smartCrop (image: Buffer, width: number, height = width): Promise<Buffer> {
+  const boost = await faceDetect(image);
+  const {topCrop} = await smartcrop.crop(image, {width, height, boost});
+  return sharp(image)
+      .extract({width: topCrop.width, height: topCrop.height, left: topCrop.x, top: topCrop.y})
+      .resize(width, height).toBuffer();
+}
 
 async function getBestSearchResult (url: string, title: string) {
   const res = await fetch(url);
@@ -103,16 +133,22 @@ async function saveArtwork (id: string, url: string) {
   } finally {
     let doc = await artworks.get(docId);
     const buffer = await (await fetch(url)).buffer();
+    let cropped;
+    try {
+      cropped = await smartCrop(buffer, 600);
+    } catch (err) {
+      mainStory.warn('aquarelle', `Unable to smartcrop ${id} from ${url}`, {attach: err});
+      cropped = buffer;
+    }
 
-    const image = sharp(buffer);
-
-    const metadata = await image.metadata();
+    const metadata = await sharp(cropped).metadata();
     const mimeType = mime.getType(metadata.format);
-    await artworks.putAttachment(docId, 'hq', doc._rev, buffer, mimeType);
+    
+    await artworks.putAttachment(docId, 'hq', doc._rev, cropped, mimeType);
     doc = await artworks.get(docId);
-    await artworks.putAttachment(docId, 'large', doc._rev, await image.resize(300).toBuffer(), mimeType);
+    await artworks.putAttachment(docId, 'large', doc._rev, await sharp(cropped).resize(300).toBuffer(), mimeType);
     doc = await artworks.get(docId);
-    await artworks.putAttachment(docId, 'small', doc._rev, await sharp(buffer).resize(64).toBuffer(), mimeType);
+    await artworks.putAttachment(docId, 'small', doc._rev, await sharp(cropped).resize(64).toBuffer(), mimeType);
   }
 }
 
