@@ -43,6 +43,16 @@ async function getHQImage (url: string) {
   return img.attribs['src'];
 }
 
+async function getEntName (ent: Artist|Album)  {
+  if (ent.artist) {
+    const album = <Album>ent;
+    const artists = new PouchDB<Artist>('artists');
+    const artist = await artists.get(album.artist);
+    return `${artist.name} - ${ent.name}`;
+  }
+  return ent.name;
+}
+
 export async function downloadHQCover (ent: Artist|Album) {
   const artworks = new PouchDB('artworks');
   const docId = 'artworks/' + ent._id;
@@ -58,7 +68,7 @@ export async function downloadHQCover (ent: Artist|Album) {
   
   mainStory.debug('aquarelle', `Fetching artwork for ${ent._id}`);
 
-  const url = `${base}/search/?q=${encodeURIComponent(ent.name)}&type=${type}`;
+  const url = `${base}/search/?q=${encodeURIComponent(await getEntName(ent))}&type=${type}`;
 
   const id = await getBestSearchResult(url, ent.name);
 

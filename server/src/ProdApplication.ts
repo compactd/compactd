@@ -32,6 +32,7 @@ export class ProdApplication extends CompactdApplication {
       process.exit(1);
     }
 
+    setupScheduler();
   }
   route () {
     super.route();
