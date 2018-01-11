@@ -10,12 +10,23 @@ async function getIDs<T> (pouch: typeof PouchDB, db: string): Promise<[PouchDB.D
   return [data, ids];
 }
 
+function tryRemoveArtwork(pouch: typeof PouchDB, id: string) {
+  return async () => {
+    const artworks = new pouch('artworks');
+    
+    try {
+      const doc = await artworks.get('artworks/' + id);
+      await artworks.remove(doc);
+    } catch (ignored) {}
+  }
+}
 
 export default async function clean (pouch: typeof PouchDB, dryRun = false) {
   let didSomething = false;
 
   const [files, filesId]   = await getIDs(pouch, 'files');
   const [tracks, tracksId]  = await getIDs(pouch, 'tracks');
+
 
   const widowTracks = tracksId.filter((track) => {
     return !filesId.find((file) => file.id.startsWith(`${track.id}/`));
@@ -46,7 +57,7 @@ export default async function clean (pouch: typeof PouchDB, dryRun = false) {
 
   if (!dryRun) {
     await Promise.all(widowAlbums.map((doc) => {
-      return albums.remove(doc.id, doc.rev);
+      return albums.remove(doc.id, doc.rev).then(tryRemoveArtwork(pouch, doc.id));
     }));
   }
 
@@ -66,7 +77,7 @@ export default async function clean (pouch: typeof PouchDB, dryRun = false) {
   
   if (!dryRun) {
     await Promise.all(widowArtists.map((doc) => {
-      return artists.remove(doc.id, doc.rev);
+      return artists.remove(doc.id, doc.rev).then(tryRemoveArtwork(pouch, doc.id));
     }));
   }
   if (didSomething) {
