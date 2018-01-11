@@ -6,7 +6,7 @@ const sbConfig = require('storyboard').config;
 if(process.argv.includes('--verbose')  || process.env.STORYBOARD) {
   require('storyboard-preset-console');
   if (!process.env.STORYBOARD) {
-    sbConfig({filter: '*:INFO -scanner'});
+    sbConfig({filter: '*:DEBUG -scanner'});
   }
 }
 
