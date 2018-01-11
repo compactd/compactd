@@ -58,10 +58,7 @@ export class CompactdApplication {
         ...headers,
       }, req.method !== 'GET' ? {body: JSON.stringify(req.body)} : {});
 
-      mainStory.info('http', `${req.method} ${req.url} -> http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`, {
-        attach: opts,
-        attachLevel: 'trace'
-      });
+      mainStory.info('http', `${req.method} ${req.url} -> http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`);
 
       const remoteReq = request(opts).pipe(res);
     });
