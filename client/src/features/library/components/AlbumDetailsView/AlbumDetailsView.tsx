@@ -7,7 +7,7 @@ import {albumURI, Track} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
 import Artwork from 'app/Artwork';
-import { Tab2, Tabs2, Spinner, HotkeysTarget, Hotkeys, Hotkey } from "@blueprintjs/core";
+import { Tab2, Tabs2, Spinner, HotkeysTarget, Hotkeys, Hotkey, Popover, MenuItem, Menu, MenuDivider, Position } from "@blueprintjs/core";
 import { AlbumComponent } from 'components';
 
 require('./AlbumDetailsView.scss');
@@ -119,6 +119,20 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     return <div className="album-details-view">
       <div className="album-header">
         <AlbumComponent id={id} layout="large" subtitle={['artist', 'year']}/>
+        <div className="albums-actions">
+          <Popover content={
+            <Menu>
+              <MenuDivider title="Edit" />
+              <MenuItem iconName="media" text="Edit Artwork"/>
+              <MenuItem iconName="text-highlight" text="Change title case"/>
+              <MenuDivider title="Playback" />
+              <MenuItem iconName="play" text="Listen to this album"/>
+              <MenuItem iconName="random" text="Shuffle"/>
+            </Menu>
+          } position={Position.BOTTOM_RIGHT}>
+            <span className="pt-icon-edit"></span>
+          </Popover>
+        </div>
       </div>
       <div className="album-content">
         <ScrollableDiv offset={0} binding={album}>

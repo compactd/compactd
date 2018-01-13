@@ -6,7 +6,12 @@ div.album-details-loader {
 
 }
 div.album-details-view{
-
+  .albums-actions {
+    float: right;
+    margin: 1em;
+    color: #a6a0b3;
+    cursor: pointer;
+  }
   div.album-header > div {
     display:  inline-block;
     vertical-align: top;
