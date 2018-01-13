@@ -4,7 +4,7 @@ import Map from './Map';
 
 export default class XHRSource extends AudioSource {
   private static sources: Map<XHRSource> = {};
-  private tokens: Map<string>;
+  private tokens: Map<string> = {};
   private prefetched: boolean;
   private track: string;
   public static readonly STREAM_ENDPOINT =  '/api/boombox/stream/' ;
