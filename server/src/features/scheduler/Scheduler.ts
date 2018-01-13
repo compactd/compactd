@@ -35,15 +35,16 @@ export default class Scheduler {
   /**
    * Executes all given tasks until the executorKey has changed
    */
-  async execute(): Promise<void> {
-    const key = this.executorKey;
+  async execute(key = this.executorKey): Promise<void> {
+    if (this.queue.length > 0) {
+      const [func] = this.queue.splice(0, 1);
+      
+      try {
+        await func();
+      } catch (ignored) {}
 
-    for (let i in this.queue) {
-      const func = this.queue[i];
-      await func();
-      this.queue.splice(+i, 1);
-      if (this.executorKey != key) {
-        return;
+      if (this.executorKey == key) {
+        return await this.execute(key);
       }
     }
   }
