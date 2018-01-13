@@ -12,6 +12,7 @@ import * as md5 from 'md5';
 import {mainStory} from 'storyboard';
 import {SchedulerFunc} from '../scheduler/Scheduler';
 import * as cheerio from 'cheerio';
+import { promisify } from 'util';
 const cv = require('opencv');
 const smartcrop = require('smartcrop-sharp');
 
@@ -118,7 +119,7 @@ export async function downloadHQCover (ent: Artist|Album) {
   await saveArtwork(ent._id, hq);
 }
 
-async function saveArtwork (id: string, url: string) {
+export async function saveArtwork (id: string, url: string) {
   const artworks = new PouchDB('artworks');
   const docId = 'artworks/' + id;
 
@@ -132,7 +133,12 @@ async function saveArtwork (id: string, url: string) {
     });
   } finally {
     let doc = await artworks.get(docId);
-    const buffer = await (await fetch(url)).buffer();
+    let buffer: Buffer = null;
+    if (url.startsWith('/')) {
+      buffer = await promisify(fs.readFile)(url, {encoding: null});
+    } else {
+      buffer = await (await fetch(url)).buffer();
+    }
     let cropped;
     try {
       cropped = await smartCrop(buffer, 600);

@@ -1,0 +1,25 @@
+.result-row {
+  margin: 1em;
+  .header {
+    text-transform: uppercase;
+    margin-bottom: 1em;
+  }
+  .content {
+    .image-container {
+      display: inline-block;
+      position: relative;
+      margin: 0.2em;
+      cursor: pointer;
+      .image-info {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background-color: rgb(56, 53, 70);
+        color: #fff;
+        font-size: 12px;
+        padding: 0.1em;
+        border-radius: 2px;
+      }
+    }
+  }
+}
