@@ -1,9 +1,12 @@
 import LibraryItemComponent from "components/LibraryItemComponent";
 import * as React from "react";
+import { Spinner, Classes } from "@blueprintjs/core";
 
 require('./PlaceholderComponent.scss');
 
-export default class PlaceholderComponent extends LibraryItemComponent<{}, {}> {
+export default class PlaceholderComponent extends LibraryItemComponent<{
+  loading: boolean
+}, {}> {
   loadImage(id: string, img: HTMLImageElement): void {}
 
   loadItem(id: string): void {}
@@ -21,7 +24,7 @@ export default class PlaceholderComponent extends LibraryItemComponent<{}, {}> {
   }
   renderImage() {
     return <div className="placeholder-image">
-      <span className="pt-icon-plus"></span>
+      {this.props.loading ? <Spinner className={Classes.SMALL}/> : <span className="pt-icon-plus"></span>}
     </div>
   }
 

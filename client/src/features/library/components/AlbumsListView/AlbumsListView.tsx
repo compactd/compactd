@@ -3,13 +3,17 @@ import {LibraryActions} from '../../actions.d';
 import {LibraryState} from 'definitions';
 import {AlbumListItem} from '../AlbumListItem';
 import ScrollableDiv from 'components/ScrollableDiv';
-import {Album, albumURI, artistURI} from 'compactd-models';
+import {Album, albumURI, artistURI, DSAlbum, mapAlbumToParams} from 'compactd-models';
 import * as fuzzy from 'fuzzy';
 import {match} from 'react-router';
 import {BetterImage, ArtistComponent} from 'components';
 import {EventEmitter} from 'eventemitter3';
 import * as objectHash from 'object-hash';
 import PlaceholderComponent from 'components/PlaceholderComponent';
+import Map from 'models/Map';
+import Session from 'app/session';
+import Toaster from 'app/toaster';
+import DSAlbumComponent from 'components/DSAlbumComponent/DSAlbumComponent';
 
 require('./AlbumsListView.scss');
 
@@ -23,6 +27,8 @@ interface AlbumsListViewProps {
 
 export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   albumsFilter: string;
+  dsResults: Map<DSAlbum[]>;
+  displayResults: boolean;
 }>{
   private oldScroll: [number, number];
   private hash: string;
@@ -30,12 +36,34 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   private emitter: EventEmitter;
   constructor () {
     super();
-    this.state = {albumsFilter: ''};
+    this.state = {albumsFilter: '', dsResults: {}, displayResults: false};
     this.emitter = new EventEmitter();
   }
   handleAlbumsFilterChange (evt: Event) {
     const target = evt.target as HTMLInputElement;
     this.setState({albumsFilter: target.value});
+  }
+  handleSearchClick() {
+    this.setState({displayResults: true});
+
+    const {actions, library} = this.props;
+    const artistId = `library/${this.props.artist}`;
+
+    const artist = this.props.artist ?
+      (library.artistsById[artistId]
+        || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
+
+    const res = Session.fetch('/api/datasource/artists/' + artist.name).then((res) => res.json())
+    .then((res: any) => {
+      this.setState({
+        dsResults: {
+          ...this.state.dsResults,
+          [artist._id]: res.topAlbums
+        }
+      });
+    }).catch((err) => {
+      Toaster.error(err);
+    });
   }
   componentDidMount () {
     if (!this.props.artist) {
@@ -126,6 +154,8 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     const artist = this.props.artist ?
       (library.artistsById[artistId]
         || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
+    console.log(this.state);
+    const dsResults = this.state.dsResults[artistId];
 
     const albums = artist.albums.map((album, index) => {
       return  <AlbumListItem key={album}
@@ -135,7 +165,19 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
                 emitter={this.emitter}
                 index={index}
                 visible={index < this.oldScroll[1] + 1}/>
-    }).concat(<PlaceholderComponent id="" layout="medium" theme="dark"/>);
+    }).concat(!this.state.displayResults ?
+      <PlaceholderComponent id="" layout="medium" theme="dark" loading={false} onClick={this.handleSearchClick.bind(this)}/> :
+      !dsResults ?
+        <PlaceholderComponent id="" layout="medium" theme="dark" loading={true} /> : 
+        dsResults.filter((val, i) => {
+          const uri = albumURI(mapAlbumToParams({artist: artist._id, name: val.name}));
+          if (artist.albums.includes(uri)) {
+            return false;
+          }
+          return true;
+        }).slice(0, 6).map((res) => {
+          return <DSAlbumComponent layout="medium" id="" theme="dark" album={res} />;
+        }));
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
