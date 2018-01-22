@@ -103,7 +103,7 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
   unloadItem(): void {
     const provider = LibraryProvider.getInstance();
     provider.cancelFeeds(this.feeds);
-    if (this.isUsingEmbeddedArtworks()) {
+    if (this.isUsingEmbeddedArtworks() && this.image) {
       URL.revokeObjectURL(this.image.src);
     }
   }
