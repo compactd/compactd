@@ -119,6 +119,9 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     if (nextProps.artist !== this.props.artist) {
       if (!nextProps.artist) return this.props.actions.fetchAllAlbums();
       this.props.actions.fetchArtist(nextProps.artist);
+      this.setState({
+        displayResults: false
+      });
     }
     const {actions, library} = this.props;
     const artistId = `library/${this.props.artist}`;
@@ -154,7 +157,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     const artist = this.props.artist ?
       (library.artistsById[artistId]
         || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
-    console.log(this.state);
+        
     const dsResults = this.state.dsResults[artistId];
 
     const albums = artist.albums.map((album, index) => {
@@ -175,7 +178,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
             return false;
           }
           return true;
-        }).slice(0, 6).map((res) => {
+        }).slice(0, 12).map((res) => {
           return <DSAlbumComponent layout="medium" id="" theme="dark" album={res} />;
         }));
     

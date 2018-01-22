@@ -1,3 +1,15 @@
 .ds-album-component {
   opacity: 0.52;
+  .pt-tag {
+    margin-right: 4px;
+    cursor: pointer;
+  }
+  .rel-header {
+    .rel-name {
+      width: 120px;
+    }
+    .rel-counters {
+      float: right;
+    }
+  }
 }
