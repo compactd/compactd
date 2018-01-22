@@ -9,6 +9,7 @@ import {match} from 'react-router';
 import {BetterImage, ArtistComponent} from 'components';
 import {EventEmitter} from 'eventemitter3';
 import * as objectHash from 'object-hash';
+import PlaceholderComponent from 'components/PlaceholderComponent';
 
 require('./AlbumsListView.scss');
 
@@ -134,7 +135,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
                 emitter={this.emitter}
                 index={index}
                 visible={index < this.oldScroll[1] + 1}/>
-    })
+    }).concat(<PlaceholderComponent id="" layout="medium" theme="dark"/>);
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
