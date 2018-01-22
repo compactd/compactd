@@ -148,8 +148,8 @@ const fetchAlbum = async (album: string) => {
 
   const tracks = await Track.allDocs({
       include_docs: true,
-      startkey: album,
-      endkey: album + '\uffff'
+      startkey: album + '/',
+      endkey: album + '/\uffff'
     })
     
   
