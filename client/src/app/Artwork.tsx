@@ -31,14 +31,14 @@ export default class Artwork {
 
   attach (blob: Blob, target: HTMLImageElement, oldSrc: string): Promise<Blob> {
     return new Promise((resolve) => {
-      if (oldSrc !== target.src) {
+      if (!target || oldSrc !== target.src) {
         return resolve(blob);
       }
       target.src = URL.createObjectURL(blob);
       target.addEventListener('load', () => {
         resolve(blob);
       });
-    })
+    });
   }
 
   /**
@@ -47,7 +47,7 @@ export default class Artwork {
    * @param size the size, either large (300px) or small (64px)
    */
   load (docId: string, size: 'large' | 'small', target: HTMLImageElement): Promise<Blob> {
-    const oldSrc = target.src;
+    const oldSrc = target ? target.src : null;
     return this.queue.add(() => {
       if (!docId.startsWith('artworks/')) {
         docId = 'artworks/' + docId;
