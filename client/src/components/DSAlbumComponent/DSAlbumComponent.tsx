@@ -106,14 +106,13 @@ export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentPr
 
     const grouped = groupBy([].concat(...res), 'format');
 
-    const rels = Object.keys(grouped).map((format) => {
+    const rels = Object.keys(grouped).filter((el) => !el.isEmpty()).map((format) => {
       return grouped[format].sort((b: Release, a: Release) => {
         if (a.seeders < b.seeders) return -1;
         if (a.seeders > b.seeders) return 1;
         return 0
       })[0];
     });
-    console.log(grouped, rels);
     this.setState({releases:{
       [this.props.album.id]: rels
     }});
