@@ -58,7 +58,11 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       this.setState({
         dsResults: {
           ...this.state.dsResults,
-          [artist._id]: res.topAlbums
+          [artist._id]: res.topAlbums.filter((album: any) => {
+            if (!album.cover) return false;
+            if (album.name === '(null)') false;
+            return true;
+          })
         }
       });
     }).catch((err) => {
