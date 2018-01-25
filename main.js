@@ -243,6 +243,8 @@ switch (mode) {
       }).then(createAndScanLibrary)
       .then(fetchArtworks)
       .then(() => {
+        fs.writeFileSync(path.join(config.get('dataDirectory'), '_version'), pkg.version);
+
         console.log('  ' + chalk.bgGreen.black(' Successfully configured compactd '))
         console.log('\n' + chalk.grey('You may start it using '+ chalk.yellow('compactd --serve')));
       }).catch((err) => {
@@ -274,6 +276,7 @@ async function createAndScanLibrary ([res, spin]) {
   console.log('');
   spin.message('Starting scan');
   spin.start();
+
   const libID = Models.libraryURI(Models.mapLibraryToParams(res));
   const library = Object.assign({}, res, {_id: libID});
   const libraries = new PouchDB('libraries');
