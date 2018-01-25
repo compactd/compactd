@@ -7,6 +7,7 @@ import config from './config';
 import * as serveStatic from 'serve-static';
 import { setupScheduler } from './scheduler';
 import { scheduler } from './features/scheduler/Scheduler';
+import * as SemVer from 'semver';
 
 const pkg = require('../../package.json');
 
@@ -26,7 +27,8 @@ export class ProdApplication extends CompactdApplication {
       process.exit(1);
     }
     const version = fs.readFileSync(versionFile).toString();
-    if (version !== pkg.version) {
+    
+    if (![null, 'prerelease', 'prepatch', 'patch'].includes(SemVer.diff(version, pkg.version))) {
       mainStory.fatal('compactd', 'Please upgrade your database to the latest version')
       mainStory.info('compactd', 'You may want to use compactd --upgrade');
       process.exit(1);
