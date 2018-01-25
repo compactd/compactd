@@ -1,5 +1,6 @@
 div.albums-list-view{
   background-color: #373546;
+  position: relative;
   div.list-header {
     padding: 1em 1em;
     span {
@@ -7,6 +8,16 @@ div.albums-list-view{
     }
     div.pt-input-group {
     }
+  }
+  div.top-gradient {
+    position: absolute;
+    top: 58px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to bottom, rgba(55,53,70,1) 0%,rgba(55,53,70,0) 100%);
+    z-index: 1;
   }
   div.albums-container {
 

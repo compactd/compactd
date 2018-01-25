@@ -197,6 +197,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       <div className="list-header">
         {header}
       </div>
+        <div className="top-gradient"></div>
       <ScrollableDiv divRef={(div) => this.div = div}>
         <div className="albums-container">
           {albums}

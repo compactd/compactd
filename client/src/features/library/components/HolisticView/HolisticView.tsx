@@ -149,6 +149,8 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               library.expandArtists ? 'pt-icon-caret-left' : 'pt-icon-caret-right')}></span>
             </div>
           </div>
+          
+          <div className="top-gradient"></div>
           <ScrollableDiv divRef={(div) => this.handleArtistDivRef(this.artistsHash, div)}>
             {artists}
           </ScrollableDiv>
