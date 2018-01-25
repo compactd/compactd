@@ -13,13 +13,21 @@ import {mainStory} from 'storyboard';
 import {SchedulerFunc} from '../scheduler/Scheduler';
 import * as cheerio from 'cheerio';
 import { promisify } from 'util';
-const cv = require('opencv');
 const smartcrop = require('smartcrop-sharp');
+let cv: any;
+try {
+  cv = require('opencv');
+} catch (err) {
+  // OpenCV not installed
+}
 
 const base = 'https://www.discogs.com';
 
 function faceDetect(input: Buffer) {
   return new Promise(function(resolve, reject) {
+    if (!cv) {
+      return {};
+    }
     cv.readImage(input, function(err: any, image: any) {
       if (err) return reject(err);
       image.detectObject(cv.FACE_CASCADE, {}, function(err: any, faces: any){
