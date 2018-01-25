@@ -59,6 +59,14 @@ export default class Scheduler {
       });
     }
     this.queue.push(func);
+
+    if (!this.interval) {
+      this.interval = setInterval(() => {
+        clearInterval(this.interval);
+        this.interval = null;
+        this.execute();
+      }, 15 * 60 * 1000);
+    }
   }
   /**
    * Middleware that postpone on every request 
