@@ -44,7 +44,17 @@ export class DatabaseConfigurator {
     //     validate_doc_update: createValidator(schema, perms)
     //   } as any);
     // })).then(() => {});
-    return Promise.resolve({});
+    return fetch(`http://${
+      this.opts.couchHost
+    }:${this.opts.couchPort}/trackers`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + new Buffer(
+          this.opts.adminUsername + ':' + this.opts.adminPassword).toString('base64')
+      },
+      body: ''
+    }).then((res) => {});
   }
 
   async setupNode () {
