@@ -24,7 +24,7 @@ export abstract class CompactdModel<T> {
   protected _id: string;
   protected _fetch: typeof fetch;
 
-  protected listeners: Map<ModelEventListener<T>>;
+  protected listeners: Map<ModelEventListener<T>> = {};
   private _live: boolean;
 
   protected constructor (pouch: typeof PouchDB, f: typeof fetch, model: string, id: string, status: Status) {
@@ -61,9 +61,7 @@ export abstract class CompactdModel<T> {
     const key = Date.now();
     this.listeners[key] = listener;
 
-    if (!this.live) {
-      this.attachFeed();
-    }
+    this.attachFeed();
 
     return {
       unbind: () => {
@@ -77,7 +75,49 @@ export abstract class CompactdModel<T> {
     }
   }
 
-  public addOnPropsChangedListener (callback: (propName: string, newProps: T, oldProps: T) => void) {
+  // public feed (callback: (props: T & {_rev: string}) => void) {
+  //   enum feedState {
+  //     cancelled, paused, running, created
+  //   }
+  //   let state = feedState.created;
+  //   let unbinder: EventListenerUnbinder;
+  //   const funcs = {
+  //     cancel: () => {
+  //       if (state === feedState.cancelled) {
+  //         throw new Error('Cannot cancel an already cancelled feed');
+  //       }
+  //       funcs.pause();
+  //     },
+  //     pause: () => {
+  //       if (state !== feedState.running) {
+  //         return;
+  //       }
+  //       unbinder.unbind();
+  //       unbinder = null;
+  //     },
+  //     start: () => {
+  //       if (state === feedState.paused) {
+  //         return;
+  //       }
+  //       if (state === feedState.cancelled) {
+  //         throw new Error('Cannot start a cancelled feed');
+  //       }
+  //       if ([Status.PREFETCHED, Status.BAREBONE].includes(this.status)) {
+  //         this.pull().then(() => {
+  //           funcs.start();
+  //         });
+  //         return;
+  //       }
+  //       unbinder = this.addOnPropsChangedListener((name, newProps) => {
+  //         callback(newProps);
+  //       });
+  //       state = feedState.running;
+  //     }
+  //   }
+  //   return funcs;
+  // }
+
+  public addOnPropsChangedListener (callback: (propName: string, newProps: T & {_rev: string}, oldProps: T) => void) {
     return this.addEventListener({
       onPropsChanged: callback,
       onDelete: () => {}

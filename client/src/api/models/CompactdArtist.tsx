@@ -23,19 +23,22 @@ export class CompactdArtist extends CompactdModel<Artist> {
    * @param props
    */
   public constructor (pouchdb: PouchDB.Static, _fetch: typeof fetch, props: Artist)
-  public constructor (pouchdb: PouchDB.Static, _fetch: typeof fetch, id: string, name: string)
-  public constructor (pouchdb: PouchDB.Static, _fetch: typeof fetch, id: string | Artist | CompactdArtist) {
+  public constructor (pouchdb: PouchDB.Static, _fetch: typeof fetch, id: string, name?: string)
+  public constructor (pouchdb: PouchDB.Static, _fetch: typeof fetch, id: string | Artist | CompactdArtist, name?: string) {
     if (typeof id === 'string') {
-      super(pouchdb, _fetch, CompactdArtist.DATABASE_NAME, id, name ?  Status.BAREBONE : Status.FETCHED);
+      super(pouchdb, _fetch, CompactdArtist.DATABASE_NAME, id, !name ?  Status.BAREBONE : Status.FETCHED);
       this._name = name;
     } else if (id instanceof CompactdArtist) {
       super(pouchdb, _fetch, CompactdArtist.DATABASE_NAME, id._id, id._status);
       this._name = id._name;
     } else if (typeof id === 'object') {
-      super(pouchdb, _fetch, CompactdArtist.DATABASE_NAME, id._id, id.name ? Status.BAREBONE : Status.FETCHED);
+      super(pouchdb, _fetch, CompactdArtist.DATABASE_NAME, id._id,  Status.FETCHED);
+      this._name = id.name;
     }
   }
-
+  public getRevision () {
+    return this.database.get(this._id).then((doc) => doc._rev);
+  }
   /**
    * Artist name
    */
@@ -82,51 +85,32 @@ export class CompactdArtist extends CompactdModel<Artist> {
 
     return items.rows.map(CompactdArtist.fromProps(pouchDB, f));
   }
-
-
-  /**
-   * Create a new artist or return one from the cache
-   * @param pouchDB the pouchDB constructor to use
-   * @param f the fetch function to use
-   * @param id the id of the artist
-   * @param name (optionnal) the name of the artist
-   */
-  public static get (pouchDB: PouchDB.Static, f: typeof fetch, id: string | Artist, name?: string) {
-    if (typeof id !== 'string') {
-      const artist = id as Artist;
-
-      id = artist._id;
-      name = artist.name;
-    }
-    return new CompactdArtist(pouchDB, f, id, name);
-  }
   
   protected attachFeed(): void {
     if (this._changes) {
       return;
     }
-    const ts = Date.now();
-    this.pull().then(() => {
-      this._changes = this.database.changes({
-        since: ts,
-        live: true,
-        include_docs: true,
-        doc_ids: [this._id]
-      }).on('change', ({doc, deleted, id}) => {
-        if (doc.name !== this._name) {
-          const props = this.props;
-          this._name = doc.name;
-          this.fireOnPropsChanged('name', doc, props);
-          return;
-        }
-        if (deleted) {
-          this._status = Status.DELETED;
-          this.fireOnDelete(id);
-          return;
-        }
-        console.log('Unable to see change', arguments);
-      })
-    });
+    this._changes = this.database.changes({
+      since: 'now',
+      live: true,
+      include_docs: true,
+      doc_ids: [this._id]
+    }).on('change', ({doc, deleted, id}) => {
+      if (deleted) {
+        this._status = Status.DELETED;
+        this.fireOnDelete(id);
+        return;
+      }
+
+      if (doc.name !== this._name) {
+        const props = this.props;
+        this._name = doc.name;
+        this.fireOnPropsChanged('name', doc, props);
+        return;
+      }
+      
+      console.log('Unable to see change', arguments);
+    })
   }
 
   protected detachFeed(): void {
@@ -151,7 +135,7 @@ export class CompactdArtist extends CompactdModel<Artist> {
     const _id = artistURI(mapArtistToParams({name}));
 
     return db.put({_id, name}).then(() => {
-      return CompactdArtist.get(pouch, _fetch, _id, name);
+      return new CompactdArtist(pouch, _fetch, _id, name);
     });
   }
 

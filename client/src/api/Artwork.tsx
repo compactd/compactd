@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb';
 import * as PQueue from 'p-queue';
-import Session from 'app/session';
+import Session from 'api/session';
 
 export default class Artwork {
   private queue: PQueue;

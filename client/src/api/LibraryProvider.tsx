@@ -2,7 +2,6 @@ import PouchDB from 'pouchdb';
 import {Album, Track, Artist} from 'compactd-models';
 
 export type ChangeCallback<T> = (changes: PouchDB.Core.ChangesResponseChange<T>) => void;
-export type FeedCallback<T> = (doc: T) => void;
 export default class LibraryProvider {
   private cache: {
     [id: string]: Promise<any>
