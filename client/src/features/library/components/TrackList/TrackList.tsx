@@ -23,7 +23,11 @@ export class TrackList extends React.Component<TrackListProps, {
   }
   render (): JSX.Element {
     const {actions, tracks, player, library} = this.props;
-    const content = tracks.map((track, index) => {
+    const content = tracks.sort((a, b) => {
+      if (a.number > b.number) return 1;
+      if (a.number < b.number) return -1;
+      return 0;
+    }).map((track, index) => {
       const el = <TrackListItem track={track} actions={actions} library={library} key={track._id}
       playing={player.stack.length && player.stack[0]._id === track._id} playHidden={this.state.showHidden} />;
       
