@@ -51,6 +51,11 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
       this.unloadItem();
     });
   }
+  
+  handleMouseOver() {
+    this.loadItem(this.props.id);
+    this.loadImage(this.props.id, this.image);
+  }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
     if (nextProps.id !== this.props.id) {
@@ -133,7 +138,8 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
           {active,
         'clickable': !!this.props.onClick
         })}
-        onClick={onClick as any}>
+        onClick={onClick as any}
+        onMouseOver={this.handleMouseOver.bind(this)}>
       <div className="item-image">{this.renderImage()}</div>
       <div className="item-props">
         <div className="item-name">
