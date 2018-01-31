@@ -14,6 +14,11 @@ import * as classnames from "classnames";
 import {EventEmitter} from 'eventemitter3';
 
 import {filter, score} from 'fuzzaldrin';
+import PlaceholderComponent from 'components/PlaceholderComponent/PlaceholderComponent';
+import { Session } from 'inspector';
+import session from 'app/session';
+import toaster from 'app/toaster';
+import { syncDatabases } from 'app/database';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -28,6 +33,7 @@ interface HolisticViewProps {
 }
 interface HolisticViewState {
   artistsFilter: string;
+  addingArtist: string;
 }
 
 
@@ -47,7 +53,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   }
   constructor () {
     super();
-    this.state = {artistsFilter: ''};
+    this.state = {artistsFilter: '', addingArtist: null};
     this.emitter = new EventEmitter();
   }
   componentDidMount () {
@@ -129,7 +135,29 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     
     return [start, end];
   }
-
+  async handleNewArtist (name: string) {
+    this.setState({
+      addingArtist: name
+    });
+    const res = await session.fetch('/api/artists/create', {
+      method: 'POST',
+      body: JSON.stringify({name}),
+      headers: {
+        'content-type': 'application/json'
+      }
+    });
+    const body = await res.json();
+    if (res.status !== 201 || !body.ok) {
+      toaster.error(body.error);
+      return;
+    }
+    await syncDatabases();
+    this.props.actions.fetchAllArtists();
+    this.setState({
+      addingArtist: null
+    });
+    window.location.reload();
+  }
   render (): JSX.Element {
     const {actions, library, player} = this.props;
 
@@ -142,7 +170,21 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               index={index}
               visible={index < this.oldArtistScroll[1] + 1}
               />
-    });
+            }).concat(this.state.addingArtist ? <PlaceholderComponent 
+              id="" 
+              layout="medium" 
+              theme="dark" 
+              loading={true} 
+              sub="Creating artist"
+              header={this.state.addingArtist} /> : 
+            (this.state.artistsFilter ? <PlaceholderComponent 
+              id="" 
+              layout="medium" 
+              theme="dark" 
+              loading={false} 
+              sub="Click to create a new artist"
+              onClick={this.handleNewArtist.bind(this, this.state.artistsFilter)} 
+              header={this.state.artistsFilter} /> : []));
 
     return <div className="holistic-view">
       <FuzzySelector library={library} actions={actions} />

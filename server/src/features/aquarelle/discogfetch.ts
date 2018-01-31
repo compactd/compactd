@@ -26,7 +26,7 @@ const base = 'https://www.discogs.com';
 function faceDetect(input: Buffer) {
   return new Promise(function(resolve, reject) {
     if (!cv) {
-      return {};
+      return resolve({});
     }
     cv.readImage(input, function(err: any, image: any) {
       if (err) return reject(err);

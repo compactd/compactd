@@ -36,4 +36,20 @@ export default function(app: Express.Application) {
       mainStory.error('utils', err.message, {attach: err});
     });
   });
+  app.post('/api/artists/create', (req, res) => {
+    if (!req.body.name || req.body.name.length < 3) {
+      return res.status(400).send({
+        error: 'Name is either too short or empty'
+      });
+    }
+    return utils.createArtist(req.body.name).then((doc) => {
+      res.status(201).send({doc, ok: true});
+    }).catch((err) => {
+      res.status(500).send({
+        success: false,
+        error: 'An error occurred, please see logs for more details'
+      });
+      mainStory.error('utils', err.message, {attach: err});
+    })
+  });
 }

@@ -5,7 +5,9 @@ import { Spinner, Classes } from "@blueprintjs/core";
 require('./PlaceholderComponent.scss');
 
 export default class PlaceholderComponent extends LibraryItemComponent<{
-  loading: boolean
+  loading: boolean,
+  sub?: string, 
+  header?: string
 }, {}> {
   loadImage(id: string, img: HTMLImageElement): void {}
 
@@ -17,10 +19,10 @@ export default class PlaceholderComponent extends LibraryItemComponent<{
     return ['placeholder-component'];
   }
   renderSubtitle(): string | JSX.Element {
-    return 'Click to search for albums';
+    return this.props.sub || 'Click to search for albums';
   }
   renderHeader(): string | JSX.Element {
-    return 'Add album';
+    return this.props.header || 'Add album';
   }
   renderImage() {
     return <div className="placeholder-image">
