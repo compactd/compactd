@@ -21,6 +21,7 @@ const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAAL
 
 export default abstract class LibraryItemComponent<P, S> extends React.Component<LibraryItemComponentProps & P, S> {
   private watcher: any;
+  private loaded: boolean = false;
 
   protected image: HTMLImageElement;
   
@@ -37,50 +38,58 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
 
   componentDidMount() {
     if (!this.props.emitter || this.props.visible) {
+      this.loaded = true;
       this.loadItem(this.props.id);
       this.loadImage(this.props.id, this.image);
-
       return;
     }
 
     this.props.emitter.on(`show-${this.props.hash}-${this.props.index}`, () => {
+      this.loaded = true;
       this.loadItem(this.props.id);
       this.loadImage(this.props.id, this.image);
     });
     this.props.emitter.on(`hide-${this.props.hash}-${this.props.index}`, () => {
+      this.loaded = false;
       this.unloadItem();
     });
   }
   
   handleMouseOver() {
+    if (this.loaded) return;
+
     this.loadItem(this.props.id);
     this.loadImage(this.props.id, this.image);
   }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
-    if (nextProps.id !== this.props.id) {
+    if (nextProps.id !== this.props.id && (!this.props.emitter || this.props.visible)) {
       if (nextProps.id) {
+        this.loaded = true;
         this.loadItem(nextProps.id);
         this.loadImage(nextProps.id, this.image);
+        return;
       }
       if (this.props.id) {
+        this.loaded = true;
         this.unloadItem();
       }
     }
 
     if (nextProps.hash !== this.props.hash) {
       this.props.emitter.on(`show-${nextProps.hash}-${nextProps.index}`, () => {
+        this.loaded = true;
         this.loadItem(this.props.id);
         this.loadImage(this.props.id, this.image);
       });
       this.props.emitter.on(`hide-${nextProps.hash}-${nextProps.index}`, () => {
+        this.loaded = false;
         this.unloadItem();
       });
     }
   }
 
-  componentWillUnmount() {
-  }
+  componentWillUnmount() {}
   
   getImageSizings (): 'large' | 'small' {
     switch (this.props.layout) {
