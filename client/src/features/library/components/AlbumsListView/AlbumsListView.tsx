@@ -14,6 +14,7 @@ import Map from 'models/Map';
 import Session from 'app/session';
 import Toaster from 'app/toaster';
 import DSAlbumComponent from 'components/DSAlbumComponent/DSAlbumComponent';
+import { filter } from 'fuzzaldrin';
 
 require('./AlbumsListView.scss');
 
@@ -164,7 +165,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
         
     const dsResults = this.state.dsResults[artistId];
 
-    const albums = artist.albums.map((album, index) => {
+    const albums = filter(artist.albums, this.state.albumsFilter).map((album, index) => {
       return  <AlbumListItem key={album}
                 active={this.props.match.params.album === albumURI(album).name}
                 album={album} actions={actions} all={this.props.all}
