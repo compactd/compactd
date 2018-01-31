@@ -61,7 +61,8 @@ div.track-list-item {
   }
 
   .track-duration {
-      color: #7a7594;
+    color: #7a7594;
+    padding-right: 3px; 
   }
 
   &.playing {
