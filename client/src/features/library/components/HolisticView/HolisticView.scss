@@ -13,9 +13,12 @@ div.holistic-view{
       left: 0;
       right: 0;
       width: 100%;
-      height: 8px;
+      height: 4px;
       background: linear-gradient(to bottom, #292e38 0%, rgba(41, 46, 56, 0) 100%);
       z-index: 1;
+    }
+    div.scrollable-div {
+      padding-top: 4px;
     }
     &.minimal {
       width: 90px !important;
