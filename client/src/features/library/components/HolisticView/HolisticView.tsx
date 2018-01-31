@@ -115,11 +115,16 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
       while (i < l)
         h = (h << 5) - h + str.charCodeAt(i++) | 0;
     return h;
-  };
+  }
+  private hash() {
+    return this.props.library.artists.reduce((acc, val) => {
+      return this.hashCode(acc + '::' + val).toString(16);
+    }, "BEGIN::" + this.state.artistsFilter + '::');
+  }
   private updateHash (props = this.props) {
-    const artistsHash = (props.library.artists.length * 5 + this.hashCode(this.state.artistsFilter) * 13).toString(16).substr(0, 5);
-
+    const artistsHash = this.hash();
     if (this.artistsHash !== artistsHash) {
+      this.emitter.removeAllListeners();
       this.artistsHash = artistsHash;
       this.oldArtistScroll = this.computeRange(this.artistsDiv);
       this.emitShowRange(this.artistsHash, this.oldArtistScroll[0], this.oldArtistScroll[1]);
