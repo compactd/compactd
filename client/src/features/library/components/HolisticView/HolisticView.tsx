@@ -13,6 +13,8 @@ import {FuzzySelector} from '../FuzzySelector';
 import * as classnames from "classnames";
 import {EventEmitter} from 'eventemitter3';
 
+import {filter, score} from 'fuzzaldrin';
+
 const {Flex, Box} = require('reflexbox');
 
 require('./HolisticView.scss');
@@ -27,6 +29,7 @@ interface HolisticViewProps {
 interface HolisticViewState {
   artistsFilter: string;
 }
+
 
 export class HolisticView extends React.Component<HolisticViewProps, HolisticViewState> {
   private oldArtistScroll: [number, number];
@@ -82,6 +85,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   handleArtistsFilterChange (evt: Event) {
     const target = evt.target as HTMLInputElement;
     this.setState({artistsFilter: target.value});
+    this.updateHash();
   }
   handleArtistDivRef(id: string, div: HTMLDivElement) {
     this.artistsDiv = div;
@@ -97,7 +101,17 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     }
   }
   componentWillReceiveProps (nextProps: HolisticViewProps) {
-    const artistsHash = (nextProps.library.artists.length * 420).toString(16).substr(0, 5);
+    this.updateHash(nextProps);
+  }
+  hashCode (str: string) {
+    var h = 0, l = str.length, i = 0;
+    if ( l > 0 )
+      while (i < l)
+        h = (h << 5) - h + str.charCodeAt(i++) | 0;
+    return h;
+  };
+  private updateHash (props = this.props) {
+    const artistsHash = (props.library.artists.length * 5 + this.hashCode(this.state.artistsFilter) * 13).toString(16).substr(0, 5);
 
     if (this.artistsHash !== artistsHash) {
       this.artistsHash = artistsHash;
@@ -119,7 +133,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   render (): JSX.Element {
     const {actions, library, player} = this.props;
 
-    const artists = library.artists.map((artist, index) => {
+    const artists = filter(library.artists, this.state.artistsFilter).map((artist, index) => {
       return <ArtistListItem key={artist} actions={actions}
               artist={artist} active={
                 artistURI(artist).name === this.props.match.params.artist
