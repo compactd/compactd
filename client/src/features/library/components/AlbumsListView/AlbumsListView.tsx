@@ -172,7 +172,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
                 emitter={this.emitter}
                 index={index}
                 visible={index < this.oldScroll[1] + 1}/>
-    }).concat(!this.state.displayResults ?
+    }).concat(artist._id ? !this.state.displayResults ?
       <PlaceholderComponent id="" layout="medium" theme="dark" loading={false} onClick={this.handleSearchClick.bind(this)}/> :
       !dsResults ?
         <PlaceholderComponent id="" layout="medium" theme="dark" loading={true} /> : 
@@ -184,7 +184,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
           return true;
         }).slice(0, 12).map((res) => {
           return <DSAlbumComponent layout="medium" id="" theme="dark" album={res} />;
-        }));
+        }) : []);
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
