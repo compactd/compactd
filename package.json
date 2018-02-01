@@ -14,7 +14,7 @@
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc -p ./server",
     "build:client": "webpack --config ./config/webpack.production.js --progress",
-    "run:api": "npm run build:server && WALTZ_AUTH=1 NO_WEBPACK=1 node server/dev",
+    "run:api": "npm run build:server && cross-env WALTZ_AUTH=1 NO_WEBPACK=1 node server/dev",
     "version": "npm run build:server && npm run build:client"
   },
   "dependencies": {
@@ -63,6 +63,7 @@
     "shortid": "^2.2.8",
     "slug": "^0.9.1",
     "smartcrop-sharp": "^1.0.5",
+    "socket-pouch": "github:compactd/socket-pouch#5b2f8b4255fa43c3cdc8a0b35059b14beab81c63",
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4",
     "source-map-support": "^0.4.15",

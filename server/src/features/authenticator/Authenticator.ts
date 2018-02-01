@@ -9,6 +9,7 @@ import * as assert from 'assert';
 import * as Express from 'express';
 import {mainStory} from 'storyboard';
 import * as cluster from 'cluster';
+import * as pouch from 'pouchdb';
 
 const docURI = require('docuri');
 
@@ -233,6 +234,7 @@ export default class Authenticator {
       }
       try {
         const user = this.verifySession(token);
+        (req as any).user = user;
         const unused = user.toLowerCase(); // Check is user isnt undefined, otherwise throw error
         next();
       } catch (err) {
@@ -286,7 +288,34 @@ export default class Authenticator {
       });
     }
   }
+  async proxyPouchCreator (token: string) {
+    let {db, user} = jwt.verify(token, this.secret) as {db: string, user: string};
+    if (process.env.ADMIN_PARTY) {
+      const auth = new Buffer(PouchDB.credentials).toString('base64');
+      return new PouchDB(db);
+    }
 
+    if (!this.passwords[user]) {
+      
+      const pwd = await this.generatePassword();
+
+      await this.createDatabaseUser(this.getDatabaseUser(user, pwd));
+      
+      this.passwords[user] = pwd;
+    }
+    const pass = this.passwords[user];
+
+    if (cluster.isWorker) {
+      user = `c${cluster.worker.id}_${user}`;
+    } else {
+      user = `m_${user}`;
+    }
+    const url = `http://${user}:${pass}@${PouchDB.host}/${db}`
+    console.log('got', url)
+    const database = new pouch(url);
+    console.log(database);
+    return database;
+  }
   proxyRequestDecorator () {
     return async (proxyReqOpts: any, srcReq: any) => {
 

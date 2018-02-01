@@ -16,10 +16,10 @@ export default class LibraryProvider {
     this.feeds = {};
   }
   async getDocument<T> (db: string, id: string): Promise<T> {
-    if (this.cache[id]) {
-      return this.cache[id];
-    }
-    const doc = this.cache[id] = new PouchDB<T>(db).get(id);
+    // if (this.cache[id]) {
+    //   return this.cache[id];
+    // }
+    const doc /*= this.cache[id]*/ = new PouchDB<T>(db).get(id);
     return doc;
   }
   getTrack (id: string) {

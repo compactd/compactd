@@ -1,16 +1,16 @@
 import PouchDB from 'pouchdb';
-import Session from 'app/session';
+import session from 'app/session';
 
-export const getDatabase = function<T> (name: string) {
+(PouchDB as any).adapter('socket', require('socket-pouch/client'));
 
-  return new PouchDB<T>(`${window.location.origin}/database/${name}`, {
-    ajax: {
-      cache: true,
-      headers: {
-        Authorization: 'Bearer ' + Session.getToken()
-      }
-    }
-  });
+export const getDatabase = async function<T> (name: string) {
+  const res = await session.fetch('/api/database/'+ name);
+  const {token, ok} = await res.json();
+  console.log(token, ok);
+  return new PouchDB<T>(token, {
+    adapter: 'socket',
+    url: 'ws://localhost:9001'
+  } as any);
 }
 
 
@@ -26,6 +26,6 @@ function syncDB(local: PouchDB.Database, remote: PouchDB.Database) {
 
 export const syncDatabases = function (...dbs: string[]) {
   return Promise.all(dbs.map((db) => {
-    return syncDB(new PouchDB(db), getDatabase(db));
+    return getDatabase(db).then(syncDB.bind(null, new PouchDB(db)));
   }));
 }
