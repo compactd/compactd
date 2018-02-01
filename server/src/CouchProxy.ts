@@ -6,8 +6,7 @@ const socketPouchServer = require('socket-pouch/server');
 const auth = new Authenticator('proxy', config.get('secret'));
 socketPouchServer.listen(9001, {
   pouchCreator: async function (token: string) {
-    
-    return {pouch: await auth.proxyPouchCreator(token)};
+    return {pouch: await auth.proxyPouchCreator(token, 's_')};
   }
 }, function () {
   // server started

@@ -11,6 +11,17 @@ export const getDatabase = async function<T> (name: string) {
     url: (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://' + (process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:9001')
   } as any);
 }
+export const getHttpDatabase = function<T> (name: string) {
+  return new PouchDB<T>(`${window.location.origin}/database/${name}`, {
+    ajax: {
+      cache: true,
+      headers: {
+        Authorization: 'Bearer ' + session.getToken()
+      }
+    }
+  });
+}
+
 
 
 function syncDB(local: PouchDB.Database, remote: PouchDB.Database) {

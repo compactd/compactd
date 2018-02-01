@@ -3,7 +3,7 @@ import { AppAction } from './actions.d';
 import PouchDB from 'pouchdb';
 import * as thunk from 'redux-thunk';
 import * as jwt from 'jwt-decode';
-import {getDatabase} from 'app/database';
+import {getDatabase, getHttpDatabase} from 'app/database';
 import Toaster from 'app/toaster';
 import Socket from 'app/socket';
 import Artwork from 'app/Artwork';
@@ -88,21 +88,24 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
   return async (dispatch, getState) => {
     const dbName = dbs[0];
     const db = new PouchDB(dbName);
-    const remote = await getDatabase(dbName);
+    const remote = getHttpDatabase(dbName);
 
     db.replicate.from(remote).on('complete', (info) => {
       dispatch({
         type: UPDATE_SYNC,
         progress: (max - dbs.length + 1) / max
       });
-      db.sync(remote, {live: true, retry: true, timeout: 0}).on('change', (info) => {
-        console.log(info);
-        
-      }).on('error', (err: any) => {
-        console.log('err', err, err.stack);
-        Toaster.error(`An error happened during live database sync for ${dbName}: ${err.message}`);
-      }).on('paused', function (info) {
+      getDatabase(dbName).then((remotedb) => {
+        db.sync(remotedb, {live: true, retry: true, timeout: 0}).on('change', (info) => {
+          console.log(info);
+          
+        }).on('error', (err: any) => {
+          console.log('err', err, err.stack);
+          Toaster.error(`An error happened during live database sync for ${dbName}: ${err.message}`);
+        }).on('paused', function (info) {
+        });
       });
+
       if (dbs.length > 1) {
         return (syncDB(dbs.slice(1), max) as any)(dispatch, getState);
       } else {
