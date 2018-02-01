@@ -17,6 +17,7 @@ import * as request from 'request';
 import * as http from 'http';
 import { fork } from 'child_process';
 import jwt from './jwt';
+import httpEvent from './http-event';
 const pkg = require('../../package.json');
 const socketPouchServer = require('socket-pouch/server');
 const modelsPkg = require('../../node_modules/compactd-models/package.json');
@@ -87,7 +88,7 @@ export class CompactdApplication {
       this.configure();
       this.route();
       const server = http.createServer(this.app);
-      //httpEventEmitter.attach(server as any, this.auth);
+      httpEvent.attach(server as any, this.auth);
       // socketPouchServer.attach(this.app, {
       //   remoteUrl: 'http://localhost:5984',
       //   pouchCreator: () => {
