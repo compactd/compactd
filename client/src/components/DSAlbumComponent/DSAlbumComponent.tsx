@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as classnames from 'classnames';
-import {Album, DSAlbum, albumURI, Artist, DSArtist, artistURI, Tracker, Release} from 'compactd-models';
+import {Album, DSAlbum, albumURI, Artist, DSArtist, artistURI, Tracker, Release, mapAlbumToParams} from 'compactd-models';
 import BetterImage from '../BetterImage';
 import * as pluralize from 'pluralize';
 import Artwork from 'app/Artwork';
@@ -14,6 +14,8 @@ import PouchDB from 'pouchdb';
 const groupBy = require('lodash.groupby');
 import Map from 'models/Map';
 import { Tooltip } from '@blueprintjs/core';
+import { getDatabase } from 'app/database';
+import session from 'app/session';
 
 
 interface DSAlbumComponentProps {
@@ -32,13 +34,39 @@ export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentPr
       downloading: false
     };
   }
+  renderYT () {
+    return <Tooltip content="Add the album, allowing you to stream from youtube">
+      <span onClick={async () => {
+        this.setState({downloading: true});
+        const url = path.join('/api/datasource/albums/', this.props.album.artist, this.props.album.name);
+        const res = await session.fetch(url);
+        const data = await res.json();
+        console.log(data);
+        
+        const albums = await getDatabase('albums');
+        const id = albumURI(mapAlbumToParams({
+          name: this.props.album.name,
+          artist: this.props.album.artist
+        }));
+        await albums.put({
+          _id: id, 
+          name: this.props.album.name,
+          artist: this.props.album.artist
+        });
+
+        Promise.all(data.tracks.)
+      }} className={classnames("pt-tag pt-minimal", {
+      "pt-intent-danger": true
+    })} ><div className="pt-icon pt-icon-play"></div></span>
+    </Tooltip>;
+  }
   renderSubtitle(): JSX.Element | string {
     if (this.state.downloading) {
       return 'Downloading...';
     }
     if (this.state.releases[this.props.album.id]) {
       if (!this.state.releases[this.props.album.id].length) {
-        return 'No results :/'
+        return <div>No results {this.renderYT()}</div>
       }
       const res = this.state.releases[this.props.album.id].map((rel) => {
         return <Tooltip content={
@@ -61,7 +89,7 @@ export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentPr
           "pt-intent-warning": rel.seeders <= 2
         })}key={rel._id} >{rel.format}</span>
         </Tooltip>;
-      })
+      }).concat(this.renderYT());
       return <div>
         {res}
       </div>

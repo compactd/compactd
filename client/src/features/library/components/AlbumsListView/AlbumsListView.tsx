@@ -183,7 +183,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
             return false;
           }
           return true;
-        }).slice(0, 12).map((res) => {
+        }).slice(0, 50).map((res) => {
           return <DSAlbumComponent layout="medium" id="" theme="dark" album={res} />;
         }) : []);
     
