@@ -8,6 +8,7 @@ import {HotkeysTarget, Hotkey, Hotkeys, Slider} from '@blueprintjs/core';
 import session from 'app/session';
 import * as classnames from 'classnames';
 import XHRSource from 'models/XHRSource';
+import FavComponent from 'components/FavComponent/FavComponent';
 
 require('./PlayerStatus.scss');
 
@@ -141,7 +142,10 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
         <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
-        <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>
+        <span className="right-controls">          
+          <span className="fav-track"><FavComponent id={player.stack[0]._id} /></span>
+          <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>  
+        </span>
       </div> : <div className="player-name">
       </div>
     return <div className={classnames("player-status", {

@@ -25,7 +25,7 @@
     "change-case": "^3.0.1",
     "cheerio": "^1.0.0-rc.2",
     "clui": "^0.3.6",
-    "compactd-models": "^2.3.4",
+    "compactd-models": "^2.4.0",
     "convict": "^3.0.0",
     "cookie-parser": "^1.4.3",
     "ddos": "^0.1.25",

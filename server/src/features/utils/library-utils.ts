@@ -108,6 +108,25 @@ export async function createArtist (name: string) {
   return {_id, name};
 }
 
+export async function toggleFavTrack (trackID: string) {
+  const Track = new PouchDB<Track>('tracks');
+
+  const track = await Track.get(trackID);
+
+  await Track.put({
+    _id: track._id,
+    _rev: track._rev,
+    name: track.name,
+    artist: track.artist,
+    album: track.album,
+    number: track.number,
+    duration: track.duration,
+    disc: track.disc,
+    hidden: track.hidden,
+    fav: !track.fav
+  });
+}
+
 export async function changeTrackArtist (trackId: string, artistId: string) {
   const Track  = new PouchDB<Track>('tracks');
   const Artist = new PouchDB<Artist>('artists');

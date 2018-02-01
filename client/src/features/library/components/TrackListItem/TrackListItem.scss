@@ -47,6 +47,20 @@ div.track-list-item {
     background-color: rgba(233, 234, 241, 0.78);
     box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.06);
   }
+  .fav-component:not(.checked) {
+    opacity: 0;
+    transition: all ease 0.2s;
+  }
+  .fav-component.checked {
+    opacity: 0.4;
+    transition: all ease 0.2s;
+  }
+  &:hover {
+    .fav-component {
+      opacity: 0.6;
+      transition: all ease 0.2s;
+    }
+  }
   .track-number {
     margin-right: 0.2em;
     color: #7a7594;
@@ -62,6 +76,8 @@ div.track-list-item {
 
   .track-duration {
     color: #7a7594;
+    width: 50px;
+    display: inline-block;
     padding-right: 3px; 
   }
 
