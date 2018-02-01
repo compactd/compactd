@@ -24,4 +24,12 @@ export default (app: Express.Application) => {
       mainStory.error('analytics', 'An error occured', {attach: err});
     })
   });
+  app.get('/api/tracks/favorites/top', (req, res) => {
+    Analytics.getFavedTracks().then((docs) => {
+      res.status(200).send(docs);
+    }).catch((err) => {
+      res.send({error: 'An error has occured while reducing reports'});
+      mainStory.error('analytics', 'An error occured', {attach: err});
+    })
+  });
 }

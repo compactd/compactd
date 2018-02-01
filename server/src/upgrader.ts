@@ -7,6 +7,7 @@ import PouchDB from './database';
 import {resetLibrary} from './features/utils/library-utils';
 import {Library} from 'compactd-models';
 import {Scanner} from './features/scanner/Scanner';
+import { initialize } from './features/analytics/Analytics';
 
 const {version} = require('../../package.json');
 
@@ -15,7 +16,10 @@ type UpgradeFunction = (() => Promise<void>);
 export const upgraders: {
   [version: string]: 'reset' | UpgradeFunction;
 } = {
-  '1.2.0-5': 'reset'
+  '1.2.0-5': 'reset',
+  '1.3.0-alpha.7': () => {
+    return initialize();
+  }
 }
 
 export async function runUpgrade (oldOne: string, version: string): Promise<boolean> {
@@ -30,10 +34,10 @@ export async function runUpgrade (oldOne: string, version: string): Promise<bool
 
       return true;
     }
-
+    
     await requiredUpgrades.reduce((acc, val: string) => {
       return acc.then(() => {
-        return (requiredUpgrades as any)[val]();
+        return (upgraders as any)[val]();
       });
     }, Promise.resolve());
     return false;

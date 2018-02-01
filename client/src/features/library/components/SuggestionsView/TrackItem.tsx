@@ -7,7 +7,7 @@ interface TrackItemProps {
   actions: Actions;
   library: LibraryState;
   track: string;
-  reports: number;
+  reports?: number;
   index: number;
 }
 export default class TrackItem extends React.Component<TrackItemProps, {}> {

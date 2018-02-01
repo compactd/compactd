@@ -1,4 +1,5 @@
 import PouchDB from '../../database';
+import { Track } from 'compactd-models';
 const docuri = require('docuri');
 
 
@@ -15,6 +16,7 @@ export interface Report {
 
 const reports = new PouchDB<Report>('reports');
 
+
 export async function report (type: ReportType, track: string) {
   const ts = Date.now();
   const doc = await reports.put({
@@ -22,6 +24,7 @@ export async function report (type: ReportType, track: string) {
   });
   return doc;
 }
+
 export async function getTopTracks (limit = 10) {
   const res = await reports.query('analytics/by_track', {
     group: true,
@@ -29,9 +32,20 @@ export async function getTopTracks (limit = 10) {
   });
   return res.rows.sort((a, b) => {
     return b.value - a.value;
-  }).filter((key, index) => index < limit);
+  }).filter((key, index) => limit && index < limit);
 }
 
+export async function getFavedTracks (limit = 10) {
+  const res = await new PouchDB('tracks').query('fav/only_favs', {});
+  const top = await getTopTracks(420);
+  return res.rows.sort((a, b) => {
+    const ar = top.find((el) => el.id === a) || {value: 0};
+    const br = top.find((el) => el.id === b) || {value: 0};
+    if (ar.value > b.value) return 1;
+    if (ar.value < b.value) return -1;
+    return 0;
+  });
+}
 
 // This is just to pass
 const emit: any = null;
@@ -48,5 +62,22 @@ export async function initialize () {
       }
     }
   };
-  await reports.put(ddoc as any);
+  const tdoc = {
+    _id: '_design/fav',
+    views: {
+      only_favs: {
+        map: function (doc: Track) {
+          if (doc.fav) {
+            emit(doc.fav);
+          }
+        }.toString()  
+      }
+    }
+  };
+  try {
+    await new PouchDB('tracks').put(tdoc as any);
+  } catch (err) {}
+  try {
+    await reports.put(ddoc as any);
+  } catch (err) {}
 }
