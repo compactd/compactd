@@ -6,10 +6,9 @@ import session from 'app/session';
 export const getDatabase = async function<T> (name: string) {
   const res = await session.fetch('/api/database/'+ name);
   const {token, ok} = await res.json();
-  console.log(token, ok);
   return new PouchDB<T>(token, {
     adapter: 'socket',
-    url: 'ws://localhost:9001'
+    url: 'ws://' + (process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:9001')
   } as any);
 }
 
