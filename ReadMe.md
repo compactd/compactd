@@ -40,6 +40,7 @@ Redux, React, PouchDB, Webpack, Typescript, Socket.io...
  - Latest Ffmpeg. Installation varies from OS, you might wanna follow [this guide](https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg)
  - deluge with deluge-web are optionnal (for downloading new content)
  - [audiowaveform](https://github.com/bbc/audiowaveform) is optionnal, only  if you  want to use the waveform feature. Ubuntu, Arch, and Mac OS are straightforward, debian requires building from source; Windows doesn't work.
+ - opencv2 is optional, it allows the artwork processing tool to recognize face and crops images if they are not squared
  
 ## Installation
 
@@ -48,6 +49,49 @@ $ npm install --global compactd
 $ compactd --configure
 ```
 Follow the steps. Once it is down everything is configured!
+
+## Nginx configuration
+
+You need at least to locations, one for the http part and one for the socket server which allows realtime data update. Example:
+
+```nginx
+server {
+
+    listen 443 ssl;                                                             
+    server_name compactd.io;
+
+    include snippets/ssl-compactd.io.conf;
+    include snippets/ssl-params.conf;
+
+    access_log            /var/log/nginx/access.log;
+
+    location /engine.io/ {
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_http_version 1.1;
+      proxy_set_header        Host $host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+
+      proxy_pass          http://127.0.0.1:9001;
+    }
+
+    location / {
+      proxy_set_header        Host $host;
+      proxy_set_header        X-Real-IP $remote_addr;
+      proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header        X-Forwarded-Proto $scheme;
+
+      # Fix the âIt appears that your reverse proxy set up is broken" error.
+      proxy_pass          http://127.0.0.1:9000;
+      proxy_read_timeout  90;
+
+      proxy_redirect      http://127.0.0.1:9000 https://compactd.io;
+    }
+  }
+```
+
  
 ## Starting
  
