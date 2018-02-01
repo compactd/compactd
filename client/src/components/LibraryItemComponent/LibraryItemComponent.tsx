@@ -145,7 +145,8 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
       `${layout}-layout`,
       ...this.getClassNames(),
           {active,
-        'clickable': !!this.props.onClick
+          'clickable': !!this.props.onClick,
+          'pt-dark': this.props.theme === 'dark'
         })}
         onClick={onClick as any}
         onMouseOver={this.handleMouseOver.bind(this)}>

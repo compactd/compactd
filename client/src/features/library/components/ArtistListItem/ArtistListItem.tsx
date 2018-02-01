@@ -18,6 +18,7 @@ interface ArtistListItemProps {
   hash?: string;
   index?: number;
   visible?: boolean;
+  tooltip?: 'none' | 'disabled' | 'on';
 }
 
 export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
@@ -58,7 +59,8 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       hash,
       emitter,
       index,
-      visible
+      visible,
+      tooltip
     } = this.props;
     const slug = artistURI(artist).name;
     return <div className="artist-list-item"> 
@@ -71,6 +73,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
         hash={hash}
         emitter={emitter}
         visible={visible}
+        tooltip={tooltip}
         subtitle='counters' 
         onClick={this.handleClick.bind(this)} />
     </div>

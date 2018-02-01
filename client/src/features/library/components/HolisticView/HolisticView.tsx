@@ -19,6 +19,7 @@ import { Session } from 'inspector';
 import session from 'app/session';
 import toaster from 'app/toaster';
 import { syncDatabases } from 'app/database';
+import { Tooltip } from '@blueprintjs/core';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -170,6 +171,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               } hash={this.artistsHash}
               emitter={this.emitter}
               index={index}
+              tooltip={library.expandArtists ? 'disabled': 'on'}
               visible={index < this.oldArtistScroll[1] + 1 && index >= this.oldArtistScroll[0]}
               />
             }).concat(showAdd ? this.state.addingArtist ? <PlaceholderComponent 

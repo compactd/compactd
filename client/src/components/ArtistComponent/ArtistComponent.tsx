@@ -8,11 +8,13 @@ import LibraryItemComp from '../LibraryItemComponent';
 import LibraryProvider from 'app/LibraryProvider';
 import * as path from 'path';
 import './ArtistComponent.scss';
+import { Tooltip, Position } from '@blueprintjs/core';
 
 interface ArtistComponentProps {
-  id: string,
+  id: string;
   subtitle?: 'counters' | 'text' | 'none' | 'artist';
   subtitleText?: string;
+  tooltip?: 'none' | 'disabled' | 'on';
 }
 
 export default class ArtistComponent extends LibraryItemComp<ArtistComponentProps, {
@@ -81,6 +83,19 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
   isUsingEmbeddedArtworks (props = this.props) {
     const {id, layout} = props;
     return (id && layout !== 'minimal' ) && id.startsWith('library/');
+  }
+
+  renderImage () {
+    if (!this.props.tooltip || this.props.tooltip === 'none') {
+      return super.renderImage();
+    }
+    return <Tooltip
+      content={this.state.artist ? this.state.artist.name : 'Please wait...'}
+      isDisabled={this.props.tooltip === 'disabled'}
+      position={Position.RIGHT}
+      tooltipClassName="pt-dark">
+      {super.renderImage()}
+    </Tooltip>
   }
 
 }
