@@ -8,7 +8,7 @@ import {AlbumDetailsView} from '../AlbumDetailsView';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {match} from 'react-router';
 import * as fuzzy from 'fuzzy';
-import {artistURI} from 'compactd-models';
+import {artistURI, mapArtistToParams} from 'compactd-models';
 import {FuzzySelector} from '../FuzzySelector'; 
 import * as classnames from "classnames";
 import {EventEmitter} from 'eventemitter3';
@@ -156,16 +156,13 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
       toaster.error(body.error);
       return;
     }
-    await syncDatabases();
-    this.props.actions.fetchAllArtists();
     this.setState({
       addingArtist: null
     });
-    window.location.reload();
   }
   render (): JSX.Element {
     const {actions, library, player} = this.props;
-
+    const showAdd = this.state.artistsFilter ? !library.artists.includes(artistURI(mapArtistToParams({name: this.state.artistsFilter}))) :  false;
     const artists = filter(library.artists, this.state.artistsFilter).map((artist, index) => {
       return <ArtistListItem key={artist} actions={actions}
               artist={artist} active={
@@ -175,7 +172,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               index={index}
               visible={index < this.oldArtistScroll[1] + 1}
               />
-            }).concat(this.state.addingArtist ? <PlaceholderComponent 
+            }).concat(showAdd ? this.state.addingArtist ? <PlaceholderComponent 
               id="" 
               layout="medium" 
               theme="dark" 
@@ -189,7 +186,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
               loading={false} 
               sub="Click to create a new artist"
               onClick={this.handleNewArtist.bind(this, this.state.artistsFilter)} 
-              header={this.state.artistsFilter} /> : []));
+              header={this.state.artistsFilter} /> : []) : []);
 
     return <div className="holistic-view">
       <FuzzySelector library={library} actions={actions} />

@@ -5,6 +5,10 @@ import {artistURI} from 'compactd-models';
 import Toaster from 'app/toaster';
 import session from 'app/session';
 import {syncDatabases} from 'app/database';
+import { ThunkAction } from 'redux-thunk';
+import { CompactdState } from 'definitions/state';
+import { Dispatch } from 'redux';
+import LibraryProvider from 'app/LibraryProvider';
 
 const trickle = require('timetrickle');
 // import * as IFetch from '@types/whatwg-fetch';
@@ -175,7 +179,29 @@ function toggleExpandArtist () {
   return {type: TOGGLE_EXPAND_ARTIST};
 }
 
+let artistChanges: any[] = null;
+
 function fetchAllArtists () {
+  return (dispatch: Dispatch<LibraryAction>, getState: () => CompactdState) =>  {
+    _fetchAllArtists().then(dispatch);
+    if (!artistChanges) {
+      artistChanges = [LibraryProvider.getInstance().onDocAdded('artists', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ARTISTS,
+          artists: getState().library.artists.concat(id).sort()
+        });
+      }),
+      LibraryProvider.getInstance().onDocRemoved('artists', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ARTISTS,
+          artists: getState().library.artists.filter((doc) => doc !== id)
+        });
+      })]
+    }
+  }
+}
+
+function _fetchAllArtists () {
   return Promise.resolve().then(() => {
     const artists = new PouchDB<Defs.Artist>('artists');
     return artists.allDocs({

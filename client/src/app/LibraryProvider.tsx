@@ -81,6 +81,26 @@ export default class LibraryProvider {
     });
     return key;
   }
+  onDocAdded (db: string, cb: (id: string) => void) {
+    return new PouchDB(db).changes({
+      since: 'now',
+      live: true
+    }).on('change', ({changes, id}) => {
+      if (changes[0].rev.startsWith('1-')) {
+        cb(id);
+      }
+    });
+  }
+  onDocRemoved (db: string, cb: (id: string) => void) {
+    return new PouchDB(db).changes({
+      since: 'now',
+      live: true
+    }).on('change', ({doc, id, deleted}) => {
+      if (deleted) {
+        cb(id);
+      }
+    });
+  }
   public static getInstance () {
     return LibraryProvider.sInstance;
   }

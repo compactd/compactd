@@ -72,9 +72,6 @@ export default class ArtworkEditDialog extends React.Component<ArtworkEditDialog
              body: data,
              method: 'PUT'
            }).then(() => {
-            Toaster.show({
-              message: 'Please reload the opened tab to view changes'
-            });
            });
          }} />
         </div>
