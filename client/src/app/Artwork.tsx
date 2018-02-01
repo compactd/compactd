@@ -46,11 +46,23 @@ export default class Artwork {
    * @param docId the document id, starting with or without artowrks/
    * @param size the size, either large (300px) or small (64px)
    */
-  load (docId: string, size: 'large' | 'small', target: HTMLImageElement): Promise<Blob> {
+  load (docId: string, size: 'large' | 'small', target: HTMLImageElement, watch = true): Promise<Blob> {
     const oldSrc = target ? target.src : null;
     return this.queue.add(() => {
       if (!docId.startsWith('artworks/')) {
         docId = 'artworks/' + docId;
+      }
+      if (watch) {
+        const changes: any = this.artworks.changes({
+          doc_ids: [docId],
+          live: true,
+          since: 'now'
+        }).on('change', (info) => {
+          if (!target || !target.src) {
+            return changes.cancel();
+          }
+          this.load(docId, size, target, false);
+        });
       }
       return this.artworks.getAttachment(docId, size).catch((err) => {
         console.log('No attachment for: ' + docId);

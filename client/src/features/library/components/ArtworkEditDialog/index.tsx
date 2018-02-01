@@ -44,9 +44,7 @@ export default class ArtworkEditDialog extends React.Component<ArtworkEditDialog
           }),
           headers: {'Content-Type': 'application/json'}
         });
-        Toaster.show({
-          message: 'Please reload the opened tab to view changes'
-        });
+       
       }}>
         <BetterImage src={res.url} height={128} />
         <div className="image-info">
