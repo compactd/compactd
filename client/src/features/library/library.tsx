@@ -219,7 +219,28 @@ function _fetchAllArtists () {
   });
 }
 
+let albumChanges: any[] = null;
+
 function fetchAllAlbums () {
+  return (dispatch: Dispatch<LibraryAction>, getState: () => CompactdState) =>  {
+    _fetchAllAlbums().then(dispatch);
+    if (!albumChanges) {
+      albumChanges = [LibraryProvider.getInstance().onDocAdded('albums', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ALBUMS,
+          albums: getState().library.albums.concat(id).sort()
+        });
+      }),
+      LibraryProvider.getInstance().onDocRemoved('albums', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ALBUMS,
+          albums: getState().library.albums.filter((doc) => doc !== id)
+        });
+      })]
+    }
+  }
+}
+function _fetchAllAlbums () {
   return Promise.resolve().then(() => {
     const albums = new PouchDB<Defs.Artist>('albums');
     return albums.allDocs({
