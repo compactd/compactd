@@ -61,6 +61,18 @@ div.track-list-item {
       transition: all ease 0.2s;
     }
   }
+  &.playing {
+    .fav-component.checked {
+      opacity: 1;
+      transition: all ease 0.2s;
+      color: rgb(255, 0, 0);
+    }
+    .fav-component {
+      opacity: 0.5;
+      transition: all ease 0.2s;
+      color: rgb(255, 255, 255);
+    }
+  }
   .track-number {
     margin-right: 0.2em;
     color: #7a7594;
