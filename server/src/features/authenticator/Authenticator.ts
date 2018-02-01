@@ -311,9 +311,7 @@ export default class Authenticator {
       user = `m_${user}`;
     }
     const url = `http://${user}:${pass}@${PouchDB.host}/${db}`
-    console.log('got', url)
     const database = new pouch(url);
-    console.log(database);
     return database;
   }
   proxyRequestDecorator () {

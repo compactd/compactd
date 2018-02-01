@@ -73,7 +73,9 @@ export class CompactdApplication {
           error: 'Database ' + db + ' not allowed'
         });
       }
-      return res.status(200).send({ok: true, token: jwt.sign({db, user: (req as any).user})});
+      return res.status(200).send({ok: true, token: jwt.sign({db, user: (req as any).user}, {
+        expiresIn: '1d',
+      })});
     });
 
    fork(path.join(__dirname, 'CouchProxy.js'));
