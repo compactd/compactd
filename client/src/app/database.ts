@@ -8,7 +8,10 @@ export const getDatabase = async function<T> (name: string) {
   const {token, ok} = await res.json();
   return new PouchDB<T>(token, {
     adapter: 'socket',
-    url: 'ws://' + (process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:9001')
+    url: 'ws://' + (process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:9001'),
+    socketOptions: {
+      secure: window.location.protocol === 'https:'
+    }
   } as any);
 }
 
