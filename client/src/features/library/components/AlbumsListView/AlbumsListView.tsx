@@ -88,8 +88,12 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     } else {
       this.props.actions.fetchArtist(this.props.artist);
     }
-
-    const div = this.div;
+    
+    window.addEventListener('resize', (evt) => {
+      window.requestAnimationFrame(() => {
+        this.computeHeight(this.div);
+      })
+    });
   }
   handleArtistDivRef(id: string, div: HTMLDivElement) {
     this.div = div;
