@@ -20,6 +20,7 @@ import session from 'app/session';
 import toaster from 'app/toaster';
 import { syncDatabases } from 'app/database';
 import { Tooltip } from '@blueprintjs/core';
+import { ArtistListView } from 'features/library/components/ArtistListView';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -39,10 +40,6 @@ interface HolisticViewState {
 
 
 export class HolisticView extends React.Component<HolisticViewProps, HolisticViewState> {
-  private oldArtistScroll: [number, number];
-  private artistsHash: string;
-  private artistsDiv: HTMLDivElement;
-  private emitter: EventEmitter;
   static contextTypes = {
     router: PropTypes.shape({
       history: PropTypes.shape({
@@ -55,93 +52,17 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   constructor () {
     super();
     this.state = {artistsFilter: '', addingArtist: null};
-    this.emitter = new EventEmitter();
   }
   componentDidMount () {
     this.props.actions.fetchAllArtists();
-
-    const div = this.artistsDiv;
-
-    this.oldArtistScroll = this.computeRange(div);
-
-    div.addEventListener('scroll', (event) => {
-      window.requestAnimationFrame(() => {
-        const id = this.artistsHash;
-
-        const [oldStart, oldEnd] = this.oldArtistScroll;
-        const [start, end] = this.computeRange(div);
-
-        if (start === oldStart) return;
-
-        if (start > oldStart) {
-          this.emitHideRange(id, oldStart, start);
-        } else {
-          this.emitHideRange(id, end, oldEnd);
-        }
-
-        if (start > oldStart) {
-          this.emitShowRange(id, oldEnd, end);
-        } else {
-          this.emitShowRange(id, start, oldStart);
-        }
-        
-        this.oldArtistScroll = [start, end];
-      })
-    });
   }
   handleArtistsFilterChange (evt: Event) {
     const target = evt.target as HTMLInputElement;
     this.setState({artistsFilter: target.value});
-    this.updateHash();
   }
-  handleArtistDivRef(id: string, div: HTMLDivElement) {
-    this.artistsDiv = div;
-  }
-  private emitShowRange(id: string, start: number, end: number) {
-    for (let i = start ; i < end ; i++) {
-      this.emitter.emit(`show-${id}-${i}`);
-    }
-  }
-  private emitHideRange(id: string, start: number, end: number) {
-    for (let i = start ; i < end ; i++) {
-      this.emitter.emit(`hide-${id}-${i}`);
-    }
-  }
-  componentWillReceiveProps (nextProps: HolisticViewProps) {
-    this.updateHash(nextProps);
-  }
-  hashCode (str: string) {
-    var h = 0, l = str.length, i = 0;
-    if ( l > 0 )
-      while (i < l)
-        h = (h << 5) - h + str.charCodeAt(i++) | 0;
-    return h;
-  }
-  private hash() {
-    return this.props.library.artists.reduce((acc, val) => {
-      return this.hashCode(acc + '::' + val).toString(16);
-    }, "BEGIN::" + this.state.artistsFilter + '::');
-  }
-  private updateHash (props = this.props) {
-    const artistsHash = this.hash();
-    if (this.artistsHash !== artistsHash) {
-      this.emitter.removeAllListeners();
-      this.artistsHash = artistsHash;
-      this.oldArtistScroll = this.computeRange(this.artistsDiv);
-      this.emitShowRange(this.artistsHash, this.oldArtistScroll[0], this.oldArtistScroll[1]);
-    }
-  }
-  private computeRange(div: HTMLDivElement): [number, number] {
-    const top = div.scrollTop;
-    const height = div.getBoundingClientRect().height;
-    const childHeight = 80;
-    const length = Math.ceil(height/ childHeight);
-    const start = Math.floor(top / childHeight);
-    const end = start + length;
-    
-    return [start, end];
-  }
-  async handleNewArtist (name: string) {
+  
+  async handleNewArtist () {
+    const name = this.state.artistsFilter;
     this.setState({
       addingArtist: name
     });
@@ -164,31 +85,6 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   render (): JSX.Element {
     const {actions, library, player} = this.props;
     const showAdd = this.state.artistsFilter ? !library.artists.includes(artistURI(mapArtistToParams({name: this.state.artistsFilter}))) :  false;
-    const artists = filter(library.artists, this.state.artistsFilter).map((artist, index) => {
-      return <ArtistListItem key={artist} actions={actions}
-              artist={artist} active={
-                artistURI(artist).name === this.props.match.params.artist
-              } hash={this.artistsHash}
-              emitter={this.emitter}
-              index={index}
-              tooltip={library.expandArtists ? 'disabled': 'on'}
-              visible={index < this.oldArtistScroll[1] + 1 && index >= this.oldArtistScroll[0]}
-              />
-            }).concat(showAdd ? this.state.addingArtist ? <PlaceholderComponent 
-              id="" 
-              layout="medium" 
-              theme="dark" 
-              loading={true} 
-              sub="Creating artist"
-              header={this.state.addingArtist} /> : 
-            (this.state.artistsFilter ? <PlaceholderComponent 
-              id="" 
-              layout="medium" 
-              theme="dark" 
-              loading={false} 
-              sub="Click to create a new artist"
-              onClick={this.handleNewArtist.bind(this, this.state.artistsFilter)} 
-              header={this.state.artistsFilter} /> : []) : []);
 
     return <div className="holistic-view">
       <FuzzySelector library={library} actions={actions} />
@@ -211,9 +107,10 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
           </div>
           
           <div className="top-gradient"></div>
-          <ScrollableDiv divRef={(div) => this.handleArtistDivRef(this.artistsHash, div)}>
-            {artists}
-          </ScrollableDiv>
+          <ArtistListView match={this.props.match} actions={actions} items={library.artists} placeholderState={
+            showAdd ? this.state.addingArtist === this.state.artistsFilter ? 'loading' : 
+                    (this.state.artistsFilter ? 'on' :'off') : 'off'
+          } filter={this.state.artistsFilter} onPlaceholderClick={this.handleNewArtist.bind(this)}/>
         </Box>
         <Box col={3}>
           <AlbumsListView actions={actions} match={this.props.match}

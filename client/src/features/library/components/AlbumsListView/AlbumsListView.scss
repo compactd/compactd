@@ -24,7 +24,21 @@ div.albums-list-view{
   }
   div.albums-container {
 
-  }
+    }
+    .ReactVirtualized__Grid.ReactVirtualized__List {
+      overflow-y: auto;
+      overflow-x: hidden;
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 4px;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 0px;
+        background-color: rgba(153, 148, 192, 0.308);
+        box-shadow: 0 0 1px rgba(255, 255, 255, .1);
+        margin-right: 2px;
+      }
+    }
   // div.artist-header {
   //   img {
   //     border-radius: 16px;

@@ -2,6 +2,8 @@ import PouchDB from 'pouchdb';
 import * as PQueue from 'p-queue';
 import Session from 'app/session';
 
+const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
+
 export default class Artwork {
   private queue: PQueue;
 
@@ -41,6 +43,17 @@ export default class Artwork {
     });
   }
 
+  shouldAttach (docId: string, target: HTMLImageElement) {
+    if (!document.contains(target)) {
+      return false;
+    }
+    const attr = target.getAttribute('data-doc-id');
+    if (attr && attr !== docId) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * 
    * @param docId the document id, starting with or without artowrks/
@@ -48,9 +61,13 @@ export default class Artwork {
    */
   load (docId: string, size: 'large' | 'small', target: HTMLImageElement, watch = true): Promise<Blob> {
     const oldSrc = target ? target.src : null;
+    if (!docId.startsWith('artworks/')) {
+      docId = 'artworks/' + docId;
+    }
+    target.src = BLANK_IMAGE;
     return this.queue.add(() => {
-      if (!docId.startsWith('artworks/')) {
-        docId = 'artworks/' + docId;
+      if (!this.shouldAttach(docId, target)) {
+        return Promise.resolve(new Blob());
       }
       if (watch) {
         const changes: any = this.artworks.changes({
@@ -58,7 +75,7 @@ export default class Artwork {
           live: true,
           since: 'now'
         }).on('change', (info) => {
-          if (!target || !target.src) {
+          if (!this.shouldAttach(docId, target)) {
             return changes.cancel();
           }
           this.load(docId, size, target, false);
@@ -73,6 +90,9 @@ export default class Artwork {
           return res.blob();
         });
       }).then((res: Blob) => {
+        if (!this.shouldAttach(docId, target)) {
+          return Promise.resolve(new Blob());
+        }
         return this.attach(res, target, oldSrc);
       });
     });

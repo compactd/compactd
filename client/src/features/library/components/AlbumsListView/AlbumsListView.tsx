@@ -15,7 +15,12 @@ import Session from 'app/session';
 import Toaster from 'app/toaster';
 import DSAlbumComponent from 'components/DSAlbumComponent/DSAlbumComponent';
 import { filter } from 'fuzzaldrin';
-
+import { ListProps } from 'react-virtualized';
+import AlbumComponent from 'components/AlbumComponent/AlbumComponent';
+import { join } from 'path';
+import { parse, stringify } from 'querystring';
+import { List } from 'react-virtualized/dist/es/List';
+import * as PropTypes from 'prop-types';
 require('./AlbumsListView.scss');
 
 interface AlbumsListViewProps {
@@ -30,15 +35,22 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   albumsFilter: string;
   dsResults: Map<DSAlbum[]>;
   displayResults: boolean;
+  height?: number;
+  width?: number;
 }>{
-  private oldScroll: [number, number];
-  private hash: string;
+  static contextTypes = {
+    router: PropTypes.shape({
+      history: PropTypes.shape({
+        push: PropTypes.func.isRequired,
+        replace: PropTypes.func.isRequired,
+        createHref: PropTypes.func.isRequired
+      }).isRequired
+    }).isRequired
+  }
   private div: HTMLDivElement;
-  private emitter: EventEmitter;
   constructor () {
     super();
     this.state = {albumsFilter: '', dsResults: {}, displayResults: false};
-    this.emitter = new EventEmitter();
   }
   handleAlbumsFilterChange (evt: Event) {
     const target = evt.target as HTMLInputElement;
@@ -78,46 +90,9 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     }
 
     const div = this.div;
-
-    this.oldScroll = this.computeRange(div);
-
-    div.addEventListener('scroll', (event) => {
-      window.requestAnimationFrame(() => {
-        const id = this.hash;
-
-        const [oldStart, oldEnd] = this.oldScroll;
-        const [start, end] = this.computeRange(div);
-
-        if (start === oldStart) return;
-
-        if (start > oldStart) {
-          this.emitHideRange(id, oldStart, start);
-        } else {
-          this.emitHideRange(id, end, oldEnd);
-        }
-
-        if (start > oldStart) {
-          this.emitShowRange(id, oldEnd, end);
-        } else {
-          this.emitShowRange(id, start, oldStart);
-        }
-        
-        this.oldScroll = [start, end];
-      })
-    });
   }
   handleArtistDivRef(id: string, div: HTMLDivElement) {
     this.div = div;
-  }
-  private emitShowRange(id: string, start: number, end: number) {
-    for (let i = start ; i < end ; i++) {
-      this.emitter.emit(`show-${id}-${i}`);
-    }
-  }
-  private emitHideRange(id: string, start: number, end: number) {
-    for (let i = start ; i < end ; i++) {
-      this.emitter.emit(`hide-${id}-${i}`);
-    }
   }
   componentWillReceiveProps (nextProps: AlbumsListViewProps) {
 
@@ -128,34 +103,110 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
         displayResults: false
       });
     }
+  }
+
+  computeHeight (div: HTMLDivElement) {
+    if (!div) return;
+    const windowHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    const {top, width} = div.getBoundingClientRect();
+
+    if (top === 0 || width === 0) return;
+
+    const height = windowHeight - top;
+
+    if (height === this.state.height && width === this.state.width) {
+      return;
+    }
+
+    this.setState({
+      height, width
+    });
+  }
+  get albums () {
     const {actions, library} = this.props;
     const artistId = `library/${this.props.artist}`;
 
-    const artist = this.props.artist ?
-    (library.artistsById[artistId]
-      || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
+    if (this.props.artist) {
+      if (library.artistsById[artistId]) {
+        return library.artistsById[artistId].albums;
+      } else {
+        return [];
+      }
+    }
+    return library.albums;
+  }
+  get items () {
+    const {library} = this.props;
+    const artistId = `library/${this.props.artist}`;
+    if (this.props.artist) {
+      const artist = library.artistsById[artistId];
+      const dsResults = this.state.dsResults[artistId];
+      if (!this.state.displayResults) {
+        return this.albums.concat('?search-albums');
+      }
+      if (dsResults) {
+        return this.albums.concat(dsResults.filter((val, i) => {
+          const uri = albumURI(mapAlbumToParams({artist: artist._id, name: val.name}));
+          if (artist.albums.includes(uri)) {
+            return false;
+          }
+          return true;
+        }).slice(0, 20).map((res) => {
+          return 'results?' + stringify(res);
+        }));
+      } else {
+        return this.albums.concat('?searching-albums');
+      }
+    }
+    return filter(this.albums, this.state.albumsFilter);
+  }
+  renderItem (props: ListProps) {
+    return <div style={props.style} key={props.key} >
+        {this._renderItem(props)}
+      </div>
+  }
+  handleAlbumClick (album: string, active: boolean, event: MouseEvent) {
+    if (
+      !event.defaultPrevented && // onClick prevented default
+      event.button === 0// && // ignore right clicks
+    //  !this.props.target //&& // let browser handle "target=_blank" etc.
+      // !isModifiedEvent(event) // ignore clicks with modifier keys
+    ) {
+      event.preventDefault()
 
-    const hash = objectHash({
-      artist: nextProps.artist,
-      albums: artist.albums.length
-    });
+      const { history } = this.context.router
+      const props = albumURI(album);
+      history.push(active ? '/library' : `/library/${
+        this.props.all ? 'all/':  ''}${
+        props.artist
+      }/${props.name}`);
+    }
 
-    if (this.hash !== hash) {
-      this.hash = hash;
-      this.oldScroll = this.computeRange(this.div);
+  }
+  
+  _renderItem (props: ListProps) {
+    const {index, style, parent} = props;
+    const item = this.items[index];
+    if (item.startsWith('library/')) {
+      const active = this.props.match.params.album === albumURI(item).name;
+      return <AlbumComponent
+              id={item}
+              onClick={this.handleAlbumClick.bind(this, item, active)}
+              active={active}
+              layout="medium"
+              theme="dark"
+              subtitle="counters"
+              visible={props.isVisible}/>
+    } else if (item === '?searching-albums') {
+      return <PlaceholderComponent id="" layout="medium" theme="dark" loading={true} />;
+    } else if (item === '?search-albums') {
+      return <PlaceholderComponent id="" layout="medium" theme="dark" loading={false} onClick={this.handleSearchClick.bind(this)}/>;
+    } else if (item.startsWith('results?')) {
+      const [pre, ...res] = item.split('?');
+      return <DSAlbumComponent layout="medium" id="" theme="dark" album={parse(res.join('?')) as any} />
     }
   }
-  private computeRange(div: HTMLDivElement): [number, number] {
-    const top = div.scrollTop;
-    const height = div.getBoundingClientRect().height;
-    const childHeight = 80;
-    const length = Math.ceil((height) / childHeight);
-    const start = Math.floor(top / childHeight);
-    const end = start + length;
-    
-    return [start, end];
-  }
-
+  
   render (): JSX.Element {
     const {actions, library} = this.props;
     const artistId = `library/${this.props.artist}`;
@@ -163,29 +214,8 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       (library.artistsById[artistId]
         || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
         
-    const dsResults = this.state.dsResults[artistId];
 
-    const albums = filter(artist.albums, this.state.albumsFilter).map((album, index) => {
-      return  <AlbumListItem key={album}
-                active={this.props.match.params.album === albumURI(album).name}
-                album={album} actions={actions} all={this.props.all}
-                hash={this.hash}
-                emitter={this.emitter}
-                index={index}
-                visible={index < this.oldScroll[1] + 1}/>
-    }).concat(artist._id ? !this.state.displayResults ?
-      <PlaceholderComponent id="" layout="medium" theme="dark" loading={false} onClick={this.handleSearchClick.bind(this)}/> :
-      !dsResults ?
-        <PlaceholderComponent id="" layout="medium" theme="dark" loading={true} /> : 
-        dsResults.filter((val, i) => {
-          const uri = albumURI(mapAlbumToParams({artist: artist._id, name: val.name}));
-          if (artist.albums.includes(uri)) {
-            return false;
-          }
-          return true;
-        }).slice(0, 12).map((res) => {
-          return <DSAlbumComponent layout="medium" id="" theme="dark" album={res} />;
-        }) : []);
+    const albums = this.items;
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
@@ -203,11 +233,18 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
         {header}
       </div>
         <div className="top-gradient"></div>
-      <ScrollableDiv divRef={(div) => this.div = div}>
-        <div className="albums-container">
-          {albums}
+        <div className="scroll-container" ref={(ref) => {
+          this.div = ref;
+          this.computeHeight(ref);
+        }}>
+          <List
+            __filter={this.state.albumsFilter}
+            height={this.state.height}
+            width={this.state.width} 
+            rowHeight={80} 
+            rowCount={albums.length}
+            rowRenderer={this.renderItem.bind(this)} />
         </div>
-      </ScrollableDiv>
     </div>
   }
 }

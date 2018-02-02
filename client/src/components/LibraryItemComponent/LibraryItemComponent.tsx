@@ -58,21 +58,21 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   handleMouseOver() {
     if (this.loaded) return;
 
-    this.loadItem(this.props.id);
-    this.loadImage(this.props.id, this.image);
+    // this.loadItem(this.props.id);
+    // this.loadImage(this.props.id, this.image);
   }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
     if (nextProps.id !== this.props.id && (!this.props.emitter || this.props.visible)) {
+      if (this.props.id) {
+        this.loaded = false;
+        this.unloadItem();
+      }
       if (nextProps.id) {
         this.loaded = true;
         this.loadItem(nextProps.id);
         this.loadImage(nextProps.id, this.image);
         return;
-      }
-      if (this.props.id) {
-        this.loaded = true;
-        this.unloadItem();
       }
     }
 
@@ -89,7 +89,10 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
     }
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+    this.loaded = false;
+    this.unloadItem();
+  }
   
   getImageSizings (): 'large' | 'small' {
     switch (this.props.layout) {
@@ -119,7 +122,7 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
     return <img width={size} height={size} 
     src={BLANK_IMAGE} ref={(ref) => {
       this.image = ref;
-    }} />;
+    }} data-doc-id={"artworks/" + this.props.id} />;
   }
 
   abstract getClassNames(): string[];

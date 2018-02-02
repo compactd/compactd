@@ -76,7 +76,11 @@ export default class LibraryProvider {
         callback(changes.doc);
       }
     })
-    this.getDocument<T>(db, id).then(callback).catch((err) => {
+    this.getDocument<T>(db, id).then((doc) => {
+      if (this.feeds[key]) {
+        callback(doc);
+      }
+    }).catch((err) => {
       console.log('couldnt find', db, id);
     });
     return key;
