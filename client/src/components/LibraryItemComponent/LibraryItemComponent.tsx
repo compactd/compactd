@@ -11,10 +11,8 @@ interface LibraryItemComponentProps {
   active?: boolean;
   className?: string;
   id: string;
-  emitter?: EventEmitter;
-  hash?: string;
   index?: number;
-  visible?: boolean;
+  onlyImage?: boolean;
 }
 
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
@@ -37,22 +35,10 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
 
   componentDidMount() {
-    if (!this.props.emitter || this.props.visible) {
-      this.loaded = true;
-      this.loadItem(this.props.id);
-      this.loadImage(this.props.id, this.image);
-      return;
-    }
-
-    this.props.emitter.on(`show-${this.props.hash}-${this.props.index}`, () => {
-      this.loaded = true;
-      this.loadItem(this.props.id);
-      this.loadImage(this.props.id, this.image);
-    });
-    this.props.emitter.on(`hide-${this.props.hash}-${this.props.index}`, () => {
-      this.loaded = false;
-      this.unloadItem();
-    });
+    this.loaded = true;
+    this.loadItem(this.props.id);
+    this.loadImage(this.props.id, this.image);
+    return;
   }
   
   handleMouseOver() {
@@ -63,7 +49,7 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
   }
 
   componentWillReceiveProps (nextProps: LibraryItemComponentProps) {
-    if (nextProps.id !== this.props.id && (!this.props.emitter || this.props.visible)) {
+    if (nextProps.id !== this.props.id) {
       if (this.props.id) {
         this.loaded = false;
         this.unloadItem();
@@ -74,18 +60,6 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
         this.loadImage(nextProps.id, this.image);
         return;
       }
-    }
-
-    if (nextProps.hash !== this.props.hash) {
-      this.props.emitter.on(`show-${nextProps.hash}-${nextProps.index}`, () => {
-        this.loaded = true;
-        this.loadItem(this.props.id);
-        this.loadImage(this.props.id, this.image);
-      });
-      this.props.emitter.on(`hide-${nextProps.hash}-${nextProps.index}`, () => {
-        this.loaded = false;
-        this.unloadItem();
-      });
     }
   }
 
@@ -149,7 +123,8 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
       ...this.getClassNames(),
           {active,
           'clickable': !!this.props.onClick,
-          'pt-dark': this.props.theme === 'dark'
+          'pt-dark': this.props.theme === 'dark',
+          'hide-text': this.props.onlyImage
         })}
         onClick={onClick as any}
         onMouseOver={this.handleMouseOver.bind(this)}>

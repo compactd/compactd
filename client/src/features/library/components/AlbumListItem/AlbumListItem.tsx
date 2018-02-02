@@ -69,9 +69,6 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
           subtitle="counters"
           id={album} 
           index={index}
-          hash={hash}
-          emitter={emitter}
-          visible={visible}
           onClick={this.handleClick.bind(this)}/>
       </div>
   }

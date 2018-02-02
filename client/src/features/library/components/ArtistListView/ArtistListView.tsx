@@ -19,6 +19,7 @@ interface ArtistListViewProps {
   filter?: string;
   placeholderState: 'off' | 'on' | 'loading';
   onPlaceholderClick?: Function;
+  minimal?: boolean;
 }
 
 export class ArtistListView extends React.Component<ArtistListViewProps, {
@@ -72,11 +73,11 @@ export class ArtistListView extends React.Component<ArtistListViewProps, {
     const item = this.items[index];
     if (item.startsWith('library/')) {
       const active = artistURI(item).name === this.props.match.params.artist;
-      return <ArtistComponent active={
+      return <ArtistComponent onlyImage={this.props.minimal} active={
                 active
-              } onClick={
+              } tooltip={this.props.minimal ? 'on': 'disabled'} onClick={
                 this.handleItemClick.bind(this, item, active)
-              } id={item} layout="medium" theme="dark" subtitle="counters" visible={props.isVisible}/>
+              } id={item} layout="medium" theme="dark" subtitle="counters" />
     } else if (item.startsWith('placeholder?')) {
       const [o, filter] = item.split('?');
       return <PlaceholderComponent 
@@ -96,6 +97,13 @@ export class ArtistListView extends React.Component<ArtistListViewProps, {
           loading={true} 
           sub="Creating artist"
           header={filter} />
+    }
+  }
+  componentWillReceiveProps (nextProps: ArtistListViewProps) {
+    if (nextProps.minimal !== this.props.minimal) { 
+      setTimeout(() => {
+        this.computeHeight(this.div);
+      }, 210);
     }
   }
   

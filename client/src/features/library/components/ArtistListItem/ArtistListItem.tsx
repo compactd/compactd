@@ -70,11 +70,8 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
         theme='dark' 
         id={artist}
         index={index}
-        hash={hash}
-        emitter={emitter}
-        visible={visible}
         tooltip={tooltip}
-        subtitle='counters' 
+        subtitle='counters'
         onClick={this.handleClick.bind(this)} />
     </div>
   }

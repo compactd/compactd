@@ -199,8 +199,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
               active={active}
               layout="medium"
               theme="dark"
-              subtitle="counters"
-              visible={props.isVisible}/>
+              subtitle="counters" />
     } else if (item === '?searching-albums') {
       return <PlaceholderComponent id="" layout="medium" theme="dark" loading={true} />;
     } else if (item === '?search-albums') {

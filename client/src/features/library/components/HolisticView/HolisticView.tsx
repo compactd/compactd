@@ -107,7 +107,8 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
           </div>
           
           <div className="top-gradient"></div>
-          <ArtistListView match={this.props.match} actions={actions} items={library.artists} placeholderState={
+          <ArtistListView match={this.props.match} actions={actions} items={library.artists}
+          minimal={!library.expandArtists} placeholderState={
             showAdd ? this.state.addingArtist === this.state.artistsFilter ? 'loading' : 
                     (this.state.artistsFilter ? 'on' :'off') : 'off'
           } filter={this.state.artistsFilter} onPlaceholderClick={this.handleNewArtist.bind(this)}/>
