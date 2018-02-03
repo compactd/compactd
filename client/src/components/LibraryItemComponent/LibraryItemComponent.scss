@@ -9,6 +9,11 @@ div.item-component {
   div {
     transition: all 0.3s ease;
   }
+
+  .images-container {
+    outline: none;
+  }
+  
   div.item-counter {
     display: inline-block;
   }
