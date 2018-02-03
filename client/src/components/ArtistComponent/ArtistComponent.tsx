@@ -39,7 +39,7 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
 
   loadImage(id: string, img: HTMLImageElement): void {
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().load(id, this.getImageSizings(), this.image);
+      Artwork.getInstance().load(id, this.getImageSizings(), img);
     }
   }
   loadCounters (id: string) {
@@ -66,7 +66,7 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
     const provider = LibraryProvider.getInstance();
     provider.cancelFeeds(this.feeds);
     if (this.isUsingEmbeddedArtworks()) {
-      URL.revokeObjectURL(this.image.src);
+      URL.revokeObjectURL(this.images[this.props.id].src);
     }
   }
   getClassNames(): string[] {

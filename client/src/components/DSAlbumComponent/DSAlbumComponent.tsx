@@ -80,7 +80,7 @@ export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentPr
   }
 
   loadImage(id: string, img: HTMLImageElement): void {
-    this.image.src = this.props.album.cover;
+    img.src = this.props.album.cover;
   }
   
   async loadItem(id: string): Promise<void> {

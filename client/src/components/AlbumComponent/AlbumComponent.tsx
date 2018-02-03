@@ -69,7 +69,7 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
 
   loadImage(id: string, img: HTMLImageElement): void {
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().load(id, this.getImageSizings(), this.image);
+      Artwork.getInstance().load(id, this.getImageSizings(), img);
     }
   }
   
@@ -103,8 +103,8 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
   unloadItem(): void {
     const provider = LibraryProvider.getInstance();
     provider.cancelFeeds(this.feeds);
-    if (this.isUsingEmbeddedArtworks() && this.image) {
-      URL.revokeObjectURL(this.image.src);
+    if (this.isUsingEmbeddedArtworks() && this.images[this.props.id]) {
+      URL.revokeObjectURL(this.images[this.props.id].src);
     }
   }
   getClassNames(): string[] {
