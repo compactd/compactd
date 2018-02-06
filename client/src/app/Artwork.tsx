@@ -42,7 +42,7 @@ export default class Artwork {
       
       target.addEventListener('load', function onload () {
         resolve(blob);
-      }, {once: true});
+      }, {once: true} as any); // hack
     });
   }
 
