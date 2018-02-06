@@ -20,6 +20,9 @@ class ScrollableDiv extends React.Component<{
       this.updateHeight()
     }, 200);
   }
+  componentWillReceiveProps () {
+    this.updateHeight();
+  }
   updateHeight () {
     this.div.style.height =
       (window.innerHeight

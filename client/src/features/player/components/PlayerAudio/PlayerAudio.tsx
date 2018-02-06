@@ -74,12 +74,12 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       })
     });
 
-    window.addEventListener('resize', debounce(() => {
-        if (this.props.expanded) {
+    if (this.props.expanded) {
+        window.addEventListener('resize', debounce(() => {
           this.updateSvgWidths();
           this.buildWaveform(this.data);
-        }
-      }, 420))
+        }, 420))
+      }
 
   }
   private showAndUpdateRange() {
@@ -134,8 +134,13 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
       }
     }
     if (nextProps.expanded && !this.props.expanded) {
+      const key = setInterval(() => {
+        window.requestAnimationFrame(() => {
+          window.dispatchEvent(new Event('resize'));
+        });
+      }, 5);
       setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
+        clearInterval(key);
         this.buildWaveform(null);
         this.fetchWaveform((nextProps.source || this.props.source).getTrack());
       }, 250);
@@ -145,8 +150,16 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
         this.buildWaveform(null);
         this.showAndUpdateRange();
       }
+      
+      const key = setInterval(() => {
+        window.requestAnimationFrame(() => {
+          window.dispatchEvent(new Event('resize'));
+        });
+      }, 10);
       setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
+        clearInterval(key);
+        this.buildWaveform(null);
+        this.fetchWaveform((nextProps.source || this.props.source).getTrack());
       }, 250);
     }
     if (nextProps.nextSource) {
