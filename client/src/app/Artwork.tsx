@@ -1,5 +1,7 @@
 import PouchDB from 'pouchdb';
 import * as PQueue from 'p-queue';
+const debounce = require('debounce');
+
 import Session from 'app/session';
 
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
@@ -31,15 +33,16 @@ export default class Artwork {
     return this.load(id, 'small', target);
   }
 
-  attach (blob: Blob, target: HTMLImageElement, oldSrc: string): Promise<Blob> {
+  attach (blob: Blob, target: HTMLImageElement): Promise<Blob> {
     return new Promise((resolve) => {
-      if (!target || oldSrc !== target.src) {
+      if (!window.document.contains(target)) {
         return resolve(blob);
       }
       target.src = URL.createObjectURL(blob);
-      target.addEventListener('load', () => {
+      
+      target.addEventListener('load', function onload () {
         resolve(blob);
-      });
+      }, {once: true});
     });
   }
 
@@ -60,7 +63,6 @@ export default class Artwork {
    * @param size the size, either large (300px) or small (64px)
    */
   load (docId: string, size: 'large' | 'small', target: HTMLImageElement, watch = true): Promise<Blob> {
-    const oldSrc = target ? target.src : null;
     if (!docId.startsWith('artworks/')) {
       docId = 'artworks/' + docId;
     }
@@ -74,12 +76,12 @@ export default class Artwork {
           doc_ids: [docId],
           live: true,
           since: 'now'
-        }).on('change', (info) => {
+        }).on('change', debounce((info: PouchDB.Core.ChangesResponseChange<{}>) => {
           if (!this.shouldAttach(docId, target)) {
             return changes.cancel();
           }
           this.load(docId, size, target, false);
-        });
+        }, 500, false));
       }
       return this.artworks.getAttachment(docId, size).catch((err) => {
         console.log('No attachment for: ' + docId);
@@ -93,7 +95,7 @@ export default class Artwork {
         if (!this.shouldAttach(docId, target)) {
           return Promise.resolve(new Blob());
         }
-        return this.attach(res, target, oldSrc);
+        return this.attach(res, target);
       });
     });
   }
