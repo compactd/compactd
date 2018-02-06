@@ -206,7 +206,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       return <PlaceholderComponent id="" layout="medium" theme="dark" loading={false} onClick={this.handleSearchClick.bind(this)}/>;
     } else if (item.startsWith('results?')) {
       const [pre, ...res] = item.split('?');
-      return <DSAlbumComponent layout="medium" id="" theme="dark" album={parse(res.join('?')) as any} />
+      return <DSAlbumComponent layout="medium" id={item} theme="dark" album={parse(res.join('?')) as any} />
     }
   }
   
