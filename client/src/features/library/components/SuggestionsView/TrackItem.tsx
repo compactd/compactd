@@ -30,8 +30,7 @@ export default class TrackItem extends React.Component<TrackItemProps, {}> {
       this.handleAltClick(evt);
       return;
     }
-    const stack = library.topTracks.map((el) => el.key).slice(this.props.index);
-    actions.replacePlayerStack(stack);
+    actions.replacePlayerStack([this.props.track]);
   }
   private handleAltClick (evt: MouseEvent) {
     evt.stopPropagation();
