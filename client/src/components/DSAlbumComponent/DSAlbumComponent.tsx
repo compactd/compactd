@@ -89,15 +89,24 @@ export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentPr
     const album = this.props.album.name;
     const artist = this.props.album.artist;
 
-    const res = await Promise.all(trackers.rows.map(async ({doc}) => {
-      if (doc._id === '_design/validator') return [];
-      const query = qs.stringify({name: album, artist});
-      const res = await Session.fetch(`/api/cascade/${doc._id}/search?${query}`)
-      const data = await res.json();
-      return data;
-    }));
+    let res: any[];
 
-    if (!res.length) {
+    try {
+      res = await Promise.all(trackers.rows.map(async ({doc}) => {
+        if (doc._id === '_design/validator') return [];
+        const query = qs.stringify({name: album, artist});
+        const res = await Session.fetch(`/api/cascade/${doc._id}/search?${query}`)
+        const data = await res.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        return data;
+      }));
+    } catch (err) {
+      console.log(err);
+    }
+
+    if (!res || !res.length) {
       this.setState({releases:{
         [this.props.album.id]: []
       }});
