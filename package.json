@@ -1,6 +1,6 @@
 {
   "name": "compactd",
-  "version": "1.3.0-alpha.12",
+  "version": "1.3.0-alpha.13",
   "description": "Remote music player that allows to play music remotely",
   "main": "./server/index.js",
   "bin": {
