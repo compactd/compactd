@@ -118,7 +118,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
             all={this.props.all || !this.props.match.params.artist}
             artist={!this.props.all ? this.props.match.params.artist: undefined} library={library} />
         </Box>
-        <Box col={7}>
+        <Box col={7} auto>
           <AlbumDetailsView actions={actions} player={player}
             artist={this.props.match.params.artist}
             album={this.props.match.params.album} library={library} />
