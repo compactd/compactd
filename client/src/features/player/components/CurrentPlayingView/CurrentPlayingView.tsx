@@ -89,8 +89,10 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
       if (current) {
         this.detachImage(current);
       }
-      this.attachImage(next);
-      actions.fetchDatabaseAlbum(next);
+      if (next) {
+        this.attachImage(next);
+        actions.fetchDatabaseAlbum(next);
+      }
     }
 
     setTimeout(() => {
