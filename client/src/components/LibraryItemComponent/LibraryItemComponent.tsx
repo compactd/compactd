@@ -82,7 +82,7 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
       case 'compact': 
         return 'small';
       case 'medium':
-        return 'large';
+        return 'small';
       case 'large':
         return 'large';
     }
