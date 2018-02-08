@@ -29,7 +29,7 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
 
   loadImage(id: string, img: HTMLImageElement): void {
     if (id) {
-      Artwork.getInstance().load(id, 'large', img);
+      Artwork.getInstance().load(id, 'hq', img);
     }
   }
   
@@ -50,7 +50,7 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
     this.images[id] = node;
 
     node.addEventListener('load', () => {
-      this.infoDiv.style.backgroundColor = `rgba(${this.colorThief.getColor(node).join(', ')}, 0.25)`;
+      this.infoDiv.style.backgroundColor = `rgba(${this.colorThief.getColor(node).join(', ')}, 0.18)`;
     });
   }
 

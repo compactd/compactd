@@ -62,7 +62,7 @@ export default class Artwork {
    * @param docId the document id, starting with or without artowrks/
    * @param size the size, either large (300px) or small (64px)
    */
-  load (docId: string, size: 'large' | 'small', target: HTMLImageElement, watch = true): Promise<Blob> {
+  load (docId: string, size: 'large' | 'small' | 'hq', target: HTMLImageElement, watch = true): Promise<Blob> {
     if (!docId.startsWith('artworks/')) {
       docId = 'artworks/' + docId;
     }
@@ -84,6 +84,9 @@ export default class Artwork {
         }, 500, false));
       }
       return this.artworks.getAttachment(docId, size).catch((err) => {
+        if (size === 'hq') {
+          return this.load(docId, 'large', target, false);
+        }
         console.log('No attachment for: ' + docId);
         return fetch('/api/assets/no-album.jpg', {
           method: 'GET',
