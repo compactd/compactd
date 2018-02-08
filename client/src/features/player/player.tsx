@@ -158,12 +158,22 @@ function jumpTo (target: string | number | Defs.Track) {
   }
 }
 
-async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Promise<PlayerAction> {
+async function replacePlayerStack(stack: PlayerStack, filterHidden = false, shuffle = false): Promise<PlayerAction> {
   await Promise.resolve();
   const tracks = new PouchDB<Defs.Track>('tracks');
   const filterHiddenFunc = (doc: Defs.Track) => {
     return filterHidden ? !doc.hidden : true;
   };
+  const possiblyShuffle = (a: Defs.Track, b: Defs.Track) => {
+    if (shuffle) return 0.5 - Math.random();
+    if (a._id < b._id) {
+      return -1;
+    }
+    if (a._id > b._id) {
+      return 1;
+    }
+    return 0;
+  }
 
   if (Array.isArray(stack)) {
     if (stack.length === 2 && !Number.isNaN(Number(stack[1] as any))) {
@@ -177,18 +187,18 @@ async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Pro
       });
       return {
         type: REPLACE_PLAYER_STACK_ACTION,
-        stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc)
+        stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc).sort(possiblyShuffle)
       };
     }
     if (typeof stack[0] === 'string') {
       const docs = await Promise.all((stack as string[]).map((id) => {
         return tracks.get(id);
       }));
-      return await replacePlayerStack(docs);
+      return await replacePlayerStack(docs, filterHidden, shuffle);
     }
     return {
       type: REPLACE_PLAYER_STACK_ACTION,
-      stack: stack as Defs.Track[]
+      stack: (stack as Defs.Track[]).sort(possiblyShuffle)
     }
   }
 
@@ -210,7 +220,7 @@ async function replacePlayerStack(stack: PlayerStack, filterHidden = false): Pro
 
   return {
     type: REPLACE_PLAYER_STACK_ACTION,
-    stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc)
+    stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc).sort(possiblyShuffle)
   };
 }
 

@@ -133,10 +133,14 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
             <Menu>
               <MenuDivider title="Edit" />
               <MenuItem iconName="media" text="Edit Artwork" onClick={() => this.setState({showArtworkEdit: true})}/>
-              <MenuItem iconName="text-highlight" text="Change title case"/>
+              {/* <MenuItem iconName="text-highlight" text="Change title case"/> */}
               <MenuDivider title="Playback" />
-              <MenuItem iconName="play" text="Listen to this album"/>
-              <MenuItem iconName="random" text="Shuffle"/>
+              <MenuItem iconName="play" text="Listen to this album" onClick={() => {
+                actions.replacePlayerStack(album);
+              }}/>
+              <MenuItem iconName="random" text="Shuffle" onClick={() => {
+                actions.replacePlayerStack(album, false, true);
+              }}/>
             </Menu>
           } position={Position.BOTTOM_RIGHT}>
             <span className="pt-icon-edit"></span>
