@@ -50,7 +50,7 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
     this.images[id] = node;
 
     node.addEventListener('load', () => {
-      this.infoDiv.style.backgroundColor = `rgba(${this.colorThief.getColor(node).join(', ')}, 0.18)`;
+      this.infoDiv.style.backgroundColor = `rgba(${this.colorThief.getColor(node).join(', ')}, 0.24)`;
     });
   }
 

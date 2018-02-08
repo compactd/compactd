@@ -7,7 +7,8 @@ div.playlist-view {
   }
   .current-playing-info {
     padding: 1em;
-    background-color: #e6e6e647;
+    background-color: #e6e6e636;
+    transition: background-color 1.4s ease;
     box-shadow: 1px -1px 4px rgba(0, 0, 0, 0.26);
     a {
       display: block;
