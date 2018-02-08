@@ -5,6 +5,8 @@ import Map from 'models/Map';
 import Artwork from 'app/Artwork';
 import { Link } from 'react-router-dom';
 
+const ColorThief = require('color-thief-browser');
+
 require('./CurrentPlayingView.scss');
 
 interface CurrentPlayingViewProps {
@@ -15,8 +17,16 @@ interface CurrentPlayingViewProps {
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
 
 export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps, {}>{
+  private infoDiv: HTMLDivElement;
+  private colorThief: any;
   private div: HTMLDivElement;
   private images: Map<HTMLImageElement> = {};
+
+  constructor () {
+    super();
+    this.colorThief = new ColorThief();
+  }
+
   loadImage(id: string, img: HTMLImageElement): void {
     if (id) {
       Artwork.getInstance().load(id, 'large', img);
@@ -38,6 +48,10 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
     this.loadImage(id, node);
 
     this.images[id] = node;
+
+    node.addEventListener('load', () => {
+      this.infoDiv.style.backgroundColor = `rgba(${this.colorThief.getColor(node).join(', ')}, 0.25)`;
+    });
   }
 
   detachImage (id: string) {
@@ -153,7 +167,7 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
     }
 
     return <div className="current-playing-view">
-      <div className="current-playing-info">
+      <div className="current-playing-info" ref={(ref) => this.infoDiv = ref}>
         <a className="track-title">{current.name}</a>
         <Link to={'/' + this.currentAlbum._id} className="track-album">{this.currentAlbum.name}</Link>
         <Link to={'/' + this.currentArtist._id} className="track-artist">{this.currentArtist.name}</Link>
