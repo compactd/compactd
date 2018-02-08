@@ -37,7 +37,7 @@ export default class ArtworkEditDialog extends React.Component<ArtworkEditDialog
     }
   }
   componentDidUpdate () {
-    const firstChild = this.resultsDiv.children[0];
+    if (!this.resultsDiv) return;
     const {width} = this.resultsDiv.getBoundingClientRect();
     const calculatedWidth = (width / 5) - (5 * 5);
     if (this.state.itemHeight !== calculatedWidth) {
