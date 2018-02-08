@@ -1,12 +1,14 @@
 div.artist-list-view{
-
   .ReactVirtualized__Grid.ReactVirtualized__List {
+
     overflow-y: auto;
     overflow-x: hidden;
     outline: none;
+    position: relative;
     &::-webkit-scrollbar {
       -webkit-appearance: none;
-      width: 4px;
+      width: 3px;
+      background-color: rgba(36, 36, 48, 0.72);
     }
     &::-webkit-scrollbar-thumb {
       border-radius: 0px;
