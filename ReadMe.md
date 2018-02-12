@@ -8,7 +8,8 @@ Compactd aims to be a self-hosted remote music player in your browser,
 streaming from you own personal server. It will also allows to download new
 music onto your server just like headphones does.
 
-[![https://i.imgur.com/CeDJZim.jpg](https://i.imgur.com/CeDJZiml.jpg)](https://i.imgur.com/CeDJZim.jpg)
+![Main view](https://raw.githubusercontent.com/compactd/compactd/master/art/main_view.png)
+![Waveform](https://raw.githubusercontent.com/compactd/compactd/master/art/waveform.png)
 
 ## Features
 
@@ -24,6 +25,13 @@ music onto your server just like headphones does.
  - Gazelle-based trackers support
  - Deluge torrent client supported
  - Waveform vizualisation 
+
+## Future development
+
+ - SoundScrape support: download from SoundCloud or Bandcamp
+ - Youtube support : download music from youtube
+ - Standalone desktop app: with or without server local playback / downloading
+ - Folder view: browse by folders instead of artists / albums
 
 ## Stack
 
