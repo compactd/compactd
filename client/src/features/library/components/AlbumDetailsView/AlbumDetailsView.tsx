@@ -7,7 +7,9 @@ import {albumURI, Track} from 'compactd-models';
 import BetterImage from 'components/BetterImage';
 import SuggestionsView from '../SuggestionsView';
 import Artwork from 'app/Artwork';
-import { Tab2, Tabs2, Spinner, HotkeysTarget, Hotkeys, Hotkey } from "@blueprintjs/core";
+import { Tab2, Tabs2, Spinner, HotkeysTarget, Hotkeys, Hotkey, Popover, MenuItem, Menu, MenuDivider, Position } from "@blueprintjs/core";
+import { AlbumComponent } from 'components';
+import ArtworkEditDialog from '../ArtworkEditDialog';
 
 require('./AlbumDetailsView.scss');
 
@@ -20,7 +22,11 @@ interface AlbumDetailsViewProps {
 }
 
 @HotkeysTarget
-export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {showHidden: boolean}>{
+export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {showHidden?: boolean, showArtworkEdit?: boolean}>{
+  constructor () {
+    super();
+    this.state = {};
+  }
   getAlbumId (props: AlbumDetailsViewProps = this.props) {
     
     return albumURI({name: props.album, artist: props.artist});
@@ -83,7 +89,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
       const content = Object.keys(albumsByDisc).map((disc) => {
         const tracks = albumsByDisc[disc];
   
-        return <Tab2 id={disc} title={'Disc ' + disc} panel={
+        return <Tab2 id={disc} key={disc} title={'Disc ' + disc} panel={
           <TrackList
             actions={actions}
             tracks={tracks}
@@ -116,15 +122,29 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     const p = albumURI(album._id);
     
     return <div className="album-details-view">
+      <ArtworkEditDialog
+        item={album._id}
+        isOpen={this.state.showArtworkEdit}
+        onClose={() => this.setState({showArtworkEdit: false})}/>
       <div className="album-header">
-        <div className="album-image" onClick={this.handleClick.bind(this)}>
-          <BetterImage src={Artwork.getInstance().getLargeCover(album._id, 128)} size={128} />
-          <span className="dark-overlay"></span>
-          <span className="play-overlay pt-icon pt-icon-play"></span>
-        </div>  
-        <div className="album-infos">
-          <div className="album-title">{album.name}</div>
-          <div className="album-year">{album.year}</div>
+        <AlbumComponent id={id} layout="large" subtitle={['artist', 'year']}/>
+        <div className="albums-actions">
+          <Popover content={
+            <Menu>
+              <MenuDivider title="Edit" />
+              <MenuItem iconName="media" text="Edit Artwork" onClick={() => this.setState({showArtworkEdit: true})}/>
+              {/* <MenuItem iconName="text-highlight" text="Change title case"/> */}
+              <MenuDivider title="Playback" />
+              <MenuItem iconName="play" text="Listen to this album" onClick={() => {
+                actions.replacePlayerStack(album);
+              }}/>
+              <MenuItem iconName="random" text="Shuffle" onClick={() => {
+                actions.replacePlayerStack(album, false, true);
+              }}/>
+            </Menu>
+          } position={Position.BOTTOM_RIGHT}>
+            <span className="pt-icon-edit"></span>
+          </Popover>
         </div>
       </div>
       <div className="album-content">

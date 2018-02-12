@@ -3,6 +3,7 @@ div.player-status{
   color: #fff;
   height: 4em;
   display: flex;
+  transition: all 250ms ease;
   div.player-track {
     // height: 3em;
     display: inline-block;
@@ -10,6 +11,7 @@ div.player-status{
     margin-left: 2em;
   }
   div.player-controls  {
+    transition: all 250ms ease;
     height: 4em;
     display: inline-block;
     /* vertical-align: middle; */
@@ -39,11 +41,27 @@ div.player-status{
   span.pt-icon-step-forward.play-previous {
       font-size: 20px;
   }
-  span.track-duration {
+  span.right-controls {
+    display: inline-block;
     float: right;
     margin-right: 28px;
+    &> span {
+      vertical-align: text-top;
+      &.fav-track {
+        
+        font-size: 20px;
+        margin-right: 5px;
+        margin-top: -4px;
+
+      }
+      &.track-duration {
+        width: 90px;
+        display: inline-block;
+      }
+    }
   }
   .player-name {
+    transition: all 250ms ease;
       margin-top: 1.1em;
   }
 
@@ -89,4 +107,73 @@ div.player-status{
   }
 
   span.pt-slider-handle {border-radius: 420px;height: 10px;width: 10px;/* top: 2px; */}
+
+  div.toggle-expand {
+    position: absolute;
+    top: 42px;
+    right: 16%;
+    z-index: 20;
+    color: black;
+    background-color: white;
+    padding: 6px 7px 4px 7px;
+    border-radius: 50px;
+    box-shadow: 0 0 3px black;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all ease 200ms;
+    &:hover {
+      opacity: 1;
+      transition: all ease 200ms;
+    }
+  }
+  
+  .fav-track {
+    display: inline-block;
+  }
+}
+
+div.player-status.expanded {
+  transition: all 250ms ease;
+  height: 8em;
+  display: flex;
+  div.player-track {
+  }
+  div.player-controls  {
+    transition: all 250ms ease;
+    height: 8em;
+    display: inline-block;
+    /* vertical-align: middle; */
+    line-height: 8em;
+    margin: 0 1em;
+  }
+
+  div.player-controls > span {
+  }
+
+  .player-name {
+    transition: all 250ms ease;
+    margin-top: 1.5em;
+  }
+
+  .player-audio {
+      margin-top: 0.3em;
+      transition: all 250ms ease;
+  }
+  .player-actions {
+    margin-top:  3px;
+    transition: all 250ms ease;
+  } 
+  div.player-actions > div {
+    vertical-align: middle;
+  }
+  .logout-button {
+
+  }
+  
+  span.pt-slider-handle {border-radius: 420px;height: 10px;width: 10px;/* top: 2px; */}
+  div.toggle-expand {
+    top: 98px;
+    transform: rotateZ(180deg);
+    transition: all 200ms ease;
+  }
 }

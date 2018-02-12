@@ -7,4 +7,37 @@ div.player-audio {
     display: none;
     transition: all 100ms ease;
   }
+  &.expanded {
+    div.player-range {
+      height: 2px;
+    }
+  }
+  .waveforms {
+    position: relative;
+    height: 50px;
+    width: 100%;
+  }
+  svg {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    rect.bar {
+      stroke: rgba(255, 255, 255, 0.72);
+      fill: rgba(255, 255, 255, 0.72);
+      &.progress {
+        stroke: rgba(19, 127, 189, 0.7);
+        fill: rgba(19, 127, 189, 0.7);
+        &.bot {
+          stroke: rgba(19, 127, 189, 0.4);
+          fill: rgba(19, 127, 189, 0.4);
+        }
+      }
+      &.bot {
+        stroke: rgba(255, 255, 255, 0.5);
+        fill: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
 }

@@ -8,9 +8,19 @@ import {AlbumDetailsView} from '../AlbumDetailsView';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {match} from 'react-router';
 import * as fuzzy from 'fuzzy';
-import {artistURI} from 'compactd-models';
+import {artistURI, mapArtistToParams} from 'compactd-models';
 import {FuzzySelector} from '../FuzzySelector'; 
 import * as classnames from "classnames";
+import {EventEmitter} from 'eventemitter3';
+
+import {filter, score} from 'fuzzaldrin';
+import PlaceholderComponent from 'components/PlaceholderComponent/PlaceholderComponent';
+import { Session } from 'inspector';
+import session from 'app/session';
+import toaster from 'app/toaster';
+import { syncDatabases } from 'app/database';
+import { Tooltip } from '@blueprintjs/core';
+import { ArtistListView } from 'features/library/components/ArtistListView';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -25,7 +35,9 @@ interface HolisticViewProps {
 }
 interface HolisticViewState {
   artistsFilter: string;
+  addingArtist: string;
 }
+
 
 export class HolisticView extends React.Component<HolisticViewProps, HolisticViewState> {
   static contextTypes = {
@@ -39,7 +51,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   }
   constructor () {
     super();
-    this.state = {artistsFilter: ''};
+    this.state = {artistsFilter: '', addingArtist: null};
   }
   componentDidMount () {
     this.props.actions.fetchAllArtists();
@@ -48,42 +60,32 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     const target = evt.target as HTMLInputElement;
     this.setState({artistsFilter: target.value});
   }
-  fuzzyResults () {
-    const {actions, library, player} = this.props;
-    
-    const options = {
-      pre: '$', post: '',
-      extract: (el: Artist) => el.name
-    };
-
-    const artists = library.artists
-    .map(artist => {
-      if (this.state.artistsFilter) {
-        return [
-          fuzzy.match(this.state.artistsFilter, artist.name || '', options), artist
-        ]
-      }
-      return [undefined, artist];
-    }).filter(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
-      return this.state.artistsFilter ? matched : true;
-    }).sort((a, b) => {
-      if (!this.state.artistsFilter) {
-        if ((a[1] as Artist).name > (b[1] as Artist).name) return 1;
-        if ((a[1] as Artist).name < (b[1] as Artist).name) return -1;
-        return 0;
-      }
-      return (b[0] as fuzzy.MatchResult).score - (a[0] as fuzzy.MatchResult).score;
+  
+  async handleNewArtist () {
+    const name = this.state.artistsFilter;
+    this.setState({
+      addingArtist: name
     });
-    return artists;
+    const res = await session.fetch('/api/artists/create', {
+      method: 'POST',
+      body: JSON.stringify({name}),
+      headers: {
+        'content-type': 'application/json'
+      }
+    });
+    const body = await res.json();
+    if (res.status !== 201 || !body.ok) {
+      toaster.error(body.error);
+      return;
+    }
+    this.setState({
+      addingArtist: null
+    });
   }
   render (): JSX.Element {
     const {actions, library, player} = this.props;
-    const artists = this.fuzzyResults().map(([matched, artist]: [fuzzy.MatchResult, Artist]) => {
-      return <ArtistListItem key={artist._id} actions={actions}
-              artist={artist} filterMatch={matched} active={
-                artistURI(artist._id).name === this.props.match.params.artist
-              } counter={library.counters[artist._id]}/>
-    })
+    const showAdd = this.state.artistsFilter ? !library.artists.includes(artistURI(mapArtistToParams({name: this.state.artistsFilter}))) :  false;
+
     return <div className="holistic-view">
       <FuzzySelector library={library} actions={actions} />
       <Flex>
@@ -97,60 +99,31 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
                 value={this.state.artistsFilter}
                 onChange={this.handleArtistsFilterChange.bind(this)}
                 onFocus={() => library.expandArtists || actions.toggleExpandArtist()}
-                onKeyDown={(evt) => this.handleSearchKeyPress(evt)}
                 placeholder="Filter artists" dir="auto" />
               <span onClick={actions.toggleExpandArtist}
               className={classnames('pt-icon toggle-expand-artist',
               library.expandArtists ? 'pt-icon-caret-left' : 'pt-icon-caret-right')}></span>
             </div>
           </div>
-          <ScrollableDiv>
-            {artists}
-          </ScrollableDiv>
+          
+          <div className="top-gradient"></div>
+          <ArtistListView match={this.props.match} actions={actions} items={library.artists}
+          minimal={!library.expandArtists} placeholderState={
+            showAdd ? this.state.addingArtist === this.state.artistsFilter ? 'loading' : 
+                    (this.state.artistsFilter ? 'on' :'off') : 'off'
+          } filter={this.state.artistsFilter} onPlaceholderClick={this.handleNewArtist.bind(this)}/>
         </Box>
         <Box col={3}>
           <AlbumsListView actions={actions} match={this.props.match}
             all={this.props.all || !this.props.match.params.artist}
             artist={!this.props.all ? this.props.match.params.artist: undefined} library={library} />
         </Box>
-        <Box col={7}>
+        <Box col={7} auto>
           <AlbumDetailsView actions={actions} player={player}
             artist={this.props.match.params.artist}
             album={this.props.match.params.album} library={library} />
         </Box>
       </Flex>
     </div>
-  }
-  handleSearchKeyPress (evt: React.KeyboardEvent<HTMLInputElement>) {
-    const {library} = this.props;
-    
-    const { history } = this.context.router;
-    const id = this.props.match.params.artist;
-    switch(evt.keyCode) {
-      // UP arrow
-      case 38: {
-        
-        event.preventDefault()
-        const items = this.fuzzyResults();
-        const index = items.findIndex(([matched, artist]: [fuzzy.MatchResult, Artist]) =>
-          artistURI(artist._id).name === this.props.match.params.artist);
-
-        history.push(index < 1 ? '/library' : `/${
-          (items[index - 1][1] as Artist)._id
-        }`);
-        return;
-      }
-      case 40: {
-        event.preventDefault()
-        const items = this.fuzzyResults();
-        const index = items.findIndex(([matched, artist]: [fuzzy.MatchResult, Artist]) =>
-          artistURI(artist._id).name === this.props.match.params.artist);
-        if (index >= items.length) return;  
-        history.push(`/${
-          (items[index + 1][1] as Artist)._id
-        }`);
-        return;
-      }
-    }
   }
 }

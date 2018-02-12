@@ -5,6 +5,7 @@ import * as classnames from 'classnames';
 import { ContextMenuTarget, Menu, MenuItem, MenuDivider, Dialog, Button, Popover, Position } from "@blueprintjs/core";
 import ArtistComponent from 'components/ArtistComponent';
 import {trackURI} from 'compactd-models';
+import FavComponent from 'components/FavComponent/FavComponent';
 
 require('./TrackListItem.scss');
 
@@ -56,9 +57,9 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
     const {actions, track, library} = this.props;
     if (!this.state.openSetArtist) return <div className=""></div>;
     const artists = this.props.library.artists.map((artist) => {
-      return <ArtistComponent layout="compact" artist={artist} onClick={() => {
+      return <ArtistComponent layout="compact" id={artist} onClick={() => {
         this.setState({openSetArtist: false});
-        actions.setTrackArtist(track._id, artist._id)
+        actions.setTrackArtist(track._id, artist)
       }}
       />;
     })
@@ -83,7 +84,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
       <div className="track-name">{track.name}</div>
       <div className="track-info">{track.offerRemove? <div className="remove-offer">remove?
         <div className="yes" onClick={() => actions.doRemove(track._id)}>yes</div>
-        <div className="no" onClick={() => actions.offerRemove(track._id, false)}>cancel</div></div>: ''}</div>
+        <div className="no" onClick={() => actions.offerRemove(track._id, false)}>cancel</div></div>: <FavComponent id={track._id} />}</div>
       <div className="track-duration">{duration}</div>
     </div></Popover></div>
   }

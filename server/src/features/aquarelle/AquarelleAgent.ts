@@ -1,4 +1,4 @@
-import {Album, Artist} from 'compactd-models';
+import {Album, Artist, File} from 'compactd-models';
 import {MediaSource} from '../datasource';
 import PouchDB from '../../database';
 import * as fs from 'fs';
@@ -9,6 +9,9 @@ import * as mime from 'mime';
 import config from '../../config';
 import * as md5 from 'md5';
 import {mainStory} from 'storyboard';
+import jwt from '../../jwt';
+
+const gis = require('g-i-s');
 
 async function reset() {
   const artworks = new PouchDB("artworks");
@@ -88,4 +91,80 @@ async function processArtists (onFetchArtist: Function = new Function()) {
   }));
 }
 
-export {processArtists, processAlbums, reset};
+function searchGoogleImage (query: string): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    gis(query, (err: Error, res: any[]) => {
+      if (err) return reject(err);
+      resolve(res);
+    });
+  })
+}
+
+function findLocalArtworks (dir: string): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dir, (err, files) => {
+      if (err) return reject(err);
+
+      resolve(files.filter((file) => {
+        const abs = path.join(dir, file);
+        return file.toLowerCase().endsWith('.jpg') && fs.lstatSync(abs).isFile();
+      }).map((f) => {
+        return path.join(dir, f);
+      }));
+    })
+  });
+}
+
+function createFileToken (file: string) {
+  return jwt.sign({
+    source: 'local',
+    file
+  })
+}
+
+function createURLToken (url: string) {
+  return jwt.sign({
+    source: 'remote',
+    url
+  })
+}
+
+function createLocalEntry (file: string) {
+  return sharp(file).metadata().then((data) => {
+    return {
+      token: createFileToken(file),
+      dimensions: [data.width, data.height]
+    }
+  })
+}
+
+async function findArtworks (id: string) {
+  const files = new PouchDB<File>('files');
+  const albums = new PouchDB<Album>('albums');
+  const artists = new PouchDB<Artist>('artists');
+
+  const fileId = (await files.allDocs({
+    include_docs: false,
+    startkey: id,
+    endkey: id + '\uffff'
+  })).rows[0].id;
+  const album = await albums.get(id);
+  const artist = await artists.get(album.artist);
+
+  const file = await files.get(fileId);
+
+  const folder = path.dirname(file.path);
+
+  const local = (await findLocalArtworks(folder)).map(createLocalEntry);
+
+  const results = (await searchGoogleImage(`${artist.name} - ${album.name}`)).map((res) => {
+    return {
+      url: res.url,
+      dimensions: [res.width, res.height]
+    }
+  });
+
+  return {results, local};
+}
+
+export {processArtists, processAlbums, reset, findArtworks};

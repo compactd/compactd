@@ -1,3 +1,35 @@
+@import '../../../../styles/utils';
+
 div.playlist-view {
-  padding: 0.5em;
+  div.scrollable-div {
+    
+     padding: 1em;
+  }
+  .current-playing-info {
+    padding: 1em;
+    background-color: #e6e6e636;
+    transition: background-color 1.4s ease;
+    box-shadow: 1px -1px 4px rgba(0, 0, 0, 0.26);
+    a {
+      display: block;
+      color:inherit;
+      text-decoration:none;
+    }
+    .track-title {
+      /* font-weight: bold; */
+      /* color: #605775; */
+      font-size: 15px;
+      margin-bottom: 3px;
+      @include ellipsis();
+    }
+
+    .track-album {
+      font-size: 13.3px;
+    }
+
+    .track-artist {
+      font-size: 13.3px;
+    }
+  }
+
 }

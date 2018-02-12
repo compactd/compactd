@@ -20,11 +20,15 @@ div.suggestions-view{
       }
     }
   }
-  .top-tracks {
-    width: 420px;
+  .top-tracks, .favs-tracks {
+    width: 380px;
     padding: 20px 32px 32px 32px;
     border-radius: 2px;
     @include card-shadow();
+    margin-bottom: 24px;
+    margin-right: 24px;
+    display: inline-block;
+    vertical-align: top;
   }
 
   .header {

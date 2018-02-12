@@ -12,10 +12,13 @@ import {
   mapAlbumToParams,
   mapArtistToParams,
   mapFileToParams,
-  mapTrackToParams
+  mapTrackToParams,
+  Artist
 } from 'compactd-models'; 
 import * as fs from 'fs';
 import {Scanner} from '../scanner/Scanner';
+import Scheduler from '../scheduler/Scheduler';
+import { downloadHQCover } from '../aquarelle/discogfetch';
 
 const files = new PouchDB<File>('files');
 
@@ -93,9 +96,40 @@ export async function removeTrack (trackID: string) {
   await clean(PouchDB)
 }
 
+export async function createArtist (name: string) {
+  const _id = artistURI(mapArtistToParams({name}));
+
+  const Artist = new PouchDB<Artist>('artists');
+  
+  await Artist.put({_id, name});
+
+  await downloadHQCover({_id, name});
+
+  return {_id, name};
+}
+
+export async function toggleFavTrack (trackID: string) {
+  const Track = new PouchDB<Track>('tracks');
+
+  const track = await Track.get(trackID);
+
+  await Track.put({
+    _id: track._id,
+    _rev: track._rev,
+    name: track.name,
+    artist: track.artist,
+    album: track.album,
+    number: track.number,
+    duration: track.duration,
+    disc: track.disc,
+    hidden: track.hidden,
+    fav: !track.fav
+  });
+}
+
 export async function changeTrackArtist (trackId: string, artistId: string) {
   const Track  = new PouchDB<Track>('tracks');
-  const Artist = new PouchDB<Track>('artists');
+  const Artist = new PouchDB<Artist>('artists');
   const Album  = new PouchDB<Album>('albums');
   const File = new PouchDB<File>('files');
 

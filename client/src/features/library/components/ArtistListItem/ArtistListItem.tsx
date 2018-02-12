@@ -12,10 +12,13 @@ require('./ArtistListItem.scss');
 
 interface ArtistListItemProps {
   actions: LibraryActions;
-  artist: Artist;
-  filterMatch?: MatchResult;
-  counter: {albums?: number, tracks: number};
+  artist: string;
   active: boolean;
+  emitter?: any;
+  hash?: string;
+  index?: number;
+  visible?: boolean;
+  tooltip?: 'none' | 'disabled' | 'on';
 }
 
 export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
@@ -41,34 +44,34 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       const { history } = this.context.router
 
       history.push(this.props.active ? '/library' : `/library/${
-        artistURI(this.props.artist._id).name
+        artistURI(this.props.artist).name
       }`);
     }
 
   }
   componentDidMount () {
-    setTimeout(() => {
-      this.props.actions.fetchArtistCounter(this.props.artist._id);
-    }, 50);
   }
   render (): JSX.Element {
     const {
       actions,
       artist,
-      filterMatch,
       active,
-      counter = {albums: 0, tracks: 0}
+      hash,
+      emitter,
+      index,
+      visible,
+      tooltip
     } = this.props;
-    const slug = artistURI(artist._id).name;
+    const slug = artistURI(artist).name;
     return <div className="artist-list-item"> 
       <ArtistComponent 
         active={active} 
         layout='medium' 
         theme='dark' 
-        artist={artist} 
-        fuzzyName={filterMatch && filterMatch.rendered} 
-        counter={counter} 
-        subtitle='counters' 
+        id={artist}
+        index={index}
+        tooltip={tooltip}
+        subtitle='counters'
         onClick={this.handleClick.bind(this)} />
     </div>
   }

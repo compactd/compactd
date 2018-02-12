@@ -2,8 +2,6 @@ import fetch, {Response} from 'node-fetch';
 import * as assert from 'assert';
 import {Message} from './Configure.d';
 import {ChildProcess, fork} from 'child_process';
-import {dbs} from './dbs';
-import {createValidator} from '../validators';
 import {baseConfig} from './baseConfig';
 import PouchDB from '../../database';
 import * as Analytics from '../analytics/Analytics';
@@ -46,7 +44,17 @@ export class DatabaseConfigurator {
     //     validate_doc_update: createValidator(schema, perms)
     //   } as any);
     // })).then(() => {});
-    return Promise.resolve({});
+    return fetch(`http://${
+      this.opts.couchHost
+    }:${this.opts.couchPort}/trackers`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + new Buffer(
+          this.opts.adminUsername + ':' + this.opts.adminPassword).toString('base64')
+      },
+      body: ''
+    }).then((res) => {});
   }
 
   async setupNode () {

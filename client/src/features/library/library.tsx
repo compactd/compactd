@@ -5,6 +5,10 @@ import {artistURI} from 'compactd-models';
 import Toaster from 'app/toaster';
 import session from 'app/session';
 import {syncDatabases} from 'app/database';
+import { ThunkAction } from 'redux-thunk';
+import { CompactdState } from 'definitions/state';
+import { Dispatch } from 'redux';
+import LibraryProvider from 'app/LibraryProvider';
 
 const trickle = require('timetrickle');
 // import * as IFetch from '@types/whatwg-fetch';
@@ -109,13 +113,6 @@ export function reducer (state: Defs.LibraryState = initialState,
       return Object.assign({}, state, {
         topTracks: action.topTracks
       });
-    case RESOLVE_COUNTER:
-      return Object.assign({}, state, {
-        counters: Object.assign({}, state.counters, {[action.id]: {
-          albums: action.albums,
-          tracks: action.tracks
-        }})
-      })
     case TOGGLE_EXPAND_ARTIST:
       return Object.assign({}, state, {expandArtists: !state.expandArtists});
     case RESOLVE_ARTIST:
@@ -155,8 +152,8 @@ const fetchAlbum = async (album: string) => {
 
   const tracks = await Track.allDocs({
       include_docs: true,
-      startkey: album,
-      endkey: album + '\uffff'
+      startkey: album + '/',
+      endkey: album + '/\uffff'
     })
     
   
@@ -165,12 +162,6 @@ const fetchAlbum = async (album: string) => {
     album: Object.assign({}, item, {tracks: tracks.rows.map(el => el.doc)})
   };
 };
-
-function waitLimit (limit: any) {
-  return new Promise((resolve) => {
-    limit(() => resolve());
-  });
-}
 
 const fetchTrack = async (track: string) => {
 
@@ -184,78 +175,83 @@ const fetchTrack = async (track: string) => {
   };
 };
 
-const arlimit = trickle(5, 200);
-
-const fetchArtistCounter = (id: string) => {
-  return waitLimit(arlimit).then(() => {
-    const albums = new PouchDB<Defs.Artist>('albums');
-    const tracks = new PouchDB<Defs.Artist>('tracks');
-    const opts = {
-      startkey: id,
-      endkey: id + '\uffff'
-    };
-    return Promise.all([albums.allDocs(opts), tracks.allDocs(opts)]);
-  }).then(([albums, tracks]) => {
-    return {
-      type: RESOLVE_COUNTER,
-      id,
-      albums: albums.rows.length,
-      tracks: tracks.rows.length
-    }
-  }).catch((err) => {
-    Toaster.error(err);
-  });
-};
-
-const allimit = trickle(5, 200);
-
-function fetchAlbumCounter (id: string) {
-  return waitLimit(allimit).then(() => {
-    const tracks = new PouchDB<Defs.Artist>('tracks');
-    const opts = {
-      startkey: id,
-      endkey: id + '\uffff'
-    };
-    return tracks.allDocs(opts);
-  }).then((tracks) => {
-    return {
-      type: RESOLVE_COUNTER,
-      id,
-      tracks: tracks.rows.length
-    }
-  }).catch((err) => {
-    Toaster.error(err);
-  });;
-}
-
 function toggleExpandArtist () {
   return {type: TOGGLE_EXPAND_ARTIST};
 }
 
+let artistChanges: any[] = null;
+
 function fetchAllArtists () {
+  return (dispatch: Dispatch<LibraryAction>, getState: () => CompactdState) =>  {
+    _fetchAllArtists().then(dispatch);
+    if (!artistChanges) {
+      artistChanges = [LibraryProvider.getInstance().onDocAdded('artists', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ARTISTS,
+          artists: getState().library.artists.concat(id).sort()
+        });
+      }),
+      LibraryProvider.getInstance().onDocRemoved('artists', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ARTISTS,
+          artists: getState().library.artists.filter((doc) => doc !== id)
+        });
+      })]
+    }
+  }
+}
+
+function _fetchAllArtists () {
   return Promise.resolve().then(() => {
     const artists = new PouchDB<Defs.Artist>('artists');
-    return artists.allDocs({include_docs: true,
-      startkey: 'library/', endkey: 'library/\uffff'});
+    return artists.allDocs({
+      include_docs: false,
+      startkey: 'library/',
+      endkey: 'library/\uffff'
+    });
   }).then((docs) => {
     return {
       type: RESOLVE_ALL_ARTISTS,
-      artists: docs.rows.map(res => res.doc)
+      artists: docs.rows.map(res => res.id)
     }
   }).catch((err) => {
     Toaster.error(err);
   });
 }
 
+let albumChanges: any[] = null;
+
 function fetchAllAlbums () {
+  return (dispatch: Dispatch<LibraryAction>, getState: () => CompactdState) =>  {
+    _fetchAllAlbums().then(dispatch);
+    if (!albumChanges) {
+      albumChanges = [LibraryProvider.getInstance().onDocAdded('albums', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ALBUMS,
+          albums: getState().library.albums.concat(id).sort()
+        });
+      }),
+      LibraryProvider.getInstance().onDocRemoved('albums', (id) => {
+        dispatch({
+          type: RESOLVE_ALL_ALBUMS,
+          albums: getState().library.albums.filter((doc) => doc !== id)
+        });
+      })]
+    }
+  }
+}
+function _fetchAllAlbums () {
   return Promise.resolve().then(() => {
     const albums = new PouchDB<Defs.Artist>('albums');
-    return albums.allDocs({include_docs: true,
-      startkey: 'library/', endkey: 'library/\uffff'});
+    return albums.allDocs({
+      include_docs: false,
+      startkey: 'library/',
+      endkey: 'library/\uffff'
+    });
   }).then((docs) => {
     return {
       type: RESOLVE_ALL_ALBUMS,
-      albums: docs.rows.map(res => res.doc)
+      albums: docs.rows.map(res => res.id)
     }
   }).catch((err) => {
     Toaster.error(err);
@@ -264,18 +260,18 @@ function fetchAllAlbums () {
 function fetchAllTracks () {
   return Promise.resolve().then(() => {
     const tracks = new PouchDB<Defs.Track>('tracks');
-    return tracks.allDocs({include_docs: true});
+    return tracks.allDocs({include_docs: false});
   }).then((docs) => {
     return {
       type: RESOLVE_ALL_TRACKS,
-      tracks: docs.rows.map(res => res.doc)
+      tracks: docs.rows.map(res => res.id)
     }
   }).catch((err) => {
     Toaster.error(err);
   });
 }
 
-async function fetchArtist (slug: string): Promise<LibraryAction> {
+async function fetchArtist (slug: string): Promise<any> {
   if (slug.startsWith('library/')) {
     return await fetchArtist(artistURI(slug).name);
   }
@@ -286,14 +282,14 @@ async function fetchArtist (slug: string): Promise<LibraryAction> {
   const albums = await Album.allDocs({
     startkey: `library/${slug}/`,
     endkey: `library/${slug}/\uffff`,
-    include_docs: true});
+    include_docs: false});
 
   return {
     type: RESOLVE_ARTIST,
     artist: {
       _id: artist._id,
       name: artist.name,
-      albums: albums.rows.map((el) => el.doc)
+      albums: albums.rows.map((el) => el.id)
     }
   }
 }
@@ -349,8 +345,6 @@ function doRemove (trackId: string) {
     await syncDatabases('artists', 'albums', 'tracks');
     dispatch(await fetchAllArtists());
     dispatch(await fetchAllAlbums());
-    dispatch(await fetchArtistCounter(track.artist));
-    dispatch(await fetchAlbumCounter(track.album));
 
   }
 }
@@ -376,12 +370,10 @@ function setTrackArtist  (track: string, artist: string) {
   
     dispatch(await fetchAllArtists());
     dispatch(await fetchAllAlbums());
-    dispatch(await fetchArtistCounter(artist));
   }
 }
 
 export const actions = {
-  fetchArtistCounter, fetchAlbumCounter,
   fetchArtist, fetchAllArtists, fetchAllAlbums,
   toggleExpandArtist, fetchAlbum, fetchRecommendations,
   fetchTrack, toggleHideTrack, offerRemove, doRemove,

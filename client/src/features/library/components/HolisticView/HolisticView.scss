@@ -5,8 +5,23 @@ div.holistic-view{
   div.artists-list {
     white-space: nowrap;
     transition: all ease 0.2s;
+    position: relative;
+    
+    div.top-gradient {
+      position: absolute;
+      top: 58px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to bottom, #292e38 0%, rgba(41, 46, 56, 0) 100%);
+      z-index: 1;
+    }
+    div.scrollable-div {
+      padding-top: 4px;
+    }
     &.minimal {
-      width: 90px !important;
+      width: 82px !important;
       transition: all ease 0.2s;
     }
     background-color: #292e38;

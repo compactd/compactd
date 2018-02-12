@@ -13,9 +13,13 @@ import * as Stream from 'stream';
 import config from './config';
 import {mainStory} from 'storyboard';
 import * as request from 'request';
-import httpEventEmitter from './http-event';
+//import httpEventEmitter from './http-event';
 import * as http from 'http';
+import { fork } from 'child_process';
+import jwt from './jwt';
+import httpEvent from './http-event';
 const pkg = require('../../package.json');
+const socketPouchServer = require('socket-pouch/server');
 const modelsPkg = require('../../node_modules/compactd-models/package.json');
 // const Ddos = require('ddos');
 
@@ -58,13 +62,25 @@ export class CompactdApplication {
         ...headers,
       }, req.method !== 'GET' ? {body: JSON.stringify(req.body)} : {});
 
-      mainStory.info('http', `${req.method} ${req.url} -> http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`, {
-        attach: opts,
-        attachLevel: 'trace'
-      });
+      mainStory.info('http', `${req.method} ${req.url} -> http://${config.get('couchHost')}:${config.get('couchPort')}/${remoteUrl}`);
 
       const remoteReq = request(opts).pipe(res);
     });
+
+    this.app.get('/api/database/:name', this.auth.requireAuthentication(), (req, res) => {
+      const db = req.params.name;
+      if (!CompactdApplication.ALLOWED_DATABASES.includes(db)) {
+        return res.status(403).send({
+          error: 'Database ' + db + ' not allowed'
+        });
+      }
+      return res.status(200).send({ok: true, token: jwt.sign({db, user: (req as any).user}, {
+        expiresIn: '1d',
+      })});
+    });
+
+   fork(path.join(__dirname, 'CouchProxy.js'));
+
   }
   public start () {
     return new Promise<void>((resolve, reject) => {
@@ -72,7 +88,13 @@ export class CompactdApplication {
       this.configure();
       this.route();
       const server = http.createServer(this.app);
-      httpEventEmitter.attach(server as any, this.auth);
+      httpEvent.attach(server as any, this.auth);
+      // socketPouchServer.attach(this.app, {
+      //   remoteUrl: 'http://localhost:5984',
+      //   pouchCreator: () => {
+      //     console.log(arguments);
+      //   }
+      // });
       server.listen(this.port, this.host, () => {
         mainStory.info('http', `Express listening on ${this.host}:${this.port} `);
         resolve();
@@ -131,6 +153,7 @@ export class CompactdApplication {
     this.unprotectedEndpoints();
 
     this.app.use('/api*', this.auth.requireAuthentication());
+    
   }
   /**
    * Creates the *protected* routes (under api only)

@@ -4,155 +4,125 @@ import {Album, DSAlbum, albumURI, Artist, DSArtist, artistURI} from 'compactd-mo
 import BetterImage from '../BetterImage';
 import * as pluralize from 'pluralize';
 import Artwork from 'app/Artwork';
+import LibraryItemComp from '../LibraryItemComponent';
 import './AlbumComponent.scss';
+import LibraryProvider from 'app/LibraryProvider';
+import * as path from 'path';
+
+type Subtitle = 'counters' | 'text' | 'none' | 'artist' | 'year';
 
 interface AlbumComponentProps {
-  artist?: {
-    name: string;
-    cover?: string;
-    largeCover?: string;
-  } & Partial<Artist> & Partial<DSArtist> & any;
-  album: {
-    name: string;
-    cover?: string;
-    largeCover?: string;
-  } & Partial<Album> & Partial<DSAlbum> & any;
-  layout: 'minimal' | 'compact' | 'medium' | 'large';
-  mode?: 'popup' | 'normal';
-  onClick?: (evt: MouseEvent) => void;
-  theme?: 'dark' | 'light';
-  subtitle?: 'counters' | 'text' | 'none' | 'artist';
-  active?: boolean;
-  className?: string;
-  counter?: {duration?: number, tracks?: number};
-  fuzzyName?: string;
+  id: string,
+  subtitle?: Subtitle | Subtitle[];
   subtitleText?: string;
 }
 
-export default class AlbumComponent extends React.Component<AlbumComponentProps, {}> {
+export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps, {
+  artists: {[id: string]: Artist},
+  albums: {[id: string]: Album},
+  counters: {[id: string]: [number]}
+}> {
+  private feeds: number[];
+  constructor () {
+    super();
+    this.state = {
+      artists: {},
+      albums: {},
+      counters: {}
+    };
+  }
+  renderSubtitle(subtitle = this.props.subtitle): JSX.Element | string{
+    const {id} = this.props;
+    const {counters, artists, albums} = this.state;
+    const artist = artists[id];
+    const album = albums[id];
 
-  private cover: Promise<Blob>;
+    if (Array.isArray(subtitle)) {
 
-  componentWillMount () {
-    const {album, layout} = this.props;
-    if (this.isUsingEmbeddedArtworks()) {
-      this.cover = Artwork.getInstance().get(album._id, layout === 'compact' ? 'small' : 'large');
+      const subs = subtitle.map((sub) => {
+        return <div className="subtitle-item" key={sub}>{this.renderSubtitle(sub)}</div>
+      });
+
+      return <div className="multiple-subtitles">{subs}</div>;
+    }
+    
+    switch (subtitle) {
+      case 'year':
+        if (album) {
+          return `${album.year}`;
+        }
+        return <div className="pt-skeleton">2000</div>
+      case 'counters': 
+        if (counters[id] && counters[id].length === 1) {
+          return `${counters[id][0]} tracks`
+        }
+        return <div className="pt-skeleton">00 tracks</div>
+      case 'text': 
+        return this.props.subtitleText;
+      case 'artist': 
+        if (artist && artist.name) {
+          return artist.name;
+        }
+        return <div className="pt-skeleton">Artist name</div>
     }
   }
 
-  componentWillReceiveProps (nextProps: AlbumComponentProps) {
-    const props = this.props;
-    if (this.isUsingEmbeddedArtworks(nextProps) &&
-      nextProps.album._id !== props.album._id) {
-      this.cover = Artwork.getInstance().get(nextProps.album._id,
-        nextProps.layout === 'compact' ? 'small' : 'large');
-      return;
+  loadImage(id: string, img: HTMLImageElement): void {
+    if (this.isUsingEmbeddedArtworks()) {
+      Artwork.getInstance().load(id, this.getImageSizings(), img);
+    }
+  }
+  
+  loadCounters (id: string) {
+    if (this.props.subtitle === 'counters') {
+      const provider = LibraryProvider.getInstance();
+
+      provider.getAlbumCounters(id).then(([counters]) => {
+        this.setState({
+          counters: {
+            ...this.state.counters,
+            [id]: [counters]
+          }
+        });
+      })
+    }
+  }
+  loadItem(id: string): void {
+    const provider = LibraryProvider.getInstance();
+    
+    this.feeds = [
+      provider.liveFeed<Artist>('artists', path.dirname(id), (artist) => {
+        this.setState({artists: {...this.state.artists, [id]: artist}});
+      }),
+      provider.liveFeed<Album>('albums', id, (album) => {
+        this.setState({albums: {...this.state.albums, [id]: album}});
+        this.loadCounters(id);
+      })
+    ]
+  }
+  unloadItem(): void {
+    const provider = LibraryProvider.getInstance();
+    provider.cancelFeeds(this.feeds);
+    if (this.isUsingEmbeddedArtworks() && this.images[this.props.id]) {
+      URL.revokeObjectURL(this.images[this.props.id].src);
+    }
+  }
+  getClassNames(): string[] {
+    return ['album-component'];
+  }
+  renderHeader(): string | JSX.Element {
+    const {albums} = this.state;
+    const album = albums[this.props.id];
+    if (album) {
+      return album.name;
+    } else {
+      return <div className="pt-skeleton">Artist name</div>
     }
   }
 
   isUsingEmbeddedArtworks (props = this.props) {
-    const {album, layout} = props;
-    return (album && layout !== 'minimal' ) && album._id;
-  }
-  
-  getLargeCover (size = 64) {
-    const {album} = this.props;
-    const entryId = album._id + '!large';
-    
-    if (album._id) {
-      return this.cover;
-    }
-    if (album.largeCover) return album.largeCover;
-    if (album.cover) return album.cover;
-    return '';
-  }
-  
-  getSmallCover (size = 32) {
-    const {album} = this.props;
-    const entryId = album._id + '!small';
-
-    if (album._id) {
-      return this.cover;
-    }
-
-    if (album.cover) return album.cover;
-    if (album.largeCover) return album.largeCover;
-    return '';
-  }
-
-  renderImage (): JSX.Element {
-    const {album} = this.props;
-    
-    switch (this.props.layout) {
-      case 'minimal': return;
-      case 'compact': 
-        return <BetterImage src={this.getSmallCover(32)} size={32} />;
-      case 'medium':
-        return <BetterImage src={this.getLargeCover(64)} size={64} />;
-      case 'large':
-        return <BetterImage src={this.getLargeCover(128)} size={128} />;
-    }
-  }
-  renderCounters () {
-    const {album, subtitle, counter, subtitleText} = this.props;
-    return <div className={classnames("album-counter", {
-      'pt-skeleton': !counter.tracks,
-    })}>{`${counter.tracks || 10} ${pluralize('tracks', counter.tracks || 10)}`}
-    </div>;
-  }
-  renderSubtitle () {
-    const {album, subtitle, counter, subtitleText} = this.props;
-    if (this.props.layout === 'large') {
-      return <div className="large-subtitle">
-        {this.props.artist.name ? <div className="album-artist">{this.props.artist.name}</div> : null}
-        {counter ? this.renderCounters() : subtitleText}
-      </div>
-    }
-    switch (subtitle) {
-      case 'none': return;
-      case 'artist': return <div className="album-artist">{this.props.artist.name}</div>;
-      case 'text': return <div className="album-text">{subtitleText}</div>;
-      case 'counters': return this.renderCounters();
-    }
-  }
-  renderName () {
-    if (this.props.fuzzyName) {
-      const match = Array.from(this.props.fuzzyName)
-        .map((char: string, i: number, arr: string[]) => {
-          if (char === '$') return <span className="empty"></span>;
-          if (arr[i - 1] === '$') return <span className="match">{char}</span>;
-          return <span className="not-match">{char}</span>
-        });
-        
-      return <span className="filtered">{match}</span>;
-    }
-    return this.props.album.name;
-  }
-  render () {
-    const {
-      album,
-      layout,
-      mode = 'normal',
-      onClick = new Function(),
-      theme = 'light',
-      className = '',
-      active = false,
-      fuzzyName} = this.props;
-
-
-    return <div className={classnames(className, 'album-component', `${theme}-theme`, `${layout}-layout`, {active,
-        'clickable': !!this.props.onClick
-        })} onClick={onClick as any}>
-      <div className="album-image">{this.renderImage()}</div>
-      <div className="album-info">
-        <div className="album-name">
-          {this.renderName()}
-        </div>
-        <div className="album-subtitle">
-          {this.renderSubtitle()}
-        </div>
-      </div>
-    </div>
+    const {id, layout} = props;
+    return (id && layout !== 'minimal' ) && id.startsWith('library/');
   }
 
 }

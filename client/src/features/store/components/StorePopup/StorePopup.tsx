@@ -34,9 +34,8 @@ export class StorePopup extends React.Component<StorePopupProps, {}>{
 
     return <div className="store-popup">
       <div className="popup-content">
-        <div className="popup-header" onClick={() => actions.toggleSearch()} >
+        <div className="popup-header">
           <span className="popup-title">Downloads</span>
-          <span className="popup-button pt-icon-add"></span>
         </div>
         <div className="popup-main">
           {downloads}

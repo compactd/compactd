@@ -16,7 +16,7 @@ export class ArtistsView extends React.Component<ArtistViewProps, {}>{
   render (): JSX.Element {
     const {actions, library} = this.props;
     const content = library.artists.map((artist) => {
-      return <div className="artist">{artist.name}</div>;
+      return <div className="artist">{artist}</div>;
     });
     return <div className="artists-view">
       {content}

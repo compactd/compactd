@@ -7,6 +7,8 @@ import SettingsLink from '../../../settings/components/SettingsLink';
 import {HotkeysTarget, Hotkey, Hotkeys, Slider} from '@blueprintjs/core';
 import session from 'app/session';
 import * as classnames from 'classnames';
+import XHRSource from 'models/XHRSource';
+import FavComponent from 'components/FavComponent/FavComponent';
 
 require('./PlayerStatus.scss');
 
@@ -19,13 +21,14 @@ const MAX_VOLUME = 20;
 
 @HotkeysTarget
 export class PlayerStatus extends React.Component<PlayerStatusProps, {
-  volume: number
+  volume: number,
+  waveform: boolean,
 }>{
   private player: PlayerAudio;
   private trackTimeDiv: HTMLSpanElement;
   constructor () {
     super();
-    this.state = {volume: MAX_VOLUME};
+    this.state = {volume: MAX_VOLUME, waveform: false};
   }
   renderHotkeys () {
     const {actions, player} = this.props;
@@ -84,6 +87,16 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
         this.handleVolumeChange(Math.max(this.state.volume - 1, 0));
       }}
      />
+     <Hotkey 
+      allowInInput={false}
+      global={true}
+      combo="t"
+      label="Toggle wavesurfer"
+      onKeyDown={(evt) => {
+        evt.preventDefault();
+        this.setState({waveform: !this.state.waveform});
+      }}
+     />
    </Hotkeys> 
   }
   handlePlaybackButton () {
@@ -122,14 +135,22 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
 
     const duration = date.toISOString().substr(14, 5);
 
+    const source = XHRSource.from(player.stack[0] ? player.stack[0]._id : undefined);
+    const nextSource = XHRSource.from(player.stack[1] ? player.stack[1]._id : undefined);
+
     const content = player.stack.length > 0 ?
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
         <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
-        <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>
+        <span className="right-controls">          
+          <span className="fav-track"><FavComponent id={player.stack[0]._id} /></span>
+          <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>  
+        </span>
       </div> : <div className="player-name">
       </div>
-    return <div className="player-status">
+    return <div className={classnames("player-status", {
+      expanded: this.state.waveform
+    })}>
       <div className="player-controls">
         <span className={classnames("pt-icon-step-backward play-previous", {
           enabled: player.prevStack.length > 0
@@ -145,8 +166,8 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       </div>
       <div className="player-track">
         {content}
-        <PlayerAudio source={player.stack[0] ? player.stack[0]._id : undefined}
-          playing={player.playing} onEnd={this.onAudioEnd.bind(this)}
+        <PlayerAudio source={source}
+          playing={player.playing} onEnd={this.onAudioEnd.bind(this)} expanded={this.state.waveform}
           timeUpdate={(time) => {
               window.requestAnimationFrame(() => {
                 if (track && this.trackTimeDiv) {
@@ -157,7 +178,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
               })
           }}
           ref={(ref) => this.player = ref}
-          nextSource={player.stack[1] ? player.stack[1]._id : undefined} />
+          nextSource={nextSource} />
       </div>
       <div className="player-actions">
         <Slider renderLabel={(val: number) => null} max={MAX_VOLUME} value={this.state.volume} onChange={this.handleVolumeChange.bind(this)}/>
@@ -169,6 +190,9 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
               window.location.reload();
             });
           }}></span>
+        </div>
+        <div className="toggle-expand" onClick={() => this.setState({waveform: !this.state.waveform})}>
+          <span className="pt-icon-chevron-down"></span>
         </div>
       </div>
     </div>

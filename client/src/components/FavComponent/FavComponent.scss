@@ -1,0 +1,15 @@
+@import '../../styles/utils';
+@import '../../styles/colors';
+
+div.fav-component {
+  color: $dark-secondary;
+  cursor: pointer;
+  text-align: center;
+  &.checked {
+    
+    color: rgb(199, 26, 78);
+  }
+  .pt-icon-heart-broken {
+    font-size: 13px;
+  }
+}

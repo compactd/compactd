@@ -9,6 +9,7 @@ import * as assert from 'assert';
 import * as Express from 'express';
 import {mainStory} from 'storyboard';
 import * as cluster from 'cluster';
+import * as pouch from 'pouchdb';
 
 const docURI = require('docuri');
 
@@ -129,24 +130,14 @@ export default class Authenticator {
    * @param user the orginal username
    * @param pass the databse password 
    */
-  getDatabaseUser (user: string, pass: string): DatabaseUser {
-    if (cluster.isMaster) {
-      return {
-        _id: 'org.couchdb.user:m_' + user,
-        name: 'm_' + user,
-        roles: ['end_user'],
-        type: 'user',
-        password: pass
-      };
-    } else {
-      return {
-        _id: `org.couchdb.user:c${cluster.worker.id}_${user}`,
-        name: `c${cluster.worker.id}_${user}`,
-        roles: ['end_user'],
-        type: 'user',
-        password: pass
-      };
-    }
+  getDatabaseUser (user: string, pass: string, prefix: string): DatabaseUser {
+    return {
+      _id: 'org.couchdb.user:' + prefix + user,
+      name: prefix + user,
+      roles: ['end_user'],
+      type: 'user',
+      password: pass
+    };
   }
 
   /**
@@ -156,13 +147,13 @@ export default class Authenticator {
    * @param pass the user password to verify
    * @return the signed token
    */
-  async createSession (username: string, pass: string) {
+  async createSession (username: string, pass: string, prefix = this.defaultPrefix) {
     const appUsers = new PouchDB<UserProps & {_id: string}>('app_users');
     try {
       const user = await appUsers.get(`users/${username}`);
       if (await this.verifyPassword(pass, user.password)) {
         const pwd = await this.generatePassword();
-        const dbUser = this.getDatabaseUser(username, pwd);
+        const dbUser = this.getDatabaseUser(username, pwd, prefix);
         await this.createDatabaseUser(dbUser);
         this.passwords[username] = pwd;
         setTimeout(() => {
@@ -233,6 +224,7 @@ export default class Authenticator {
       }
       try {
         const user = this.verifySession(token);
+        (req as any).user = user;
         const unused = user.toLowerCase(); // Check is user isnt undefined, otherwise throw error
         next();
       } catch (err) {
@@ -286,8 +278,33 @@ export default class Authenticator {
       });
     }
   }
+  async proxyPouchCreator (token: string, prefix = this.defaultPrefix) {
+    let {db, user} = jwt.verify(token, this.secret) as {db: string, user: string};
+    if (process.env.ADMIN_PARTY) {
+      const auth = new Buffer(PouchDB.credentials).toString('base64');
+      return new PouchDB(db);
+    }
 
-  proxyRequestDecorator () {
+    if (!this.passwords[user]) {
+      
+      const pwd = await this.generatePassword();
+
+      await this.createDatabaseUser(this.getDatabaseUser(user, pwd, prefix));
+      
+      this.passwords[user] = pwd;
+    }
+    const pass = this.passwords[user];
+
+    user = prefix + user;
+
+    const url = `http://${user}:${pass}@${PouchDB.host}/${db}`
+    const database = new pouch(url);
+    return database;
+  }
+  get defaultPrefix () {
+    return cluster.isWorker ? `c${cluster.worker.id}_` : 'm_';
+  }
+  proxyRequestDecorator (prefix = this.defaultPrefix) {
     return async (proxyReqOpts: any, srcReq: any) => {
 
       if (process.env.ADMIN_PARTY) {
@@ -306,16 +323,13 @@ export default class Authenticator {
         
         const pwd = await this.generatePassword();
 
-        await this.createDatabaseUser(this.getDatabaseUser(user, pwd));
+        await this.createDatabaseUser(this.getDatabaseUser(user, pwd, prefix));
         
         this.passwords[user] = pwd;
       }
       const pass = this.passwords[user];
-      if (cluster.isWorker) {
-        user = `c${cluster.worker.id}_${user}`;
-      } else {
-        user = `m_${user}`;
-      }
+      
+      user = prefix + user;
       
       const auth = new Buffer(`${user}:${pass}`)
         .toString('base64')

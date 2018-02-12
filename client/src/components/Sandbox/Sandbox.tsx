@@ -64,19 +64,14 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
     };
   }
   renderComponent() {
+    const {artist, album} = this.state;
     switch (this.state.type) {
       case 'artist': {
-        const artist = this.props.library.artists.find((el) => el._id === this.state.artist);
         return <ArtistComponent
-          artist={artist || {
-            name: 'Please select an artist'
-          }}
+          id={artist}
           layout={this.state.layout}
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
-          counter={!this.state.skeleton ? {
-            albums: 5, tracks: 42
-          } : {}}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
             this.setState({active: !this.state.active})
@@ -84,20 +79,11 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
           subtitleText={LOREM} />;
         }
       case 'album': {
-        const album = this.props.library.albums.find((el) => el._id === this.state.album);
-        const artist = this.props.library.artists.find((el) => el._id === album.artist);
-        
         return <AlbumComponent
-          artist={artist}
-          album={album || {
-            name: 'please select an album'
-          }}
+          id={album}
           layout={this.state.layout}
           theme={this.state.theme} 
           subtitle={this.state.subtitle}
-          counter={!this.state.skeleton ? {
-            tracks: 16  
-          } : {}}
           active={this.state.active}
           onClick={this.state.clickable ? () => {
             this.setState({active: !this.state.active})
@@ -213,10 +199,10 @@ class Sandbox extends React.Component<SandboxProps, SandboxState> {
   }
   private renderSelects() {
     const artists = this.props.library.artists.map((artist) => {
-      return <option value={artist._id} key={artist._id}>{artist.name}</option>
+      return <option value={artist} key={artist}>{artist}</option>
     });
     const albums = this.props.library.albums.map((album) => {
-      return <option value={album._id} key={album._id}>{album.name}</option>
+      return <option value={album} key={album}>{album}</option>
     });
     return <div className="selects">
       <label className="artist pt-label">

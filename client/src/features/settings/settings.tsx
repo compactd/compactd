@@ -51,7 +51,7 @@ function toggleSettingsPage (state?: boolean) {
 function removeTracker (id: string) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>('trackers');
       const doc = await Tracker.get(id);
       await Tracker.remove(doc._id, doc._rev);
       loadTrackers()(dispatch, getState);
@@ -64,7 +64,7 @@ function removeTracker (id: string) {
 function loadTrackers () {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>('trackers');
       const trackers = await Tracker.allDocs({include_docs: true});
       dispatch({
         type: RESOLVE_TRACKERS,
@@ -79,7 +79,7 @@ function loadTrackers () {
 function loadLibraries () {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Library = getDatabase<Library>('libraries');
+      const Library = await getDatabase<Library>('libraries');
       const libraries = await Library.allDocs({include_docs: true});
       dispatch({
         type: RESOLVE_LIBRARIES,
@@ -93,7 +93,7 @@ function loadLibraries () {
 function editTracker (id: string, props: Partial<Tracker>) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>('trackers');
       const old = await Tracker.get(id, {revs: false, attachments: false, revs_info: false});
       const doc = Object.assign({}, old, props);
       if (old.name !== props.name && props.name) {
@@ -156,7 +156,7 @@ function addTracker (name: string, type: 'gazelle', username: string, host: stri
       const props = {name, type, username, host};
       const id = trackerURI(mapTrackerToParams(props)) + `-${Math.floor(Math.random() * 2e8).toString(36)}`;
   
-      const Tracker = getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>('trackers');
       const tracker = await Tracker.put({...props, _id: id});
       return loadTrackers()(dispatch, getState);
     } catch (err) {

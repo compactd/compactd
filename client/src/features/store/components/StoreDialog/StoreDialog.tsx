@@ -99,7 +99,8 @@ export class StoreDialog extends React.Component<StoreDialogProps, {query: strin
       return <div className="loading-ds"><Spinner /></div>
     }
     const albums = artist.topAlbums.slice(0, 19).map((album) => {
-      return <AlbumComponent album={album} layout="compact"  onClick={() => actions.selectDSAlbum(album.id)}/>
+      // return <AlbumComponent album={album} layout="compact"  onClick={() => actions.selectDSAlbum(album.id)}/>
+      // TODO
     });
 
     return <div className="ds-artist-view">

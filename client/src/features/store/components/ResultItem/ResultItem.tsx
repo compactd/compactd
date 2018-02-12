@@ -16,13 +16,14 @@ export class ResultItem extends React.Component<ResultItemProps, {}>{
     const {item, actions} = this.props;
 
     switch (item.type) {
+      // TODO
       case 'artist':
         return <div className="result-item" key={item.id} >
-          <ArtistComponent layout="compact" artist={item}  onClick={() => {actions.selectDSArtist(item.id)}}/>
+          {/* <ArtistComponent layout="compact" artist={item}  onClick={() => {actions.selectDSArtist(item.id)}}/> */}
         </div>
       case 'album':
         return <div className="result-item" key={item.id}>
-          <AlbumComponent layout="compact" album={item} onClick={() => {actions.selectDSAlbum(item.id)}} key={item.id}/>
+          {/* <AlbumComponent layout="compact" album={item} onClick={() => {actions.selectDSAlbum(item.id)}} key={item.id}/> */}
         </div>
       case 'track':
         return <div className="result-item item-track" key={item.id} >
