@@ -24,7 +24,7 @@ const modelsPkg = require('../../node_modules/compactd-models/package.json');
 // const Ddos = require('ddos');
 
 export class CompactdApplication {
-  private static ALLOWED_DATABASES = ['libraries', 'artworks', 'tracks', 'files', 'artists', 'albums', 'trackers'];
+  private static ALLOWED_DATABASES = ['libraries', 'artworks', 'tracks', 'files', 'artists', 'albums', 'trackers', 'stores'];
 
   private auth: Authenticator;
   protected app: express.Application;

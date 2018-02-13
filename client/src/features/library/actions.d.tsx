@@ -84,4 +84,6 @@ export type LibraryActions = {
   offerRemove: (id: string, setValue?: boolean) => void;
   doRemove: (id: string) => void;
   setTrackArtist: (track: string, artist: string) => void;
+  searchDSStore: (artist: Artist) => void;
+  searchStore: (artist: string, album: string) => void;
 }

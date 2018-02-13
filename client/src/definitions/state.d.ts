@@ -1,7 +1,19 @@
 import * as Compactd from './common.d';
 import {MusicContentState} from 'app/content-decorator';
 import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker, Release} from 'compactd-models';
-
+export type ResultEntry = {
+  _id: string;
+  name: string;
+  format: string;
+  store: string;
+  sid: string;
+  stats: ({
+    name: string,
+    icon: string,
+    value: string,
+    desc: string
+  })[]
+}
 export interface LibraryState {
   topTracks: {key: string, value: number}[],
   tracksById: {
@@ -23,6 +35,14 @@ export interface LibraryState {
     [id: string]: {
       tracks: number;
       albums?: number;
+    }
+  },
+  dsResultsById: {
+    [id: string]: DSAlbum[]
+  },
+  resultsById: {
+    [id: string]: {
+      [store: string]: ResultEntry[]
     }
   }
 }

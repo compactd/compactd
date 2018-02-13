@@ -21,6 +21,7 @@ import { join } from 'path';
 import { parse, stringify } from 'querystring';
 import { List } from 'react-virtualized/dist/es/List';
 import * as PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 require('./AlbumsListView.scss');
 
 interface AlbumsListViewProps {
@@ -33,7 +34,6 @@ interface AlbumsListViewProps {
 
 export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   albumsFilter: string;
-  dsResults: Map<DSAlbum[]>;
   displayResults: boolean;
   height?: number;
   width?: number;
@@ -50,7 +50,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   private div: HTMLDivElement;
   constructor () {
     super();
-    this.state = {albumsFilter: '', dsResults: {}, displayResults: false};
+    this.state = {albumsFilter: '', displayResults: false};
   }
   handleAlbumsFilterChange (evt: Event) {
     const target = evt.target as HTMLInputElement;
@@ -64,23 +64,9 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
 
     const artist = this.props.artist ?
       (library.artistsById[artistId]
-        || {_id: '', name: '', albums: []}) : {_id: '', name: '', albums: library.albums};
+        || {_id: '', name: ''}) : {_id: '', name: ''};
 
-    const res = Session.fetch('/api/datasource/artists/' + artist.name).then((res) => res.json())
-    .then((res: any) => {
-      this.setState({
-        dsResults: {
-          ...this.state.dsResults,
-          [artist._id]: res.topAlbums.filter((album: any) => {
-            if (!album.cover) return false;
-            if (album.name === '(null)') return false;
-            return true;
-          })
-        }
-      });
-    }).catch((err) => {
-      Toaster.error(err);
-    });
+    this.props.actions.searchDSStore(artist);
   }
   componentDidMount () {
     if (!this.props.artist) {
@@ -144,7 +130,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     const artistId = `library/${this.props.artist}`;
     if (this.props.artist) {
       const artist = library.artistsById[artistId];
-      const dsResults = this.state.dsResults[artistId];
+      const dsResults = this.props.library.dsResultsById[artistId];
       if (!this.state.displayResults) {
         return this.albums.concat('?search-albums');
       }
@@ -190,6 +176,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   
   _renderItem (props: ListProps) {
     const {index, style, parent} = props;
+    const {artist} = this.props;
     const item = this.items[index];
     if (item.startsWith('library/')) {
       const active = this.props.match.params.album === albumURI(item).name;
@@ -206,7 +193,14 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
       return <PlaceholderComponent id="" layout="medium" theme="dark" loading={false} onClick={this.handleSearchClick.bind(this)}/>;
     } else if (item.startsWith('results?')) {
       const [pre, ...res] = item.split('?');
-      return <DSAlbumComponent layout="medium" id={item} theme="dark" album={parse(res.join('?')) as any} />
+      const active = this.props.match.params.album === parse(res[0]).name
+      console.log(parse(res[0]).name, this.props.match.params.album);
+      
+      return <DSAlbumComponent layout="medium" id={item} theme="dark" album={parse(res.join('?')) as any} onClick={() => {
+        const url = `/library/${artist}/store/${parse(res[0]).name}`
+        const { history } = this.context.router;
+        history.push(url);
+      }} active={active} />
     }
   }
   

@@ -65,6 +65,24 @@ class SessionManager {
       return Promise.reject('Invalid username or password');
     });
   }
+  post (url: string, body: any) {
+    return this.fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+  }
+  put (url: string, body: any) {
+    return this.fetch(url, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+  }
   fetch (input: RequestInfo, init: {
     method: string,
     body: any, 

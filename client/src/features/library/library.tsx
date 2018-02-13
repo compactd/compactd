@@ -9,11 +9,10 @@ import { ThunkAction } from 'redux-thunk';
 import { CompactdState } from 'definitions/state';
 import { Dispatch } from 'redux';
 import LibraryProvider from 'app/LibraryProvider';
+import { Artist } from 'definitions';
+import { join } from 'path';
 
 const trickle = require('timetrickle');
-// import * as IFetch from '@types/whatwg-fetch';
-// import "whatwg-fetch";
-
 
 const RESOLVE_ARTIST = 'compactd/library/RESOLVE_ARTIST';
 const RESOLVE_ALL_ARTISTS = 'compactd/library/RESOLVE_ALL_ARTISTS';
@@ -27,6 +26,8 @@ const RESOLVE_RECOMMENDATIONS = 'compactd/library/RESOLVE_RECOMMENDATIONS';
 const TOGGLE_HIDDEN = 'cassette/library/TOGGLE_HIDDEN';
 const DO_REMOVE = 'cassette/library/DO_REMOVE';
 const OFFER_REMOVE = 'cassette/library/OFFER_REMOVE';
+const SEARCH_STORE = 'cassette/library/SEARCH_STORE';
+const SEARCH_DS_STORE = 'cassette/library/SEARCH_DS_STORE';
 
 const initialState: Defs.LibraryState = {
   albumsById: {},
@@ -37,7 +38,9 @@ const initialState: Defs.LibraryState = {
   tracks: [],
   expandArtists: true,
   counters: {},
-  topTracks: []
+  topTracks: [],
+  resultsById: {},
+  dsResultsById: {}
 };
 
 const getParent = (str: string) => {
@@ -45,8 +48,26 @@ const getParent = (str: string) => {
 }
 
 export function reducer (state: Defs.LibraryState = initialState,
-  action: LibraryAction): Defs.LibraryState {
+  action: any): Defs.LibraryState {
   switch (action.type) {
+    case SEARCH_DS_STORE:
+      const {artist, results} = action;
+
+      return {
+        ...state,
+        dsResultsById: {
+          ...state.dsResultsById,
+          [artist]: results
+        }
+      }
+    case SEARCH_STORE:
+      return {
+        ...state,
+        resultsById: {
+          ...state.resultsById,
+          [action.album]: action.results
+        }
+      }
     case DO_REMOVE: {
       const id = action.track;
       const album = getParent(getParent(id));
@@ -142,6 +163,37 @@ export function reducer (state: Defs.LibraryState = initialState,
   }
   return state;
 }
+
+function searchDSStore (artist: Artist) {
+  return session.fetch('/api/datasource/artists/' + artist.name).then((res) => res.json())
+    .then((res: any) => {
+      return {
+        artist: artist._id,
+        type: SEARCH_DS_STORE,
+        results: res.topAlbums.filter((album: any) => {
+          if (!album.cover) return false;
+          if (album.name === '(null)') return false;
+          return true;
+        })
+      }
+    }).catch((err) => {
+      Toaster.error(err);
+    });
+}
+
+async function searchStore (artist: string, album: string) {
+  const artists = new PouchDB<Defs.Artist>('artists');
+  const doc = await artists.get(artist);
+  const res = await session.post('/api/stores/search', {artist: doc.name, album});
+  const {data} = await res.json();
+
+  return {
+    type: SEARCH_STORE,
+    album: join(artist, album),
+    results: data
+  }
+}
+
 
 const fetchAlbum = async (album: string) => {
 
@@ -377,5 +429,5 @@ export const actions = {
   fetchArtist, fetchAllArtists, fetchAllAlbums,
   toggleExpandArtist, fetchAlbum, fetchRecommendations,
   fetchTrack, toggleHideTrack, offerRemove, doRemove,
-  setTrackArtist, fetchAllTracks
+  setTrackArtist, fetchAllTracks, searchDSStore, searchStore
 };

@@ -21,6 +21,7 @@ import toaster from 'app/toaster';
 import { syncDatabases } from 'app/database';
 import { Tooltip } from '@blueprintjs/core';
 import { ArtistListView } from 'features/library/components/ArtistListView';
+import { StoreAlbumView } from 'features/library/components/StoreAlbumView';
 
 const {Flex, Box} = require('reflexbox');
 
@@ -32,6 +33,7 @@ interface HolisticViewProps {
   player: PlayerState;
   match: match<{artist?: string, album?: string}>;
   all: boolean;
+  _store: boolean;
 }
 interface HolisticViewState {
   artistsFilter: string;
@@ -119,9 +121,13 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
             artist={!this.props.all ? this.props.match.params.artist: undefined} library={library} />
         </Box>
         <Box col={7} auto>
-          <AlbumDetailsView actions={actions} player={player}
-            artist={this.props.match.params.artist}
-            album={this.props.match.params.album} library={library} />
+        {this.props._store ? 
+          <StoreAlbumView actions={actions} artist={this.props.match.params.artist}
+          album={this.props.match.params.album} library={library} />
+          : <AlbumDetailsView actions={actions} player={player}
+          artist={this.props.match.params.artist}
+          album={this.props.match.params.album} library={library} />
+        }
         </Box>
       </Flex>
     </div>

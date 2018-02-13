@@ -15,68 +15,18 @@ const groupBy = require('lodash.groupby');
 import Map from 'models/Map';
 import { Tooltip } from '@blueprintjs/core';
 
-
 interface DSAlbumComponentProps {
   album: DSAlbum
 }
 
-export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentProps, {
-  releases: Map<Release[]>;
-  downloading: boolean;
-}> {
+export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentProps, {}> {
   private feeds: number[];
   constructor () {
     super();
-    this.state = {
-      releases: {},
-      downloading: false
-    };
   }
   renderSubtitle(): JSX.Element | string {
-    if (this.state.downloading) {
-      return 'Downloading...';
-    }
-    if (this.state.releases[this.props.album.id]) {
-      if (!this.state.releases[this.props.album.id].length) {
-        return 'No results :/'
-      }
-      const res = this.state.releases[this.props.album.id].map((rel) => {
-        return <Tooltip content={
-          <div className="release-info">
-            <div className="rel-header">
-              <div className="rel-name">{rel.name}</div>
-            </div>
-            <div className="rel-meta">
-              <span className="rel-tracker">{rel.tracker}</span>
-
-              <span className="rel-counters">
-              <span className="pt-icon-caret-up"></span>
-              {rel.seeders}
-              <span className="pt-icon-caret-down"></span>
-              {rel.leechers}</span>
-            </div>
-          </div>
-        }>
-          <span onClick={this.downloadItem.bind(this, rel._id)} className={classnames("pt-tag pt-minimal", {
-          "pt-intent-warning": rel.seeders <= 2
-        })}key={rel._id} >{rel.format}</span>
-        </Tooltip>;
-      })
-      return <div>
-        {res}
-      </div>
-    }
-    return '...';
-  }
-  async downloadItem (id: string) {
-    this.setState({downloading: true});
-    const res = await Session.fetch(`/api/cascade/${id}/download`, {
-      method: 'POST',
-      body: null,
-      headers: {}
-    });
     
-    const data = await res.json();
+    return 'Click to see results';
   }
 
   loadImage(id: string, img: HTMLImageElement): void {
@@ -84,47 +34,7 @@ export default class DSAlbumComponent extends LibraryItemComp<DSAlbumComponentPr
   }
   
   async loadItem(id: string): Promise<void> {
-    const Trackers = new PouchDB<Tracker>('trackers');
-    const trackers = await Trackers.allDocs({include_docs: true});
-    const album = this.props.album.name;
-    const artist = this.props.album.artist;
-
-    let res: any[];
-
-    try {
-      res = await Promise.all(trackers.rows.map(async ({doc}) => {
-        if (doc._id === '_design/validator') return [];
-        const query = qs.stringify({name: album, artist});
-        const res = await Session.fetch(`/api/cascade/${doc._id}/search?${query}`)
-        const data = await res.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        return data;
-      }));
-    } catch (err) {
-      console.log(err);
-    }
-
-    if (!res || !res.length) {
-      this.setState({releases:{
-        [this.props.album.id]: []
-      }});
-      return;
-    }
-
-    const grouped = groupBy([].concat(...res), 'format');
-
-    const rels = Object.keys(grouped).filter((el) => el).map((format) => {
-      return grouped[format].sort((b: Release, a: Release) => {
-        if (a.seeders < b.seeders) return -1;
-        if (a.seeders > b.seeders) return 1;
-        return 0
-      })[0];
-    });
-    this.setState({releases:{
-      [this.props.album.id]: rels
-    }});
+    
   }
 
   unloadItem(): void {}

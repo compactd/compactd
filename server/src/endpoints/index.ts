@@ -8,6 +8,7 @@ import cascade from './cascade';
 import analytics from './analytics';
 import utils from './utils';
 import waveform from './waveform';
+import store from './store';
 
 export default function (app: Express.Application) {
   scanner(app);
@@ -15,6 +16,7 @@ export default function (app: Express.Application) {
   assets(app);
   boombox(app);
   cascade(app);
+  store(app);
   waveform(app);
   utils(app);
   analytics(app);

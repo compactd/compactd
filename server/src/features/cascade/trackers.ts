@@ -30,7 +30,7 @@ export async function createTracker (type: string, name: string, username: strin
   return await trackers.get(id);
 }
 
-function loadPasswords (): Promise<{[id: string]: string}> {
+export function loadPasswords (): Promise<{[id: string]: string}> {
 
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(passwords)) resolve({});
@@ -77,11 +77,7 @@ export async function setPassword (id: string, password: string) {
  * @param id The tracker password id
  */
 export async function getPassword (id: string) {
-  const trackers = new PouchDB<Tracker>('trackers');
-
-  const tracker = await trackers.get(id);
-
-  return (await loadPasswords())[tracker._id];
+  return (await loadPasswords())[id];
 
 }
 

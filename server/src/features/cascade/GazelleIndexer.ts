@@ -98,6 +98,7 @@ export class GazelleIndexer extends Indexer {
     return await res.json();
   }
   async searchAlbum(album: DSAlbum): Promise<Release[]> {
+
     const res = await this.call<GazelleGroup>('browse', {
       searchstr: '',
       artistname: album.artist,

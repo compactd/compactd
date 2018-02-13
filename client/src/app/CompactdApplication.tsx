@@ -45,6 +45,8 @@ export class CompactdApplication extends
             <Box col={10}>
               <Switch>
                 <Route exact path="/" children={<Redirect to="/library"/>} />
+                <Route path="/library/:artist/store/:album" children={(props: any) =>
+                  <LibraryView component={HolisticView} all={false} _store={true} {...props}/>} />
                 <Route path="/library/all/:artist?/:album?" children={(props: any) =>
                   <LibraryView component={HolisticView} all={true} {...props}/>} />
                 <Route path="/library/:artist?/:album?" children={(props: any) =>
