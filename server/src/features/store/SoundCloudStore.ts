@@ -9,6 +9,10 @@ import { EventEmitter } from "events";
 import { mainStory } from "storyboard";
 import HashMap from "../../helpers/HashMap";
 import * as urljoin from 'url-join';
+import * as cheerio from "cheerio";
+import PouchDB from '../../database';
+import * as slug from 'slug';
+import { albumURI, mapAlbumToParams } from "compactd-models/dist";
 
 const HOST = 'https://api-v2.soundcloud.com';
 
@@ -57,7 +61,7 @@ export default class SoundCloudStore extends Store {
     return collection.map(({permalink_url, likes_count, title, label_name}: any) => {
       const url = new URL(permalink_url);
       return {
-        _id: path.join(this._id, 'sets', url.pathname),
+        _id: path.join('results', slug(artist), album, url.pathname),
         name:  title,
         format: 'mp3',
         store: this._id,
@@ -72,16 +76,56 @@ export default class SoundCloudStore extends Store {
     });
   }
 
-  fetchResult(sid: string): EventEmitter {
+  fetchResult(id: string): EventEmitter {
     const eventEmitter = new EventEmitter();
-    mainStory.info('store', `Spawning 'soundscrape ${sid}'`);
+    const [o, artist, album, ...splatSid] = id.split('/');
+    const sid = splatSid.join('/');
 
-    const proc = spawn('soundscrape', [sid]);
+    const downloads = new PouchDB('downloads');
+    const libraries =  new PouchDB('libraries');
 
-    proc.stdout.on('data', (data) => console.log(data));
-    proc.stderr.on('data', (data) => console.log(data));
+    const dlId = path.join('downloads', slug(artist.toLowerCase()), slug(album.toLowerCase()), this.name, sid);
+    this.fetchResultName(sid).then((name) => {
+      const artistId = path.join('library', slug(artist.toLowerCase()));
+      return downloads.put({
+        _id: dlId,
+        name, sid, artist: artistId, album: albumURI(mapAlbumToParams({name: album, artist: artistId})), store: this.name, date: Date.now(), progress: 0
+      });
+    }).catch((err) => {
+      eventEmitter.emit('error', err);
+    });
 
+    libraries.allDocs({include_docs: true, limit: 1}).then(({rows}) => {
+      const [doc] = rows;
+      const args = [sid, '--path', (doc as any).path];
+      mainStory.info('store', `Spawning 'soundscrape ${args.join(' ')}'`);
+
+      const child = spawn('soundscrape', args);
+
+      child.stdout.pipe(process.stdout);
+      child.stderr.pipe(process.stderr);
+
+      child.on('exit', (code) => {
+        mainStory.info('store', `Received code ${code}`);
+        downloads.get(dlId).then((doc) => {
+          downloads.put({...doc, progress: 1} as any)
+        });
+      })
+    })
+    
     return eventEmitter;
+  }
+
+  async fetchResultName (sid: string) {
+    const url = urljoin('https://soundcloud.com', sid);
+
+    const res = await fetch(url);
+    const text = await res.text();
+    const $ = cheerio.load(text, {xmlMode: true});
+
+    const a = $('h1 > a[itemprop="url"]');
+
+    return a.html();
   }
 
 }

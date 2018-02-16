@@ -120,7 +120,7 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
     if (!id) return;
     const node = this.images[id];
     if (!node || !document.contains(node)) {
-      throw new Error ('Detaching non existing node: ' + id);
+      return;
     }
     this.imageContainer.removeChild(node);
   } 

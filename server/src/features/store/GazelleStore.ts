@@ -5,6 +5,7 @@ import { getPassword } from "../cascade/trackers";
 import { EventEmitter } from "events";
 import HashMap from "../../helpers/HashMap";
 import { StoreOptionSchemaEntry } from "./StoreOptionsSchema";
+import { join } from "path";
 
 const IP_ADRESS_REGEX = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 const DOMAIN_REGEX    = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/;
@@ -50,7 +51,7 @@ export default class GazelleStore extends TrackerStore {
     return res.map(({
         _id, tracker, seeders, leechers, torrent_id, bitrate, name, wanted, format
     }) => ({
-      _id,
+      _id: join('results', artist, album, torrent_id),
       store: this._id,
       name, format, sid: torrent_id, stats: [{
         name: 'Seeders',
@@ -66,11 +67,12 @@ export default class GazelleStore extends TrackerStore {
     }));
   }
 
-  fetchResult(sid: string): EventEmitter {
+  fetchResult(id: string): EventEmitter {
     const eventEmitter = new EventEmitter();
+    const [results, artist, album, sid] = id.split('/');
 
     this.indexer.downloadRelease(sid).then((buffer) => {
-      return this.downloadFile(buffer, eventEmitter);
+      return this.downloadFile(buffer, eventEmitter, id);
     }).catch((err) => {
       eventEmitter.emit('error', err);
     });

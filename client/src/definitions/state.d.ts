@@ -44,6 +44,13 @@ export interface LibraryState {
     [id: string]: {
       [store: string]: ResultEntry[]
     }
+  },
+  downloadsByArtist: {
+    [artistId: string]: ({
+      _id: string;
+      name: string;
+      progress: number;
+    })[]
   }
 }
 

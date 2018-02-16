@@ -86,4 +86,5 @@ export type LibraryActions = {
   setTrackArtist: (track: string, artist: string) => void;
   searchDSStore: (artist: Artist) => void;
   searchStore: (artist: string, album: string) => void;
+  watchDownloads: () => void;
 }

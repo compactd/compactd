@@ -4,7 +4,7 @@ import PouchDB from 'pouchdb';
 import {artistURI} from 'compactd-models';
 import Toaster from 'app/toaster';
 import session from 'app/session';
-import {syncDatabases} from 'app/database';
+import {syncDatabases, getDatabase} from 'app/database';
 import { ThunkAction } from 'redux-thunk';
 import { CompactdState } from 'definitions/state';
 import { Dispatch } from 'redux';
@@ -28,6 +28,7 @@ const DO_REMOVE = 'cassette/library/DO_REMOVE';
 const OFFER_REMOVE = 'cassette/library/OFFER_REMOVE';
 const SEARCH_STORE = 'cassette/library/SEARCH_STORE';
 const SEARCH_DS_STORE = 'cassette/library/SEARCH_DS_STORE';
+const RESOLVE_DOWNLOADS = 'cassette/library/RESOLVE_DOWNLOADS';
 
 const initialState: Defs.LibraryState = {
   albumsById: {},
@@ -40,7 +41,8 @@ const initialState: Defs.LibraryState = {
   counters: {},
   topTracks: [],
   resultsById: {},
-  dsResultsById: {}
+  dsResultsById: {},
+  downloadsByArtist: {}
 };
 
 const getParent = (str: string) => {
@@ -50,6 +52,23 @@ const getParent = (str: string) => {
 export function reducer (state: Defs.LibraryState = initialState,
   action: any): Defs.LibraryState {
   switch (action.type) {
+    case RESOLVE_DOWNLOADS:
+      const {downloads} = action;
+
+      return {
+        ...state,
+        downloadsByArtist: {
+          ...state.downloadsByArtist,
+          ...(action.downloads.reduce((acc: any, val: any) => {
+            return {
+              ...acc,
+              [val.artist]:
+                (acc[val.artist] || []).concat(val,
+                  // Nodups
+                  (state.downloadsByArtist[val.artist] || []).filter((el) => el._id !== val._id))};
+          }, {}))
+        }
+      }
     case SEARCH_DS_STORE:
       const {artist, results} = action;
 
@@ -162,6 +181,30 @@ export function reducer (state: Defs.LibraryState = initialState,
       });
   }
   return state;
+}
+
+function watchDownloads () {
+  return (dispatch: Function) => {
+    getDatabase('downloads').then((downloads) => {
+      downloads.allDocs({include_docs: true}).then(({rows}) => {
+          dispatch({
+            type: RESOLVE_DOWNLOADS,
+            downloads: rows.map(({doc}) => doc)
+          });
+      });
+
+      downloads.changes({
+        live: true,
+        since: 'now',
+        include_docs: true
+      }).on('change', (info) => {
+        dispatch({
+          type: RESOLVE_DOWNLOADS,
+          downloads: [info.doc]
+        });
+      })
+    });
+  }
 }
 
 function searchDSStore (artist: Artist) {
@@ -429,5 +472,6 @@ export const actions = {
   fetchArtist, fetchAllArtists, fetchAllAlbums,
   toggleExpandArtist, fetchAlbum, fetchRecommendations,
   fetchTrack, toggleHideTrack, offerRemove, doRemove,
-  setTrackArtist, fetchAllTracks, searchDSStore, searchStore
+  setTrackArtist, fetchAllTracks, searchDSStore, searchStore,
+  watchDownloads
 };

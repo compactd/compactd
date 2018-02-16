@@ -23,7 +23,7 @@ export default abstract class TrackerStore extends Store {
     });
   }
 
-  protected async downloadFile (buffer: Buffer, eventEmitter: EventEmitter) {
+  protected async downloadFile (buffer: Buffer, eventEmitter: EventEmitter, resId?: string) {
     await this.client.connect();
     
     const downloads = new PouchDB('downloads');
@@ -45,6 +45,7 @@ export default abstract class TrackerStore extends Store {
       name: download.name,
       hash: download.hash,
       done: download.progress === 1,
+      res_id: resId
     });
 
     

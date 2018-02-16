@@ -22,6 +22,7 @@ import { parse, stringify } from 'querystring';
 import { List } from 'react-virtualized/dist/es/List';
 import * as PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { DownloadComponent } from 'components/DownloadComponent/DownloadComponent';
 require('./AlbumsListView.scss');
 
 interface AlbumsListViewProps {
@@ -69,6 +70,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     this.props.actions.searchDSStore(artist);
   }
   componentDidMount () {
+    this.props.actions.watchDownloads();
     if (!this.props.artist) {
       this.props.actions.fetchAllAlbums();
     } else {
@@ -118,7 +120,8 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
 
     if (this.props.artist) {
       if (library.artistsById[artistId]) {
-        return library.artistsById[artistId].albums;
+        return library.artistsById[artistId].albums
+          .concat((library.downloadsByArtist[artistId] || []).map((el) => el._id));
       } else {
         return [];
       }
@@ -131,16 +134,20 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     if (this.props.artist) {
       const artist = library.artistsById[artistId];
       const dsResults = this.props.library.dsResultsById[artistId];
+
       if (!this.state.displayResults) {
         return this.albums.concat('?search-albums');
       }
+      
       if (dsResults) {
         return this.albums.concat(dsResults.filter((val, i) => {
           const uri = albumURI(mapAlbumToParams({artist: artist._id, name: val.name}));
           if (artist.albums.includes(uri)) {
             return false;
           }
-          return true;
+          return !(library.downloadsByArtist[artistId] || []).find((el) => {
+            return el._id.startsWith(uri.replace(/^library/, 'downloads'));
+          });
         }).slice(0, 20).map((res) => {
           return 'results?' + stringify(res);
         }));
@@ -177,6 +184,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   _renderItem (props: ListProps) {
     const {index, style, parent} = props;
     const {artist} = this.props;
+    const artistId = `library/${artist}`;
     const item = this.items[index];
     if (item.startsWith('library/')) {
       const active = this.props.match.params.album === albumURI(item).name;
@@ -187,6 +195,10 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
               layout="medium"
               theme="dark"
               subtitle="counters" />
+    } else if (item.startsWith('downloads/')) {
+
+      const dl = this.props.library.downloadsByArtist[artistId].find((el) => el._id === item);
+      return <DownloadComponent id={item} name={dl.name} layout="medium" theme="dark" progress={dl.progress} /> 
     } else if (item === '?searching-albums') {
       return <PlaceholderComponent id="" layout="medium" theme="dark" loading={true} />;
     } else if (item === '?search-albums') {

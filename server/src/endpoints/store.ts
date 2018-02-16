@@ -2,7 +2,7 @@ import * as Express from 'express';
 import {Library} from 'compactd-models';
 import * as shortid from 'shortid';
 import { join } from 'path';
-import { searchStores, createStore, putOption } from '../features/store/index';
+import { searchStores, createStore, putOption, downloadResult } from '../features/store/index';
 import { apiify } from './apiify';
 
  
@@ -19,6 +19,13 @@ export default function(app: Express.Application) {
 
   app.put('/api/stores/:type/:name', (req, res) => {
     const {key, value} = req.body;
-    apiify('store', putOption(join('stores', req.params.type, req.params.name), key, value), res);
+    const store = join('stores', req.params.type, req.params.name);
+    apiify('store', putOption(store, key, value), res);
+  });
+
+  app.post('/api/stores/:type/:name', (req, res) => {
+    const id = req.body.result;
+    const store = join('stores', req.params.type, req.params.name);
+    apiify('store', downloadResult(store, id), res, 201);
   });
 }

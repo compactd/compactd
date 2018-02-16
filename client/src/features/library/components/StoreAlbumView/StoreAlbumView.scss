@@ -12,6 +12,7 @@ div.store-album-view{
   .result-row {
     &.centered {
       text-align: center;
+      margin: 0 auto;
     }
     cursor: pointer;
     
@@ -29,7 +30,6 @@ div.store-album-view{
     @include ellipsis();
   }
   span.load-more {
-    text-align: center;
   }
   span.result-stats {
     display: flex;

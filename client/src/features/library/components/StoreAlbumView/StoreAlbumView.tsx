@@ -57,7 +57,9 @@ export class StoreAlbumView extends React.Component<StoreAlbumViewProps, {
         <div className="row-header"><AsyncText docId={storeId} dbName="stores" keyName="name"/></div>
         <div className="row-content">
           {items.slice(0, this.state.expanded[storeId] ? items.length : 3).map((item) => {
-            return <div className="result-row">
+            return <div className="result-row" onClick={() => {
+              session.post('/api/' + storeId, {result: item._id});
+            }}>
               <span className="result-name">{item.name}</span>
               <span className="result-format pt-tag pt-minimal">{item.format}</span>
               <span className="result-stats">{item.stats.map((stat) => {

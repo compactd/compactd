@@ -42,10 +42,20 @@ export async function getStores (): Promise<Store[]> {
   return Promise.all(rows.map(async (store: any) => {
     const matchingStore = (STORES as any)[store.doc.type];
     const opts = await getOpts(store.doc._id);
-    console.log(opts)
+    
     return new matchingStore(opts, store.doc._id);
   }));
 }
+
+export async function getStore (id: string) : Promise<Store>{
+  const stores = new PouchDB<any>('stores');
+  const store = await stores.get(id);
+
+  const matchingStore = (STORES as any)[store.type];
+  const opts = await getOpts(store._id);
+  
+  return new matchingStore(opts, store._id);
+} 
 
 export async function searchStores (artist: string, album: string) {
   const stores = await getStores();
@@ -94,4 +104,12 @@ export async function createStore (type: string, name: string) {
   await stores.put(doc);
 
   return _id;
+}
+
+export async function downloadResult (storeId: string, result: string) {
+  const store = await getStore(storeId);
+  await store.authenticate();
+  await store.fetchResult(result);
+
+  return {ok: true};
 }
