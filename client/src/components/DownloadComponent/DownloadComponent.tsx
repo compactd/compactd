@@ -20,7 +20,7 @@ export class DownloadComponent extends LibraryItemComponent<{name: string, progr
   }
   renderImage () {
     return <div className="placeholder-image">
-      <Spinner className={Classes.SMALL} value={this.props.progress}/>
+      <Spinner className={Classes.SMALL} value={this.props.progress || undefined}/>
     </div>
   }
 }

@@ -187,10 +187,10 @@ function watchDownloads () {
   return (dispatch: Function) => {
     getDatabase('downloads').then((downloads) => {
       downloads.allDocs({include_docs: true}).then(({rows}) => {
-          dispatch({
-            type: RESOLVE_DOWNLOADS,
-            downloads: rows.map(({doc}) => doc)
-          });
+        dispatch({
+          type: RESOLVE_DOWNLOADS,
+          downloads: rows.map(({doc}) => doc)
+        });
       });
 
       downloads.changes({

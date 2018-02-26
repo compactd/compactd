@@ -110,6 +110,10 @@ export default abstract class LibraryItemComponent<P, S> extends React.Component
     node.width = size;
     node.setAttribute('data-doc-id', "artworks/" + id);
 
+    if (!this.imageContainer || !document.contains(this.imageContainer)) {
+      return;
+    }
+
     this.imageContainer.appendChild(node);
     this.loadImage(id, node);
 
