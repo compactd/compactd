@@ -24,6 +24,8 @@ import * as PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { DownloadComponent } from 'components/DownloadComponent/DownloadComponent';
 import LibraryProvider from 'app/LibraryProvider';
+import * as slug from 'slug';
+
 require('./AlbumsListView.scss');
 
 interface AlbumsListViewProps {
@@ -40,6 +42,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   height?: number;
   width?: number;
 }>{
+  private changes: PouchDB.Core.Changes<{}>;
   static contextTypes = {
     router: PropTypes.shape({
       history: PropTypes.shape({
@@ -79,16 +82,21 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     } else {
       this.props.actions.fetchArtist(this.props.artist);
     }
-    LibraryProvider.getInstance().onDocAdded('albums', (id) => {
+    this.changes = LibraryProvider.getInstance().onDocAdded('albums', (id) => {
       if (id.startsWith(artistId)) {
         this.props.actions.fetchArtist(this.props.artist);
       }
     })
-    window.addEventListener('resize', (evt) => {
-      window.requestAnimationFrame(() => {
-        this.computeHeight(this.div);
-      })
-    });
+    window.addEventListener('resize', this.onResize);
+  }
+  onResize () {
+    window.requestAnimationFrame(() => {
+      this.computeHeight(this.div);
+    })
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.onResize);
+    this.changes.cancel();
   }
   handleArtistDivRef(id: string, div: HTMLDivElement) {
     this.div = div;
@@ -128,7 +136,9 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     if (this.props.artist) {
       if (library.artistsById[artistId]) {
         return library.artistsById[artistId].albums
-          .concat((library.downloadsByArtist[artistId] || []).map((el) => el._id));
+          .concat((library.downloadsByArtist[artistId] || []).filter(({name}) => {
+            return !library.artistsById[artistId].albums.includes(artistId + '/' + slug(name, {lower: true}));
+          }).map((el) => el._id));
       } else {
         return [];
       }
