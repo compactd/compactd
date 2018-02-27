@@ -74,20 +74,29 @@ export default class SoundCloudStore extends Store {
       q: `${artist} - ${album}`
     });
 
-    return collection.map(({permalink_url, likes_count, title, label_name}: any) => {
+    return collection.map(({permalink_url, likes_count, title, label_name, tracks}: any) => {
       const url = new URL(permalink_url);
+      const nonFree = tracks.every(({monetization_model}: any) => {
+        return !monetization_model || monetization_model === 'SUB_HIGH_TIER';
+      });
+
       return {
         _id: path.join('results', slug(artist, {lower: true}),  slug(album, {lower: true}), url.pathname),
         name:  title,
         format: 'mp3',
         store: this._id,
         sid: url.pathname,
-        stats: [{
+        stats: [].concat(nonFree ? {
+          icon: 'eye-open',
+          name: 'Preview Only',
+          desc: 'Only first 30s are downloadable',
+          value: '30s'
+        } : []).concat([{
           icon: 'heart',
           name: 'Likes',
           desc: 'Number of soundcloud likes',
           value: likes_count
-        }]
+        }])
       }
     });
   }
