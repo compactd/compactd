@@ -21,6 +21,7 @@ import { join } from "path";
 import * as PQueue from 'p-queue';
 import * as mkdirp from 'mkdirp';
 import * as filenamify from 'filenamify';
+import { Scanner } from "../scanner/Scanner";
 
 const NodeID3 = require('node-id3');
 
@@ -275,13 +276,13 @@ export default class SoundCloudStore extends Store {
     const [o, artist, album, ...splatSid] = id.split('/');
     const sid = splatSid.join('/');
 
-    const downloads = new PouchDB('downloads');
+    const downloads = new PouchDB<any>('downloads');
     const libraries =  new PouchDB('libraries');
     const artists =  new PouchDB<Artist>('artists');
 
     const dlId = path.join('downloads', slug(artist.toLowerCase()), slug(album.toLowerCase()), this.name, sid);
 
-    let resultName: string, dir: string, artistName: string;
+    let resultName: string, dir: string, artistName: string, libraryId: string, dirname: string;
 
     this.fetchResultName(sid).then((name) => {
       const artistId = path.join('library', slug(artist.toLowerCase()));
@@ -292,36 +293,52 @@ export default class SoundCloudStore extends Store {
         name, sid, artist: artistId, album: albumURI(mapAlbumToParams({name: album, artist: artistId})), store: this.name, date: Date.now(), progress: 0
       });
     }).then((doc) => {
+
       return artists.get('library/' + artist);
     }).then((doc) => {
+
       artistName = doc.name;
       return libraries.allDocs({include_docs: true, limit: 1});
     }).then(({rows}) => {
+
       const [{doc}] = rows;
-      dir = join((doc as any).path, artistName + ' - ' + resultName);
+      libraryId = doc._id;
+      dirname = filenamify(resultName.startsWith(artistName) ? resultName : artistName + ' - ' + resultName);
+      dir = join((doc as any).path, dirname);
       return promisify(mkdirp)(dir, {});
     }).then(() => {
-      return this.getTrackIds(urljoin('https://soundcloud.com', sid), 'playlist');
+      return this.getTrackIds(urljoin(SITE_HOST, sid), 'playlist');
     }).then((props) => {
-      const queue = new PQueue();
+
       let done = 0;
-      props.forEach((prop, index, arr) => {
-        queue.add(() => {
+      mainStory.info('store', 'Tracks props found', {attach: props});
+
+      const fns = props.map((prop, index, arr) => {
+        return () => {
           return this.fetchTrack(dir, prop, {
             number: index + 1,
             artist: artistName,
             album: resultName
           }).then(() => {
-            downloads.get(dlId).then((doc) => {
-              downloads.put({...doc, progress: (index + 1) / arr.length} as any)
+            return downloads.get(dlId).then((doc) => {
+              downloads.put({...doc, progress: (++done) / arr.length});
             });
           }).catch((err) => {
             mainStory.error('store', `Error`, {attach: err});
             eventEmitter.emit('error', err);
+            return downloads.get(dlId).then((doc) => {
+              downloads.put({...doc, progress: (++done) / arr.length, errors: (doc.errors || 0) + 1});
+            });
           });
-        })
-      })
-      return queue.onEmpty();
+        }
+      });
+
+      return fns.reduce((acc, fn) => {
+        return acc.then(fn);
+      }, Promise.resolve());
+    }).then(() => {
+      const scanner = new Scanner(libraryId);
+      return scanner.scan(PouchDB, dirname);
     }).catch((err) => {
       mainStory.error('store', `Error for ${urljoin(SITE_HOST, sid)}`, {attach: err});
       eventEmitter.emit('error', err);
