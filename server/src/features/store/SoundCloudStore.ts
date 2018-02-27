@@ -24,7 +24,7 @@ import * as filenamify from 'filenamify';
 
 const NodeID3 = require('node-id3');
 
-const HOST = 'https://api-v2.soundcloud.com';
+const V2_HOST = 'https://api-v2.soundcloud.com';
 const SITE_HOST = 'https://soundcloud.com';
 
 export const optsSchema = [{
@@ -54,7 +54,7 @@ export default class SoundCloudStore extends Store {
       client_id: this.opts.clientId
     });
     
-    const url = urljoin(HOST, endpoint, '?' + qs.stringify(params));
+    const url = urljoin(V2_HOST, endpoint, '?' + qs.stringify(params));
 
     mainStory.debug('store', `GET ${url}`);
 
@@ -304,7 +304,7 @@ export default class SoundCloudStore extends Store {
       })
       return queue.onEmpty();
     }).catch((err) => {
-      mainStory.error('store', `Error for ${urljoin('https://soundcloud.com', sid)}`, {attach: err});
+      mainStory.error('store', `Error for ${urljoin(SITE_HOST, sid)}`, {attach: err});
       eventEmitter.emit('error', err);
     });
 
@@ -312,7 +312,7 @@ export default class SoundCloudStore extends Store {
   }
 
   async fetchResultName (sid: string) {
-    const url = urljoin('https://soundcloud.com', sid);
+    const url = urljoin(SITE_HOST, sid);
 
     const res = await fetch(url);
     const text = await res.text();
