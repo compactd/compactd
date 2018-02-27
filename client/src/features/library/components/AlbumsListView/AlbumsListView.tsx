@@ -23,6 +23,7 @@ import { List } from 'react-virtualized/dist/es/List';
 import * as PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { DownloadComponent } from 'components/DownloadComponent/DownloadComponent';
+import LibraryProvider from 'app/LibraryProvider';
 require('./AlbumsListView.scss');
 
 interface AlbumsListViewProps {
@@ -70,13 +71,19 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     this.props.actions.searchDSStore(artist);
   }
   componentDidMount () {
+    const artistId = `library/${this.props.artist}`;
+
     this.props.actions.watchDownloads();
     if (!this.props.artist) {
       this.props.actions.fetchAllAlbums();
     } else {
       this.props.actions.fetchArtist(this.props.artist);
     }
-    
+    LibraryProvider.getInstance().onDocAdded('albums', (id) => {
+      if (id.startsWith(artistId)) {
+        this.props.actions.fetchArtist(this.props.artist);
+      }
+    })
     window.addEventListener('resize', (evt) => {
       window.requestAnimationFrame(() => {
         this.computeHeight(this.div);
@@ -206,7 +213,6 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     } else if (item.startsWith('results?')) {
       const [pre, ...res] = item.split('?');
       const active = this.props.match.params.album === parse(res[0]).name
-      console.log(parse(res[0]).name, this.props.match.params.album);
       
       return <DSAlbumComponent layout="medium" id={item} theme="dark" album={parse(res.join('?')) as any} onClick={() => {
         const url = `/library/${artist}/store/${parse(res[0]).name}`
