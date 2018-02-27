@@ -203,6 +203,25 @@ export default class SoundCloudStore extends Store {
         title: item.title
       }];
     }
+
+    // Soundcloud client doesn't resove all ids we need to do it manually
+    const unresolvedIds = registry[wantedKey].tracks.filter((el: any) => {
+      return !el.title;
+    }).map((el: any) => el.id);
+
+    if (unresolvedIds.length > 0) {
+      const url = `https://api-v2.soundcloud.com/tracks?ids=${unresolvedIds.join(',')}&client_id=${this.opts.clientId}`;
+      const res = await fetch(url);
+      mainStory.info('store', 'GET ' + url);
+      const tracks = await res.json();
+
+      tracks.forEach((track: any) => {
+        const index = registry[wantedKey].tracks.findIndex((el: any) => el.id === track.id);
+
+        registry[wantedKey].tracks[index] = track;
+      });
+    }
+
     return registry[wantedKey].tracks.map((el: any) => {
       return {
         id: el.id,
