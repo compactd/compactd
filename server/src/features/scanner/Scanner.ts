@@ -36,7 +36,7 @@ export class Scanner extends events.EventEmitter {
       attachLevel: 'debug'
     });
   }
-  async scan (pouchDB: typeof PouchDB) {
+  async scan (pouchDB: typeof PouchDB, subdir: string = "") {
 
     const libraries = new pouchDB<Models.Library>('libraries');
     const lib = await libraries.get(this.library);
@@ -49,11 +49,11 @@ export class Scanner extends events.EventEmitter {
 
     this.path = lib.path;
     const timestamp = Date.now();
-    this.walkDirectory();
+    this.walkDirectory(subdir);
 
     const patch = await this.getPatch();
-    await patch.reduce((acc, entry) => {
-      return acc.then(() => this.databaseEntryCreator(pouchDB, entry));
+    await patch.reduce((acc, [op, file, entry]) => {
+      return acc.then(() => this.databaseEntryCreator(pouchDB, [op, path.join(subdir, file), entry]));
     }, Promise.resolve());
 
     await this.serializeEntries(config.get('dataDirectory'));
@@ -63,8 +63,8 @@ export class Scanner extends events.EventEmitter {
     this.emit('scan_ended');
   }
 
-  walkDirectory () {
-    this.entries = walkSync.entries(this.path);
+  walkDirectory (subdir: string) {
+    this.entries = walkSync.entries(path.join(this.path, subdir));
     mainStory.debug('scanner', `Loaded ${this.entries.length} files to be potentially processed`);
   }
 
@@ -167,6 +167,7 @@ export class Scanner extends events.EventEmitter {
       if (year !== null && year.length) {
         return Number(year[0]);
       }
+      return undefined;
     }
 
     const year = date.match(/(\d\d\d\d)/);
@@ -190,7 +191,7 @@ export class Scanner extends events.EventEmitter {
 
           mainStory.debug('scanner', `Probed ${file}`, {
             attach: probed, attachLevel: 'trace'
-          })
+          });
 
           if (!probed || !probed.format ||
             !probed.format.tags || (!probed.format.tags.title && !probed.format.tags.TITLE)) {
