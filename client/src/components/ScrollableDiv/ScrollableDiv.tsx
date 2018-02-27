@@ -10,15 +10,19 @@ class ScrollableDiv extends React.Component<{
 },{}> {
   private div: HTMLDivElement;
   componentDidMount () {
-    window.addEventListener('resize', (evt) => {
-      window.requestAnimationFrame(() => {
-        this.updateHeight();
-      })
-    });
+    window.addEventListener('resize', this.onResize);
     this.updateHeight();
     setTimeout(() => {
       this.updateHeight()
-    }, 200);
+    }, 100);
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.onResize);
+  }
+  onResize () {
+    window.requestAnimationFrame(() => {
+      this.updateHeight();
+    })
   }
   componentWillReceiveProps () {
     this.updateHeight();
