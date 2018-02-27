@@ -9,6 +9,8 @@ import AsyncText from 'components/AsyncText/AsyncText';
 import { ScrollableDiv } from 'components';
 import * as classNames from 'classnames';
 import { Spinner } from '@blueprintjs/core';
+import * as PropTypes from 'prop-types';
+import { albumURI, mapAlbumToParams } from 'compactd-models/dist';
 
 require('./StoreAlbumView.scss');
 
@@ -23,6 +25,15 @@ export class StoreAlbumView extends React.Component<StoreAlbumViewProps, {
   stores: Map<any>,
   expanded: Map<boolean>
 }>{
+  static contextTypes = {
+    router: PropTypes.shape({
+      history: PropTypes.shape({
+        push: PropTypes.func.isRequired,
+        replace: PropTypes.func.isRequired,
+        createHref: PropTypes.func.isRequired
+      }).isRequired
+    }).isRequired
+  }
   constructor () {
     super();
     this.state = {stores: {}, expanded: {}};
@@ -58,7 +69,10 @@ export class StoreAlbumView extends React.Component<StoreAlbumViewProps, {
         <div className="row-content">
           {items.slice(0, this.state.expanded[storeId] ? items.length : 3).map((item) => {
             return <div className="result-row" onClick={() => {
+              const id = join('/library', this.props.artist);
               session.post('/api/' + storeId, {result: item._id});
+              const { history } = this.context.router;
+              history.push(id);
             }}>
               <span className="result-name">{item.name}</span>
               <span className="result-format pt-tag pt-minimal">{item.format}</span>
