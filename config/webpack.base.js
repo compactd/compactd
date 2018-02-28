@@ -8,7 +8,6 @@ const HtmlWebpackIncludeAssetsPlugin = require('html-webpack-include-assets-plug
 
 module.exports = {
   entry: {
-    application: ["./client/src/index.tsx"],
     vendor: ['react', 'react-dom', 'react-redux', 'react-router', 'react-router-redux', 'redux']
   },
   output: {

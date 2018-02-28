@@ -6,3 +6,4 @@ server/dist
 clearCouch.bat
 .vscode/launch.json
 .DS_Store
+electron/dist/
