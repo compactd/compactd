@@ -1,5 +1,5 @@
 import * as jwt from 'jwt-decode';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import * as urljoin from 'url-join';
 import * as hash from 'md5';
 
@@ -95,7 +95,7 @@ class SessionManager {
     if (init.method === 'GET') {
       return fetch(urljoin(origin, input), this.init(origin, {
         method: 'GET',
-        headers: new Headers(init.headers)
+        headers: init.headers
       }));
     }
 

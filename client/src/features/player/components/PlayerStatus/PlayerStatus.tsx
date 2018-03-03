@@ -194,9 +194,9 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
             // TODO
           }}></span>
         </div>
-        <div className="toggle-expand" onClick={() => this.setState({waveform: !this.state.waveform})}>
+        {/* <div className="toggle-expand" onClick={() => this.setState({waveform: !this.state.waveform})}>
           <span className="pt-icon-chevron-down"></span>
-        </div>
+        </div> */}
       </div>
     </div>
   }

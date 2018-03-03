@@ -40,5 +40,5 @@ export type AppAction = SetUserAction | ResolveStateAction | StartSyncAction
 export type AppActions = {
   fetchState: () => void;
   login: (username: string, password: string) => void;
-  sync: (origin?: string) => void;
+  sync: (origin: string) => void;
 }

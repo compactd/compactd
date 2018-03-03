@@ -6,7 +6,7 @@ export function wrapDatabaseFromState (fn: (databases: Databases, ...args: any[]
   return (...args: any[]) => {
     return (dispatch: Dispatch<any>, getState: () => CompactdState) => {
       fn(getState().app.databases, ...args).then((action) => {
-        console.log(action);
+        if (!action) return;
         dispatch(action);
       }).catch((err) => {
         console.trace(err);

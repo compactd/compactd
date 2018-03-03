@@ -1,6 +1,7 @@
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import session from 'app/session';
 import {URL} from 'url';
+import * as urljoin from 'url-join';
 
 (PouchDB as any).adapter('socket', require('socket-pouch/client'));
 
@@ -15,7 +16,7 @@ export const getDatabase = async function<T> (origin: string, name: string) {
   } as any);
 }
 export const getHttpDatabase = function<T> (origin: string, name: string) {
-  return new PouchDB<T>(`${origin}/database/${name}`, {
+  return new PouchDB<T>(urljoin(origin, 'database', name), {
     ajax: {
       cache: true,
       headers: {

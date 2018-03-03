@@ -9,8 +9,13 @@ module.exports =
     devtool: 'eval',
     entry: {
       'app': [
-          "./client/src/electron.tsx"
+          "./client/src/index-electron.tsx"
         ]
+    },
+    devServer: {
+      historyApiFallback: {
+        index: 'dist/index.html'
+      }
     },
     target: 'electron-renderer'
   })

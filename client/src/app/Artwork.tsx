@@ -1,4 +1,4 @@
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import * as PQueue from 'p-queue';
 const debounce = require('debounce');
 

@@ -1,7 +1,7 @@
 import * as React from "react";
 import Map from 'models/Map';
 import { getDatabase, getHttpDatabase } from "app/database";
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import { Databases } from "definitions/state";
 
 export interface AsyncTextProps {

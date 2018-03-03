@@ -12,6 +12,6 @@
   },
   "include": [
     "./src/**/*",
-    "../types"
+    "./src/preload.ts"
   ]
 }

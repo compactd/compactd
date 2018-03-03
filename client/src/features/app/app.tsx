@@ -1,6 +1,6 @@
 import * as Defs from 'definitions';
 import { AppAction } from './actions.d';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import * as thunk from 'redux-thunk';
 import * as jwt from 'jwt-decode';
 import {getDatabase, getHttpDatabase} from 'app/database';
@@ -115,7 +115,7 @@ function syncDB (origin: string, dbs: string[], max: number): thunk.ThunkAction<
     const dbName = dbs[0];
     const db = new PouchDB((getState().app.databases as any)[dbName]);
     const remote = getHttpDatabase(origin, dbName);
-
+    console.log('sync', db, '->', remote)
     db.replicate.from(remote).on('complete', (info) => {
       dispatch({
         type: ActionTypes.UPDATE_SYNC,
@@ -141,12 +141,13 @@ function syncDB (origin: string, dbs: string[], max: number): thunk.ThunkAction<
           }), 150);
       }
     }).on('error', (err: any) => {
-      console.log(err, err.stack, new Error().stack);
+      console.trace(err, err.stack);
       Toaster.error(`An error happened during database sync for ${dbName}: ${err.code}`);
     });
   }
 }
 function sync (origin: string): thunk.ThunkAction<void, Defs.CompactdState, void>  {
+  console.log('sync', origin);
   return (dispatch, getState) => {
     if (getState().app.syncing) {
       return;

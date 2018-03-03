@@ -1,6 +1,7 @@
 import AudioSource from './AudioSource';
 import Session from '../app/session';
 import Map from './Map';
+import * as urljoin from 'url-join';
 
 export default class XHRSource extends AudioSource {
   private origin: string;
@@ -59,7 +60,7 @@ export default class XHRSource extends AudioSource {
       this.prefetched = true;
       this.tokens[this.track] = token;
 
-      return XHRSource.STREAM_ENDPOINT + token;
+      return urljoin(this.origin, XHRSource.STREAM_ENDPOINT, token);
     } else {
       throw new Error();
     }

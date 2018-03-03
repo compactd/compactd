@@ -1,6 +1,6 @@
 import * as Defs from 'definitions';
 import { LibraryAction } from './actions.d';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import {artistURI, albumURI} from 'compactd-models';
 import Toaster from 'app/toaster';
 import session from 'app/session';

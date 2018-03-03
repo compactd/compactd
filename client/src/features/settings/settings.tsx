@@ -2,7 +2,7 @@ import * as Defs from 'definitions';
 import { SettingsAction } from './actions.d';
 import {Artist, Album, Tracker, trackerURI, mapTrackerToParams, Library} from 'compactd-models';
 import {getDatabase} from 'app/database';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import {Intent} from '@blueprintjs/core';
 import Toaster from 'app/toaster';
 import Socket from 'app/socket';

@@ -6,6 +6,7 @@ import * as reduxPromise from 'redux-promise';
 import reduxThunk from 'redux-thunk';
 import { routerMiddleware } from 'react-router-redux';
 import { withRouter } from 'react-router-dom';
+import logger from 'redux-logger'
 // Create a history of your choosing (we're using a browser history in this case)
 export const history = createHistory()
 
@@ -19,7 +20,7 @@ export class CompactdStore {
   }
   configureStore (): Store<CompactdState> {
     const enhancer = this.compose(
-      applyMiddleware(middleware, reduxThunk, reduxPromise)
+      applyMiddleware(middleware, reduxThunk, reduxPromise, logger)
     )(createStore);
     return (enhancer as any)(reducers);
   }

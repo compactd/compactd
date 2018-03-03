@@ -1,6 +1,6 @@
 
 import {Artist, Album, Track, artistURI, albumURI} from 'compactd-models';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import { Databases, CompactdState } from 'definitions/state';
 import { ThunkAction } from 'redux-thunk';
 import { Dispatch } from 'redux';

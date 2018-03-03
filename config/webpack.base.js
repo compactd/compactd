@@ -27,6 +27,7 @@ module.exports = {
       app: path.join(__dirname, '../client/src/app'),
       components: path.join(__dirname, '../client/src/components'),
       definitions: path.join(__dirname, '../client/src/definitions'),
+      renderer: path.join(__dirname, '../client/src/renderer')
     }
   },
   plugins: [
@@ -60,14 +61,13 @@ module.exports = {
         loader: "awesome-typescript-loader",
         options: {
           configFileName: 'client/tsconfig.json'
-        },
-        exclude: /electron/
+        }
       },
 
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
       {
-         test: /\.scss$/,
+         test: /\.s?css$/,
          use: [{
            loader: "style-loader"
          }, {

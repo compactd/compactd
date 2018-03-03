@@ -2,7 +2,7 @@ import * as Defs from 'definitions';
 import Toaster from 'app/toaster';
 import { StoreAction } from './actions.d';
 import {Tracker, DSAlbum, Release} from 'compactd-models';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import * as qs from 'querystring';
 import * as jwtDecode from 'jwt-decode';
 import * as io from 'socket.io-client';

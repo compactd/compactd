@@ -1,0 +1,1 @@
+global.fetchr = require('node-fetch');

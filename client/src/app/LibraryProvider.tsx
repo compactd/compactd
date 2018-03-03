@@ -1,4 +1,4 @@
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
 import {Album, Track, Artist} from 'compactd-models';
 import { Databases } from 'definitions/state';
 

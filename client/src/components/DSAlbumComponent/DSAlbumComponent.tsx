@@ -10,8 +10,10 @@ import LibraryProvider from 'app/LibraryProvider';
 import * as path from 'path';
 import * as qs from 'querystring';
 import Session from 'app/session';
-import PouchDB from 'pouchdb';
+import PouchDB from 'pouchdb-browser';
+
 const groupBy = require('lodash.groupby');
+
 import Map from 'models/Map';
 import { Tooltip } from '@blueprintjs/core';
 

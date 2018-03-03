@@ -24,7 +24,7 @@ interface AppViewProps {
 class AppView extends React.Component<AppViewProps, {}> {
   componentDidMount () {
     const {origin, actions} = this.props;
-
+    console.log('AppView', this.props);
     if (origin) {
       actions.sync(origin);
     }
