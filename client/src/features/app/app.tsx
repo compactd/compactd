@@ -8,42 +8,68 @@ import Toaster from 'app/toaster';
 import Socket from 'app/socket';
 import Artwork from 'app/Artwork';
 import Session from 'app/session';
+import * as hash from 'md5';
+import { wrapDatabaseFromState } from 'definitions/utils';
+import { Databases } from 'definitions/state';
 
-const RESOLVE_STATE = 'compactd/app/RESOLVE_STATE';
-const SET_USER = 'compactd/app/SET_USER';
-const START_SYNC = 'compactd/app/START_SYNC';
-const UPDATE_SYNC = 'compactd/app/UPDATE_SYNC';
-const END_SYNC = 'compactd/app/END_SYNC';
-const SHOW_ERROR = 'compactd/app/SHOW_ERROR';
+export enum ActionTypes {
+  RESOLVE_STATE = 'compactd/app/RESOLVE_STATE',
+  SET_USER = 'compactd/app/SET_USER',
+  START_SYNC = 'compactd/app/START_SYNC',
+  UPDATE_SYNC = 'compactd/app/UPDATE_SYNC',
+  END_SYNC = 'compactd/app/END_SYNC',
+  SHOW_ERROR = 'compactd/app/SHOW_ERROR',
+  SET_ORIGIN = 'compactd/app/SET_ORIGIN'
+}
 
 const initialState: Defs.AppState = {
-  loading: true,
+  loading: false,
   syncing: false,
   configured: true,
-  synced: false
+  synced: false,
+  databases: {}
 };
 
 export function reducer (state: Defs.AppState = initialState,
   action: AppAction): Defs.AppState {
   switch (action.type) {
-    case SET_USER:
+    case ActionTypes.SET_ORIGIN:
+      const prefix = hash(action.origin).substring(0, 6) + '_';
+      return {
+        ...state,
+        origin: action.origin,
+        loading: true,
+        databases: {
+          artists: prefix + 'artists',
+          albums: prefix + 'albums',
+          tracks: prefix + 'tracks',
+          downloads: prefix + 'downloads',
+          trackers: prefix + 'trackers',
+          files: prefix + 'files',
+          libraries: prefix + 'libraries',
+          stores: prefix + 'stores',
+          artworks: prefix + 'artworks',
+          origin: action.origin
+        }
+      }
+    case ActionTypes.SET_USER:
       return Object.assign({}, state, {user: action.user});
-    case RESOLVE_STATE:
+    case ActionTypes.RESOLVE_STATE:
       return Object.assign({}, state, {
         loading: false,
         configured: action.configured,
         user: action.user
       });
-    case START_SYNC:
+    case ActionTypes.START_SYNC:
       return Object.assign({}, state, {
         syncing: true,
         syncingProgress: 0
       });
-    case UPDATE_SYNC:
+    case ActionTypes.UPDATE_SYNC:
       return Object.assign({}, state, {
         syncingProgress: action.progress
       });
-    case END_SYNC:
+    case ActionTypes.END_SYNC:
       return Object.assign({}, state, {
         syncingProgress: 1,
         syncing: false,
@@ -53,66 +79,66 @@ export function reducer (state: Defs.AppState = initialState,
   return state;
 }
 
-function login (username: string, password: string) {
-  return Session.signIn(username, password).then((token) => {
-    return {type: SET_USER, user: token.user};
+const login = wrapDatabaseFromState(function (databases, username: string, password: string) {
+  return Session.signIn(databases.origin, username, password).then((token) => {
+    return {type: ActionTypes.SET_USER, user: token.user};
   }).catch((err) => {
     Toaster.error(err);
   });
-}
+});
 
-function fetchState () {
+const fetchState = wrapDatabaseFromState(function ({origin}) {
   return new Promise((resolve, reject) => {
     setTimeout(resolve, 400);
   }).then(() => {
-    return Session.getStatus();
+    return Session.getStatus(origin);
   }).then((status) => {
     if (status.user) {
       Artwork.createInstance(PouchDB);
       return {
-        type: RESOLVE_STATE,
+        type: ActionTypes.RESOLVE_STATE,
         configured: true,
-        user: Session.getUser()
+        user: Session.getUser(origin)
       }
     } else {
       Toaster.error('Invalid or expired token');
     }
     return {
-      type: RESOLVE_STATE,
+      type: ActionTypes.RESOLVE_STATE,
       configured: true
     }
   });
-}
+});
 
-function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.CompactdState, void>  {
+function syncDB (origin: string, dbs: string[], max: number): thunk.ThunkAction<void, Defs.CompactdState, void>  {
   return async (dispatch, getState) => {
     const dbName = dbs[0];
-    const db = new PouchDB(dbName);
-    const remote = getHttpDatabase(dbName);
+    const db = new PouchDB((getState().app.databases as any)[dbName]);
+    const remote = getHttpDatabase(origin, dbName);
 
     db.replicate.from(remote).on('complete', (info) => {
       dispatch({
-        type: UPDATE_SYNC,
+        type: ActionTypes.UPDATE_SYNC,
         progress: (max - dbs.length + 1) / max
       });
-      getDatabase(dbName).then((remotedb) => {
+      getDatabase(origin, dbName).then((remotedb) => {
         db.sync(remotedb, {live: true, retry: true, timeout: 0}).on('change', (info) => {
-          console.log(info);
+          console.log('sync received change for', dbName, info);
           
         }).on('error', (err: any) => {
           console.log('err', err, err.stack);
           Toaster.error(`An error happened during live database sync for ${dbName}: ${err.message}`);
-        }).on('paused', function (info) {
-        });
+        }).on('paused', function (info) {});
       });
 
       if (dbs.length > 1) {
-        return (syncDB(dbs.slice(1), max) as any)(dispatch, getState);
+        return (syncDB(origin, dbs.slice(1), max) as any)(dispatch, getState);
       } else {
         setTimeout(() =>
+          
           dispatch({
-            type: END_SYNC
-          }), 250);
+            type: ActionTypes.END_SYNC
+          }), 150);
       }
     }).on('error', (err: any) => {
       console.log(err, err.stack, new Error().stack);
@@ -120,15 +146,20 @@ function syncDB (dbs: string[], max: number): thunk.ThunkAction<void, Defs.Compa
     });
   }
 }
-function sync (): thunk.ThunkAction<void, Defs.CompactdState, void>  {
+function sync (origin: string): thunk.ThunkAction<void, Defs.CompactdState, void>  {
   return (dispatch, getState) => {
     if (getState().app.syncing) {
       return;
     }
+    dispatch({
+      type: ActionTypes.SET_ORIGIN,
+      origin
+    });
+
     const dbs = [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers', 'libraries'];
 
-    (syncDB(dbs, dbs.length) as any)(dispatch, getState);
-    Socket.connect();
+    (syncDB(origin, dbs, dbs.length) as any)(dispatch, getState);
+    Socket.connect(origin);
   }
 }
 

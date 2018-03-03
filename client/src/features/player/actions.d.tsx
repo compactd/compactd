@@ -56,12 +56,29 @@ export type PlayerAction =  PlayNextAction |
 
 // Album | [Album, number] | Track[] | Track
 
-export type PlayerStack = Album | [string, number] | Track[] | Track | string[];
+export type PlayerStack = {
+  album: Album;
+} | {
+  albumId: string;
+  number: number;
+} | {
+  tracks: Track[]
+} | {
+  track: Track
+} | {
+  trackIds: string[]
+};
+
+export type PlayerOptions = {
+  filterHidden?: boolean;
+  shuffle?: boolean;
+}
+
 
 export type PlayerActions = {
   playNext: (index?: number) => void;
   playPrevious: () => void;
-  replacePlayerStack: (stack: PlayerStack, filterHidden?: boolean, shuffle?: boolean) => void;
+  replacePlayerStack: (stack: PlayerStack, opts?: PlayerOptions) => void;
   clearPlaylist: () => void;
   togglePlayback: () => void;
   playAfter: (stack: PlayerStack) => void;

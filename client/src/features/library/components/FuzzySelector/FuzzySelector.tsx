@@ -71,9 +71,21 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
     //   return <MenuItem className={isActive ? 'pt-active' : ''} iconName="music" text={track.name} onClick={handleClick} key={item._id}/>
     // }
     if (this.isAlbum(item)) {
-      return <AlbumComponent id={item} active={isActive} layout="compact" onClick={handleClick as any} key={item} />;
+      return <AlbumComponent
+              id={item}
+              active={isActive}
+              layout="compact"
+              onClick={handleClick as any}
+              key={item}
+              databases={this.props.library.databases}/>;
     }
-    return <ArtistComponent id={item} active={isActive} layout="compact" onClick={handleClick as any} key={item} />;
+    return <ArtistComponent
+            id={item}
+            active={isActive}
+            layout="compact"
+            onClick={handleClick as any}
+            key={item}
+            databases={this.props.library.databases} />;
 
   }
   private filterLibraryContent (query: string, items: LibraryContent[]) {
@@ -89,8 +101,8 @@ export class FuzzySelector extends React.Component<FuzzySelectorProps, {
     this.handleClose();
     if (this.isTrack(item)) {
       
-      this.props.actions.replacePlayerStack([item, trackURI(item).number]);
-      return
+      // this.props.actions.replacePlayerStack([item, trackURI(item).number]);
+      // return
     }
     if (this.isAlbum(item)) {
 

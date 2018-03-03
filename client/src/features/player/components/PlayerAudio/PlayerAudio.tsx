@@ -18,13 +18,12 @@ interface PlayerAudioProps {
   onEnd?: () => void;
   timeUpdate?: (time: number) => void;
   expanded?: boolean;
+  origin: string;
 }
 
 const tokens: {[id: string]: string}  = {};
-async function report (source: string) {
-  const res = await fetch(`/api/reports/${source}/listen`, Session.init({
-    method: 'POST'
-  }));
+async function report (origin: string, source: string) {
+  const res = await Session.post(origin, `/api/reports/${source}/listen`, {});
   return;
 }
 
@@ -96,7 +95,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
   }
   fetchWaveform (src: string) {
     this.buildWaveform(null);
-    return Session.fetch(`/api/${src.replace(/^library/, 'tracks')}/waveform`).then((data) => {
+    return Session.fetch(this.props.origin, `/api/${src.replace(/^library/, 'tracks')}/waveform`).then((data) => {
       return data.arrayBuffer();
     }).then((data) => {
       this.data = data;
@@ -123,7 +122,7 @@ export class PlayerAudio extends React.Component<PlayerAudioProps, {}>{
         
         return this.fetchWaveform(nextProps.source.getTrack());
       }).then(() => {
-        report(nextProps.source.getTrack());
+        report(this.props.origin, nextProps.source.getTrack());
       });
     }
     if (nextProps.playing !== this.props.playing && nextProps.source) {

@@ -10,6 +10,7 @@ interface ArtworkEditDialogProps {
   item: string;
   isOpen: boolean;
   onClose: (event?: React.SyntheticEvent<HTMLElement>) => void;
+  origin: string;
 }
 
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
@@ -30,7 +31,7 @@ export default class ArtworkEditDialog extends React.Component<ArtworkEditDialog
   }
   componentWillReceiveProps(nextProps: ArtworkEditDialogProps) {
     if (nextProps.isOpen && !this.props.isOpen) {
-      Session.fetch('/api/aquarelle/search/' + this.props.item)
+      Session.fetch(nextProps.origin, '/api/aquarelle/search/' + nextProps.item)
         .then((res) => res.json()).then((data) => {
           this.setState({data});
       });
@@ -49,7 +50,7 @@ export default class ArtworkEditDialog extends React.Component<ArtworkEditDialog
     const results = this.state.data.results.slice(0, 10).map((res, index) => {
       return <div className="image-container" key={index} onClick={() => {
         onClose();
-        Session.fetch(`/api/aquarelle/${item}/remote`, {
+        Session.fetch(this.props.origin, `/api/aquarelle/${item}/remote`, {
           method: 'PUT',
           body: JSON.stringify({
             url: res.url
@@ -88,7 +89,7 @@ export default class ArtworkEditDialog extends React.Component<ArtworkEditDialog
            onClose();
            const data = new FormData();
            data.append('file', file);
-           Session.fetch(`/api/aquarelle/${item}/upload`, {
+           Session.fetch(this.props.origin, `/api/aquarelle/${item}/upload`, {
              body: data,
              method: 'PUT'
            }).then(() => {

@@ -9,8 +9,7 @@ div.playlist-item {
 
   span.playlist-duration {
     float: right;
-
-    color: rgb(89, 85, 109);
+    color: rgb(108, 104, 128);
     cursor: pointer;
   }
 
@@ -19,5 +18,9 @@ div.playlist-item {
 
     transition: all 0.2s ease;
     cursor: pointer;
+  }
+
+  .playlist-item-name > div {
+    color: #85848e;
   }
 }

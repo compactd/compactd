@@ -21,7 +21,7 @@ export default class SuggestionsView extends React.Component<SuggestionsViewProp
   }
   componentDidMount () {
     this.props.actions.fetchRecommendations();
-    session.fetch('/api/tracks/favorites/top')
+    session.fetch(this.props.library.origin, '/api/tracks/favorites/top')
       .then((res) => res.json())
       .then((res) => {
         this.setState({

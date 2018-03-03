@@ -16,13 +16,13 @@ import LibraryView from 'features/library/components/LibraryView';
 import PlayerView from 'features/player/components/PlayerView';
 import {PlaylistView} from 'features/player/components/PlaylistView';
 import {PlayerStatus} from 'features/player/components/PlayerStatus';
-import Sandbox from 'components/Sandbox';
 
 const {Flex, Box} = require('reflexbox');
 require('../styles/base.scss');
 
 interface CompactdApplicationProps {
   store: Redux.Store<CompactdState>;
+  origin: string;
 }
 
 const doNothing = (...args: any[]) =>{
@@ -35,7 +35,7 @@ export class CompactdApplication extends
   render (): JSX.Element {
     // console.log(ConnectedRouter);
     // Inexplicable bug where i need to log these avoid undefined errors
-    doNothing(Route, LibraryView, HolisticView, PlayerView, PlaylistView, PlayerStatus, Sandbox);
+    doNothing(Route, LibraryView, HolisticView, PlayerView, PlaylistView, PlayerStatus);
 
     return (<Provider store={this.props.store}>
       <ConnectedRouter history={history}>
@@ -51,8 +51,6 @@ export class CompactdApplication extends
                   <LibraryView component={HolisticView} all={true} {...props}/>} />
                 <Route path="/library/:artist?/:album?" children={(props: any) =>
                   <LibraryView component={HolisticView} {...props}/>} />
-                <Route path="/sandbox" children={(props: any) =>
-                  <Sandbox {...props}/>} />
               </Switch>
             </Box>
             <Box col={2} style={{

@@ -9,12 +9,14 @@ import LibraryProvider from 'app/LibraryProvider';
 import * as path from 'path';
 import './ArtistComponent.scss';
 import { Tooltip, Position } from '@blueprintjs/core';
+import { Databases } from 'definitions/state';
 
 interface ArtistComponentProps {
   id: string;
   subtitle?: 'counters' | 'text' | 'none' | 'artist';
   subtitleText?: string;
   tooltip?: 'none' | 'disabled' | 'on';
+  databases: Databases;
 }
 
 export default class ArtistComponent extends LibraryItemComp<ArtistComponentProps, {
@@ -39,21 +41,24 @@ export default class ArtistComponent extends LibraryItemComp<ArtistComponentProp
 
   loadImage(id: string, img: HTMLImageElement): void {
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().load(id, this.getImageSizings(), img);
+      Artwork.getInstance().load(this.props.databases, id, this.getImageSizings(), img);
     }
   }
+  
   loadCounters (id: string) {
     if (this.props.subtitle === 'counters') {
       const provider = LibraryProvider.getInstance();
-      provider.getArtistCounters(id).then((counters) => {
+      provider.getArtistCounters(this.props.databases, id).then((counters) => {
         this.setState({counters});
       })
     }
   }
+
   loadItem(id: string): void {
     const provider = LibraryProvider.getInstance();
+    console.log('loadItem(\'' + id + '\'):', this.props);
     this.feeds = [
-      provider.liveFeed<Artist>('artists', id, (artist) => {
+      provider.liveFeed<Artist>(this.props.databases.artists, id, (artist) => {
         if (id === this.props.id) {
           this.setState({artist});
           this.loadCounters(id);

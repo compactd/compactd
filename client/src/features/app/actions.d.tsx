@@ -1,4 +1,5 @@
 import {Artist, Album} from 'definitions';
+import { ActionTypes } from 'features/app';
 
 interface AppActionBase {
   type: string;
@@ -28,12 +29,16 @@ interface UpdateSyncAction {
 interface EndSyncAction {
   type: 'compactd/app/END_SYNC'
 }
+export interface SetOrigin {
+  type: ActionTypes.SET_ORIGIN,
+  origin: string;
+}
 
 export type AppAction = SetUserAction | ResolveStateAction | StartSyncAction
-  | UpdateSyncAction | EndSyncAction;
+  | UpdateSyncAction | EndSyncAction | SetOrigin;
 
 export type AppActions = {
   fetchState: () => void;
   login: (username: string, password: string) => void;
-  sync: () => void;
+  sync: (origin?: string) => void;
 }

@@ -8,6 +8,7 @@ import LibraryItemComp from '../LibraryItemComponent';
 import './AlbumComponent.scss';
 import LibraryProvider from 'app/LibraryProvider';
 import * as path from 'path';
+import { Databases } from 'definitions/state';
 
 type Subtitle = 'counters' | 'text' | 'none' | 'artist' | 'year';
 
@@ -15,6 +16,7 @@ interface AlbumComponentProps {
   id: string,
   subtitle?: Subtitle | Subtitle[];
   subtitleText?: string;
+  databases: Databases;
 }
 
 export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps, {
@@ -31,6 +33,7 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
       counters: {}
     };
   }
+  
   renderSubtitle(subtitle = this.props.subtitle): JSX.Element | string{
     const {id} = this.props;
     const {counters, artists, albums} = this.state;
@@ -69,7 +72,7 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
 
   loadImage(id: string, img: HTMLImageElement): void {
     if (this.isUsingEmbeddedArtworks()) {
-      Artwork.getInstance().load(id, this.getImageSizings(), img);
+      Artwork.getInstance().load(this.props.databases, id, this.getImageSizings(), img);
     }
   }
   
@@ -77,7 +80,7 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
     if (this.props.subtitle === 'counters') {
       const provider = LibraryProvider.getInstance();
 
-      provider.getAlbumCounters(id).then(([counters]) => {
+      provider.getAlbumCounters(this.props.databases, id).then(([counters]) => {
         this.setState({
           counters: {
             ...this.state.counters,
@@ -87,19 +90,21 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
       })
     }
   }
+
   loadItem(id: string): void {
     const provider = LibraryProvider.getInstance();
     
     this.feeds = [
-      provider.liveFeed<Artist>('artists', path.dirname(id), (artist) => {
+      provider.liveFeed<Artist>(this.props.databases.artists, path.dirname(id), (artist) => {
         this.setState({artists: {...this.state.artists, [id]: artist}});
       }),
-      provider.liveFeed<Album>('albums', id, (album) => {
+      provider.liveFeed<Album>(this.props.databases.albums, id, (album) => {
         this.setState({albums: {...this.state.albums, [id]: album}});
         this.loadCounters(id);
       })
     ]
   }
+
   unloadItem(): void {
     const provider = LibraryProvider.getInstance();
     provider.cancelFeeds(this.feeds);
@@ -107,9 +112,11 @@ export default class AlbumComponent extends LibraryItemComp<AlbumComponentProps,
       URL.revokeObjectURL(this.images[this.props.id].src);
     }
   }
+
   getClassNames(): string[] {
     return ['album-component'];
   }
+
   renderHeader(): string | JSX.Element {
     const {albums} = this.state;
     const album = albums[this.props.id];

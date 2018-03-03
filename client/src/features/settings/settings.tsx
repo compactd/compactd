@@ -51,7 +51,7 @@ function toggleSettingsPage (state?: boolean) {
 function removeTracker (id: string) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = await getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>(getState().app.origin, 'trackers');
       const doc = await Tracker.get(id);
       await Tracker.remove(doc._id, doc._rev);
       loadTrackers()(dispatch, getState);
@@ -64,7 +64,7 @@ function removeTracker (id: string) {
 function loadTrackers () {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = await getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>(getState().app.origin, 'trackers');
       const trackers = await Tracker.allDocs({include_docs: true});
       dispatch({
         type: RESOLVE_TRACKERS,
@@ -79,7 +79,7 @@ function loadTrackers () {
 function loadLibraries () {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Library = await getDatabase<Library>('libraries');
+      const Library = await getDatabase<Library>(getState().app.origin, 'libraries');
       const libraries = await Library.allDocs({include_docs: true});
       dispatch({
         type: RESOLVE_LIBRARIES,
@@ -93,7 +93,7 @@ function loadLibraries () {
 function editTracker (id: string, props: Partial<Tracker>) {
   return async function (dispatch: (action: SettingsAction) => void, getState: () => Defs.CompactdState) {
     try {
-      const Tracker = await getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>(getState().app.origin, 'trackers');
       const old = await Tracker.get(id, {revs: false, attachments: false, revs_info: false});
       const doc = Object.assign({}, old, props);
       if (old.name !== props.name && props.name) {
@@ -130,13 +130,9 @@ function editTrackerPassword (id: string, password: string ) {
     try {
       
       const {type, name} = trackerURI(id);
-      const res = await fetch(`/api/cascade/trackers/${type}/${name}/password`, {
-        method: 'post',
-        body: JSON.stringify({password}),
-        headers: Session.headers({
-          'content-type': 'application/json'
-        })
-      });
+
+      const res = await Session.post(getState().app.origin, `/api/cascade/trackers/${type}/${name}/password`, {password});
+      
       const data: any = await res.json();
       if (!res.ok) return Toaster.error(data.error);
   
@@ -156,7 +152,7 @@ function addTracker (name: string, type: 'gazelle', username: string, host: stri
       const props = {name, type, username, host};
       const id = trackerURI(mapTrackerToParams(props)) + `-${Math.floor(Math.random() * 2e8).toString(36)}`;
   
-      const Tracker = await getDatabase<Tracker>('trackers');
+      const Tracker = await getDatabase<Tracker>(getState().app.origin, 'trackers');
       const tracker = await Tracker.put({...props, _id: id});
       return loadTrackers()(dispatch, getState);
     } catch (err) {
@@ -166,16 +162,10 @@ function addTracker (name: string, type: 'gazelle', username: string, host: stri
 }
 
 function scan (id: string, full = false) {
-  return async (dispatch: any) => {
+  return async (dispatch: any, getState: () => Defs.CompactdState) => {
     dispatch({type: SET_SCANNING, scanning: true});
-    const res = await fetch(`/api/scans`, {
-      method: 'POST',
-      body: JSON.stringify({
-        libraryId: id, full
-      }),
-      headers: Session.headers({
-        'content-type': 'application/json',
-      })
+    const res = await Session.post(getState().app.origin, `/api/scans`, {
+      libraryId: id, full
     });
     if (res.status !== 201) {
       return Toaster.error('An error happened while trying to start scan. Check logs for more details');

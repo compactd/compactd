@@ -30,13 +30,12 @@ export default class TrackItem extends React.Component<TrackItemProps, {}> {
       this.handleAltClick(evt);
       return;
     }
-    actions.replacePlayerStack([this.props.track]);
+    actions.replacePlayerStack({trackIds: [this.props.track]});
   }
   private handleAltClick (evt: MouseEvent) {
     evt.stopPropagation();
-    const {actions, library, track, reports} = this.props;
-    const item = library.tracksById[track]; 
-    actions.playAfter(item);
+    const {actions} = this.props;
+    actions.playAfter({trackIds: [this.props.track]});
   }
   render () {
     const {actions, library, track, reports} = this.props;

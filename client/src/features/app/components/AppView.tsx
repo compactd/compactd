@@ -13,6 +13,7 @@ import { withRouter } from 'react-router-dom';
 interface AppViewProps {
   actions: AppActions;
   app: AppState;
+  origin: string;
 }
 
 @(connect as any)(createStructuredSelector({
@@ -21,6 +22,20 @@ interface AppViewProps {
   actions: bindActionCreators(actions, dispatch)
 }))
 class AppView extends React.Component<AppViewProps, {}> {
+  componentDidMount () {
+    const {origin, actions} = this.props;
+
+    if (origin) {
+      actions.sync(origin);
+    }
+  }
+  componentWillReceiveProps (nextProps: AppViewProps) {
+    const {origin, actions} = nextProps;
+
+    if (origin && nextProps.origin !== origin) {
+      actions.sync(origin);
+    }
+  }
   render (): JSX.Element {
     const {app, actions} = this.props;
     if (app.loading) {

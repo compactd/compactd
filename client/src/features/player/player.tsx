@@ -2,9 +2,15 @@ import * as Defs from 'definitions';
 import PouchDB from 'pouchdb';
 import * as path from 'path';
 import {albumURI} from 'compactd-models';
-import { PlayerAction, PlayerStack } from './actions.d';
+import { PlayerAction, PlayerStack, PlayerOptions } from './actions.d';
 import MusicContentStore from 'app/content-decorator';
 import Toaster from 'app/toaster';
+import { Databases, CompactdState } from 'definitions/state';
+import { Dispatch } from 'redux';
+import { wrapDatabaseFromState } from 'definitions/utils';
+import { ActionTypes } from '../app';
+import * as hash from 'md5';
+import { SetOrigin } from '../app/actions.d';
 
 const PLAY_NEXT_ACTION = 'cassette/player/PLAY_NEXT_ACTION';
 const PLAY_PREVIOUS_ACTION = 'cassette/player/PLAY_PREVIOUS_ACTION';
@@ -19,12 +25,32 @@ const decorator = new MusicContentStore<Defs.PlayerState>('player');
 const initialState: Defs.PlayerState = decorator.initialState({
   playing: false,
   stack: [],
-  prevStack: []
+  prevStack: [],
+  databases: {},
+  origin: null
 });
 
 export const reducer = decorator.createReducer(initialState, (state: Defs.PlayerState = initialState,
-  action: PlayerAction): Defs.PlayerState => {
+  action: PlayerAction | SetOrigin): Defs.PlayerState => {
   switch (action.type) {
+    case ActionTypes.SET_ORIGIN:
+      const {origin} = action as any;
+      const prefix = hash(origin).substring(0, 6) + '_';
+      return {
+        ...state,
+        origin: origin,
+        databases: {
+          artists: prefix + 'artists',
+          albums: prefix + 'albums',
+          tracks: prefix + 'tracks',
+          downloads: prefix + 'downloads',
+          trackers: prefix + 'trackers',
+          files: prefix + 'files',
+          libraries: prefix + 'libraries',
+          artworks: prefix + 'artworks',
+          origin: origin
+        }
+      }
     case JUMP_TO:
       const index = action.target;
       return Object.assign({}, state, {
@@ -80,46 +106,43 @@ function playNext () {
   return {type: PLAY_NEXT_ACTION}
 }
 
-async function playAfter (stack: PlayerStack): Promise<PlayerAction> {
+async function _playAfter (databases: Databases, stack: PlayerStack): Promise<PlayerAction> {
   await Promise.resolve();
-  const tracks = new PouchDB<Defs.Track>('tracks');
-
-  if (Array.isArray(stack)) {
-    if (stack.length === 2 && !Number.isNaN(Number(stack[1] as any))) {
-      const [album, index] = stack as [string, number];
-      const num = index;// `00${index || 0}`.slice(-2);
-      const base = album;
-      const docs = await tracks.allDocs({
-        include_docs: true,
-        startkey: path.join(base, '' + num),
-        endkey: path.join(base, '99')
-      });
-      return {
-        type: PLAY_AFTER_ACTION,
-        stack: docs.rows.map((row) => row.doc)
-      };
-    }
-    if (typeof stack[0] === 'string') {
-      const docs = await Promise.all((stack as string[]).map((id) => {
-        return tracks.get(id);
-      }));
-      return await replacePlayerStack(docs);
-    }
+  const tracks = new PouchDB<Defs.Track>(databases.tracks);
+  
+  if ((stack as any).albumId) {
+    const {albumId, number} = stack as any;
+    const base = albumId;
+    const docs = await tracks.allDocs({
+      include_docs: true,
+      startkey: path.join(base, '' + number),
+      endkey: path.join(base, '99')
+    });
     return {
       type: PLAY_AFTER_ACTION,
-      stack: stack as Defs.Track[]
-    }
-  }
-
-  if ((stack as Defs.Track).album) {
-    const track = stack as Defs.Track;
-
-    return {
-      type: PLAY_AFTER_ACTION,
-      stack: [track]
+      stack: docs.rows.map((row) => row.doc)
     };
   }
-  const album = stack as Defs.Album;
+  if ((stack as any).trackIds) {
+    const docs = await Promise.all((stack as {trackIds: string[]})
+      .trackIds.map((id: string) => {
+      return tracks.get(id);
+    }));
+    return await _playAfter(databases, {tracks: docs});
+  }
+  if ((stack as any).tracks) {
+    return {
+      type: PLAY_AFTER_ACTION,
+      stack: (stack as any).tracks
+    }
+  }
+
+  if ((stack as any).track) {
+    return _playAfter(databases, {tracks: [(stack as any).track]});
+  }
+  
+
+  const album = (stack as any).album as Defs.Album;
 
   const docs = await tracks.allDocs({
     include_docs: true,
@@ -158,9 +181,12 @@ function jumpTo (target: string | number | Defs.Track) {
   }
 }
 
-async function replacePlayerStack(stack: PlayerStack, filterHidden = false, shuffle = false): Promise<PlayerAction> {
+async function _replacePlayerStack(databases: Databases, stack: PlayerStack, {
+  filterHidden = true,
+  shuffle = false
+}: PlayerOptions = {}): Promise<PlayerAction> {
   await Promise.resolve();
-  const tracks = new PouchDB<Defs.Track>('tracks');
+  const tracks = new PouchDB<Defs.Track>(databases.tracks);
   const filterHiddenFunc = (doc: Defs.Track) => {
     return filterHidden ? !doc.hidden : true;
   };
@@ -175,42 +201,39 @@ async function replacePlayerStack(stack: PlayerStack, filterHidden = false, shuf
     return 0;
   }
 
-  if (Array.isArray(stack)) {
-    if (stack.length === 2 && !Number.isNaN(Number(stack[1] as any))) {
-      const [album, index] = stack as [string, number];
-      const num = index;// `00${index || 0}`.slice(-2);
-      const base = album;
-      const docs = await tracks.allDocs({
-        include_docs: true,
-        startkey: path.join(base, '' + num),
-        endkey: path.join(base, '\uffff')
-      });
-      return {
-        type: REPLACE_PLAYER_STACK_ACTION,
-        stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc).sort(possiblyShuffle)
-      };
-    }
-    if (typeof stack[0] === 'string') {
-      const docs = await Promise.all((stack as string[]).map((id) => {
-        return tracks.get(id);
-      }));
-      return await replacePlayerStack(docs, filterHidden, shuffle);
-    }
+  if ('albumId' in stack) {
+    const {albumId, number} = stack;
+    const base = albumId;
+    const docs = await tracks.allDocs({
+      include_docs: true,
+      startkey: path.join(base, '' + number),
+      endkey: path.join(base, '\uffff')
+    });
     return {
       type: REPLACE_PLAYER_STACK_ACTION,
-      stack: (stack as Defs.Track[]).sort(possiblyShuffle)
-    }
-  }
-
-  if ((stack as Defs.Track).album) {
-    const track = stack as Defs.Track;
-
-    return {
-      type: REPLACE_PLAYER_STACK_ACTION,
-      stack: [track]
+      stack: docs.rows.map((row) => row.doc)
+        .filter(filterHiddenFunc).sort(possiblyShuffle)
     };
   }
-  const album = stack as Defs.Album;
+  if ('trackIds' in stack) {
+    const docs = await Promise.all((stack)
+      .trackIds.map((id: string) => {
+      return tracks.get(id);
+    }));
+    return await _replacePlayerStack(databases, {tracks: docs}, {filterHidden, shuffle});
+  }
+  if ('tracks' in stack) {
+    return {
+      type: REPLACE_PLAYER_STACK_ACTION,
+      stack: stack.tracks.filter(filterHiddenFunc).sort(possiblyShuffle)
+    }
+  }
+
+   if ('track' in stack) {
+    return _replacePlayerStack(databases, {tracks: [stack.track]});
+  }
+  
+  const album = (stack as any).album as Defs.Album;
 
   const docs = await tracks.allDocs({
     include_docs: true,
@@ -223,6 +246,9 @@ async function replacePlayerStack(stack: PlayerStack, filterHidden = false, shuf
     stack: docs.rows.map((row) => row.doc).filter(filterHiddenFunc).sort(possiblyShuffle)
   };
 }
+
+const replacePlayerStack = wrapDatabaseFromState(_replacePlayerStack);
+const playAfter = wrapDatabaseFromState(_playAfter)
 
 export const actions = decorator.addActionsCreators({
   replacePlayerStack, playNext, playPrevious, togglePlayback, jumpTo, playAfter

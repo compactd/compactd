@@ -51,7 +51,9 @@ export interface LibraryState {
       name: string;
       progress: number;
     })[]
-  }
+  },
+  databases: Databases,
+  origin?: string
 }
 
 export interface AppState {
@@ -77,8 +79,22 @@ export interface AppState {
    * Logged in user
    */
   user?: string;
+  databases: Databases;
+  origin?: string;
 }
 
+export interface Databases {
+  artists?: string;
+  albums?: string;
+  tracks?: string;
+  downloads?: string;
+  trackers?: string;
+  artworks?: string;
+  files?: string;
+  libraries?: string;
+  stores?: string;
+  origin?: string;
+}
 export interface PlayerState extends MusicContentState {
   /**
    * An array containing a list of the next tracks
@@ -91,7 +107,9 @@ export interface PlayerState extends MusicContentState {
   /**
    * Is it playing right now?
    */
-  playing:    boolean;
+  playing: boolean;
+  databases: Databases;
+  origin: string;
 }
 
 export interface StoreState {

@@ -1,6 +1,9 @@
 
 import {Artist, Album, Track, artistURI, albumURI} from 'compactd-models';
 import PouchDB from 'pouchdb';
+import { Databases, CompactdState } from 'definitions/state';
+import { ThunkAction } from 'redux-thunk';
+import { Dispatch } from 'redux';
 
 interface ResolveTrackAction {
   track: Track
@@ -70,11 +73,11 @@ export default class MusicContentDecorator<T extends MusicContentState> {
   protected get RESOLVE_TRACK () {
     return `compactd/${this.feature}/music-content/RESOLVE_TRACK`;
   }
-  protected async fetchArtist (slug: string): Promise<MusicContentAction> {
+  protected async fetchArtist ({artists}: Databases, slug: string): Promise<MusicContentAction> {
     if (slug.startsWith('library/')) {
-      return await this.fetchArtist(artistURI(slug).name);
+      return await this.fetchArtist({artists}, artistURI(slug).name);
     }
-    const Artist = new PouchDB<Artist>('artists');
+    const Artist = new PouchDB<Artist>(artists);
 
     const artist = await Artist.get(artistURI({name: slug}));
     
@@ -83,8 +86,8 @@ export default class MusicContentDecorator<T extends MusicContentState> {
       artist
     }
   }
-  protected async fetchAlbum (id: string): Promise<MusicContentAction> {
-    const Album = new PouchDB<Album>('albums');
+  protected async fetchAlbum ({albums}: Databases, id: string): Promise<MusicContentAction> {
+    const Album = new PouchDB<Album>(albums);
 
     const album = await Album.get(id);
     
@@ -93,14 +96,26 @@ export default class MusicContentDecorator<T extends MusicContentState> {
       album
     }
   }
-  protected async fetchTrack (id: string): Promise<MusicContentAction> {
-    const Track = new PouchDB<Track>('tracks');
+  protected async fetchTrack ({tracks}: Databases, id: string): Promise<MusicContentAction> {
+    
+    const Track = new PouchDB<Track>(tracks);
 
     const track = await Track.get(id);
-    
+
     return {
       type: this.RESOLVE_ALBUM,
       track
+    }
+  }
+  wrapFetchCreator (creator: (db: Databases, id: string) => Promise<MusicContentAction>) {
+    return (id: string) => {
+      return (dispatch: Dispatch<MusicContentAction>, getState: () => CompactdState) => {
+        creator(getState().app.databases, id).then((action) => {
+          dispatch(action);
+        }).catch((err) => {
+          console.log(err);
+        })
+      }
     }
   }
   /**
@@ -108,9 +123,9 @@ export default class MusicContentDecorator<T extends MusicContentState> {
    */
   public getActionCreators (): ActionCreators {
     return {
-      fetchDatabaseAlbum: this.fetchAlbum.bind(this),
-      fetchDatabaseArtist: this.fetchArtist.bind(this),
-      fetchDatabaseTrack: this.fetchTrack.bind(this)
+      fetchDatabaseAlbum: this.wrapFetchCreator(this.fetchAlbum.bind(this)),
+      fetchDatabaseArtist: this.wrapFetchCreator(this.fetchArtist.bind(this)),
+      fetchDatabaseTrack: this.wrapFetchCreator(this.fetchTrack.bind(this))
     }
   }
   /**

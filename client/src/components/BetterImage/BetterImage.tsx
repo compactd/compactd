@@ -12,6 +12,7 @@ interface BetterImageProps {
   size?: number;
   key?: string | number;
   src: string | Blob | Promise<Blob | string>;
+  origin: string;
 }
 const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAALAAAAAAUABQAAAIRhI+py+0Po5y02ouz3rz7rxUAOw==';
 
@@ -19,9 +20,9 @@ const BLANK_IMAGE = 'data:image/png;base64,R0lGODlhFAAUAIAAAP///wAAACH5BAEAAAAAL
 const blobs: any = {};
 let loader = '';
 
-function fetchLoader (): Promise<string> {
+function fetchLoader (origin: string): Promise<string> {
   if (loader) return Promise.resolve(loader);
-  return fetch('/api/assets/oval-min.svg', Session.init()).then((res) => res.text())
+  return Session.fetch(origin, '/api/assets/oval-min.svg').then((res) => res.text())
     .then((svg) => {
     return `data:image/svg+xml;utf8,${svg}`;
   });
@@ -37,10 +38,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     this.setState({loading: true});
     if (typeof current === 'string' && !current.startsWith('blob:')) {
       if (current.startsWith('/api/')) {
-        fetch(current, {
-          method: 'GET',
-          headers: Session.headers()
-        }).then((res) => {
+        Session.fetch(this.props.origin, current).then((res) => {
             return res.blob();
         }).then((blob) => {
           if (!this.image) return;
@@ -96,7 +94,7 @@ export default class BetterImage extends React.Component<BetterImageProps, {load
     if (this.props.src) {
       this.fetchImage();
     }
-    fetchLoader().then((svg) => {
+    fetchLoader(this.props.origin).then((svg) => {
       // this.image.style.backgroundImage = `url('${svg}')`;
     })
   }

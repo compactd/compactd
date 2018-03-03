@@ -112,7 +112,7 @@ function searchDatasource (q: string) {
       type: SET_SEARCH_RESULTS,
       query: q
     })
-    const res = Session.fetch('/api/datasource/search?query=' + q).then((res) => res.json())
+    const res = Session.fetch(getState().app.origin, '/api/datasource/search?query=' + q).then((res) => res.json())
       .then((res) => {
         dispatch({
           type: SET_SEARCH_RESULTS,
@@ -130,7 +130,7 @@ function selectDSArtist (artist: string) {
       type: SELECT_DS_ARTIST,
       artist
     })
-    const res = Session.fetch('/api/datasource/artists/' + artist).then((res) => res.json())
+    const res = Session.fetch(getState().app.origin, '/api/datasource/artists/' + artist).then((res) => res.json())
       .then((res) => {
         dispatch({
           type: RESOLVE_DS_ARTIST,
@@ -148,7 +148,7 @@ function selectDSAlbum (album: string) {
       type: SELECT_DS_ALBUM,
       album
     })
-    const res = Session.fetch('/api/datasource/albums/' + album).then((res) => res.json())
+    const res = Session.fetch(getState().app.origin, '/api/datasource/albums/' + album).then((res) => res.json())
       .then((res) => {
         dispatch({
           type: RESOLVE_DS_ALBUM,
@@ -168,13 +168,13 @@ function loadResults (artist: string, album: string) {
       album: album
     });
     
-    const Trackers = new PouchDB<Tracker>('trackers');
+    const Trackers = new PouchDB<Tracker>(getState().app.databases.trackers);
     const trackers = await Trackers.allDocs({include_docs: true});
 
     const res = await Promise.all(trackers.rows.map(async ({doc}) => {
       if (doc._id === '_design/validator') return [];
       const query = qs.stringify({name: album, artist});
-      const res = await Session.fetch(`/api/cascade/${doc._id}/search?${query}`)
+      const res = await Session.fetch(getState().app.origin, `/api/cascade/${doc._id}/search?${query}`)
       const data = await res.json();
       return data;
     }));
@@ -190,7 +190,7 @@ function loadResults (artist: string, album: string) {
 
 function initResults () {
   return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
-    const res = await Session.fetch('/api/cascade/downloads');
+    const res = await Session.fetch(getState().app.origin, '/api/cascade/downloads');
     const downloads = await res.json();
     downloads.forEach((res: any) => { 
       dispatch({
@@ -212,7 +212,7 @@ function downloadResult (release: Release, album: DSAlbum) {
   
   return async (dispatch: (action: StoreAction) => void, getState: () => Defs.CompactdState) => {
     
-    const res = await Session.fetch(`/api/cascade/${release._id}/download`, {
+    const res = await Session.fetch(getState().app.origin, `/api/cascade/${release._id}/download`, {
       method: 'POST',
       body: null,
       headers: {}
@@ -228,13 +228,6 @@ function downloadResult (release: Release, album: DSAlbum) {
         hash: data.hash,
         name: data.name
       }
-    });
-    Socket.onClientCall('torrentProgress', (hash: string, progress: number) => {
-      if (hash !== data.hash) return;
-      dispatch({
-        type: UPDATE_DL_PROGRESS,
-        hash, progress
-      });
     });
   }
 }

@@ -262,9 +262,15 @@ export default class SoundCloudStore extends Store {
     const url = `https://api.soundcloud.com/i1/tracks/${prop.id}/streams?client_id=${this.opts.clientId}`;
     const res = await fetch(url);
 
-    const {http_mp3_128_url} = await res.json();
+    const {http_mp3_128_url, ...other} = await res.json();
     
     const time = Date.now();
+
+    if (!http_mp3_128_url) {
+      mainStory.warn(`No mp3 url found for track ${prop.id}`, {attach: other});
+      return;
+    }
+
     const mp3res = await fetch(http_mp3_128_url);
     const buffer = await mp3res.buffer();
 

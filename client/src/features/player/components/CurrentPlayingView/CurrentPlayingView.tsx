@@ -29,7 +29,7 @@ export class CurrentPlayingView extends React.Component<CurrentPlayingViewProps,
 
   loadImage(id: string, img: HTMLImageElement): void {
     if (id) {
-      Artwork.getInstance().load(id, 'hq', img);
+      Artwork.getInstance().load(this.props.player.databases, id, 'hq', img);
     }
   }
   

@@ -11,20 +11,7 @@ const store = compactdStore.configureStore();
 const rootEl = document.getElementById("root");
 render(
   <AppContainer>
-    <CompactdApplication store={store} />
+    <CompactdApplication store={store} origin={window.location.origin} />
   </AppContainer>,
   rootEl
 );
-
-if ((module as any).hot) {
-  (module as any).hot.accept('./CompactdApplication', () => { 
-    const NextApp: typeof CompactdApplication = require("./CompactdApplication").CompactdApplication;
-    render(
-      <AppContainer>
-        <NextApp store={store} />
-      </AppContainer>
-      , rootEl
-    );
-  });
-  
-}

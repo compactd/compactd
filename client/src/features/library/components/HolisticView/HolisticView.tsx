@@ -18,7 +18,6 @@ import PlaceholderComponent from 'components/PlaceholderComponent/PlaceholderCom
 import { Session } from 'inspector';
 import session from 'app/session';
 import toaster from 'app/toaster';
-import { syncDatabases } from 'app/database';
 import { Tooltip } from '@blueprintjs/core';
 import { ArtistListView } from 'features/library/components/ArtistListView';
 import { StoreAlbumView } from 'features/library/components/StoreAlbumView';
@@ -68,7 +67,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
     this.setState({
       addingArtist: name
     });
-    const res = await session.fetch('/api/artists/create', {
+    const res = await session.fetch(this.props.library.origin, '/api/artists/create', {
       method: 'POST',
       body: JSON.stringify({name}),
       headers: {
@@ -87,7 +86,6 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
   render (): JSX.Element {
     const {actions, library, player} = this.props;
     const showAdd = this.state.artistsFilter ? !library.artists.includes(artistURI(mapArtistToParams({name: this.state.artistsFilter}))) :  false;
-
     return <div className="holistic-view">
       <FuzzySelector library={library} actions={actions} />
       <Flex>
@@ -109,7 +107,7 @@ export class HolisticView extends React.Component<HolisticViewProps, HolisticVie
           </div>
           
           <div className="top-gradient"></div>
-          <ArtistListView match={this.props.match} actions={actions} items={library.artists}
+          <ArtistListView match={this.props.match} actions={actions} databases={library.databases} items={library.artists}
           minimal={!library.expandArtists} placeholderState={
             showAdd ? this.state.addingArtist === this.state.artistsFilter ? 'loading' : 
                     (this.state.artistsFilter ? 'on' :'off') : 'off'

@@ -1,5 +1,6 @@
 import PouchDB from 'pouchdb';
 import {Album, Track, Artist} from 'compactd-models';
+import { Databases } from 'definitions/state';
 
 export type ChangeCallback<T> = (changes: PouchDB.Core.ChangesResponseChange<T>) => void;
 export type FeedCallback<T> = (doc: T) => void;
@@ -22,28 +23,28 @@ export default class LibraryProvider {
     const doc /*= this.cache[id]*/ = new PouchDB<T>(db).get(id);
     return doc;
   }
-  getTrack (id: string) {
-    return this.getDocument<Track>('tracks', id);
+  getTrack ({tracks}: Databases, id: string) {
+    return this.getDocument<Track>(tracks, id);
   }
-  getArtist (id: string) {
-    return this.getDocument<Artist>('artists', id);
+  getArtist ({artists}: Databases, id: string) {
+    return this.getDocument<Artist>(artists, id);
   }
-  getAlbum (id: string) {
-    return this.getDocument<Album>('albums', id);
+  getAlbum ({albums}: Databases, id: string) {
+    return this.getDocument<Album>(albums, id);
   }
-  getAlbumCounters (id: string) {
-    const tracks = new PouchDB<Artist>('tracks');
+  getAlbumCounters ({tracks}: Databases, id: string) {
+    const db = new PouchDB<Artist>(tracks);
     const opts = {
       startkey: id,
       endkey: id + '\uffff'
     };
-    return Promise.all([tracks.allDocs(opts)]).then((docs) => {
+    return Promise.all([db.allDocs(opts)]).then((docs) => {
       return docs.map((doc) => doc.rows.length);
     });
   }
-  getArtistCounters (id: string) {
-    const albums = new PouchDB<Artist>('albums');
-    const tracks = new PouchDB<Artist>('tracks');
+  getArtistCounters (databases: Databases, id: string) {
+    const albums = new PouchDB<Artist>(databases.albums);
+    const tracks = new PouchDB<Track>(databases.tracks);
     const opts = {
       startkey: id,
       endkey: id + '\uffff'

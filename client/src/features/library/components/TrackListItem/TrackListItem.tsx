@@ -35,7 +35,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
         <MenuDivider />
         <MenuItem iconName="pt-icon-play" text="Play track" onClick={this.handleClick.bind(this)} />
         <MenuItem iconName="pt-icon-add-to-artifact" text="Play after this track" onClick={() => {
-          this.props.actions.playAfter(this.props.track)
+          this.props.actions.playAfter({track: this.props.track})
         }}/>
         <MenuDivider />
         <MenuItem onClick={() => this.props.actions.toggleHideTrack(this.props.track._id)}
@@ -51,13 +51,14 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
   handleClick () {
     const {actions, track, library} = this.props;
     if (this.props.track.offerRemove) return;
-    actions.replacePlayerStack([track.album, trackURI(track._id).number], !this.props.playHidden);
+    actions.replacePlayerStack({albumId: track.album, number: trackURI(track._id).number}, {filterHidden: !this.props.playHidden});
   }
+  
   renderArtistSelectContent () {
     const {actions, track, library} = this.props;
     if (!this.state.openSetArtist) return <div className=""></div>;
     const artists = this.props.library.artists.map((artist) => {
-      return <ArtistComponent layout="compact" id={artist} onClick={() => {
+      return <ArtistComponent databases={library.databases} layout="compact" id={artist} onClick={() => {
         this.setState({openSetArtist: false});
         actions.setTrackArtist(track._id, artist)
       }}
@@ -84,7 +85,7 @@ export class TrackListItem extends React.Component<TrackListItemProps, {
       <div className="track-name">{track.name}</div>
       <div className="track-info">{track.offerRemove? <div className="remove-offer">remove?
         <div className="yes" onClick={() => actions.doRemove(track._id)}>yes</div>
-        <div className="no" onClick={() => actions.offerRemove(track._id, false)}>cancel</div></div>: <FavComponent id={track._id} />}</div>
+        <div className="no" onClick={() => actions.offerRemove(track._id, false)}>cancel</div></div>: <FavComponent databases={library.databases} id={track._id} />}</div>
       <div className="track-duration">{duration}</div>
     </div></Popover></div>
   }

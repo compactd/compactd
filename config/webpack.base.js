@@ -26,6 +26,7 @@ module.exports = {
       features: path.join(__dirname, '../client/src/features'),
       app: path.join(__dirname, '../client/src/app'),
       components: path.join(__dirname, '../client/src/components'),
+      definitions: path.join(__dirname, '../client/src/definitions'),
     }
   },
   plugins: [
@@ -59,7 +60,8 @@ module.exports = {
         loader: "awesome-typescript-loader",
         options: {
           configFileName: 'client/tsconfig.json'
-        }
+        },
+        exclude: /electron/
       },
 
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.

@@ -1,23 +1,25 @@
 import * as jwt from 'jwt-decode';
 import PouchDB from 'pouchdb';
+import * as urljoin from 'url-join';
+import * as hash from 'md5';
 
 class SessionManager {
   private storage: Storage;
-  private tokenName = 'session_token';
+  private tokenName = 'session_token_';
 
   constructor(storage = window.localStorage) {
     this.storage = storage;
   }
-  public getUser () {
-    return this.decodeToken().user;
+  public getUser (origin: string) {
+    return this.decodeToken(origin).user;
   }
-  public getToken () {
-    return this.storage.getItem(this.tokenName);
+  public getToken (origin: string) {
+    return this.storage.getItem(this.tokenName + hash(origin));
   }
-  protected setToken (token: string) {
-    this.storage.setItem(this.tokenName, token);
+  protected setToken (origin: string, token: string) {
+    this.storage.setItem(this.tokenName + hash(origin), token);
   }
-  protected decodeToken (token = this.getToken()) {
+  protected decodeToken (origin: string, token = this.getToken(origin)) {
     if (!token) return null;
     return jwt(token) as {
       exp: number,
@@ -27,8 +29,8 @@ class SessionManager {
       ok: boolean
     }
   }
-  isSignedIn () {
-    const session = this.decodeToken();
+  isSignedIn (origin: string) {
+    const session = this.decodeToken(origin);
     if (!session) return false;
     if (session.exp > Date.now()) {
       return false;
@@ -38,7 +40,7 @@ class SessionManager {
     }
     return true;
   }
-  getStatus (): Promise<{
+  getStatus (origin: string): Promise<{
     versions: {
       server: string,
       models: string,
@@ -46,27 +48,27 @@ class SessionManager {
     user?: string
   }> {
     const init: RequestInit = {};
-    if (this.isSignedIn()) {
-      init.headers = this.headers();
+    if (this.isSignedIn(origin)) {
+      init.headers = this.headers(origin);
     }
-    return fetch('/api/status', init).then((res) => res.json());
+    return fetch(urljoin(origin, '/api/status'), init).then((res) => res.json());
   }
-  signIn (username: string, password: string) {
-    return fetch('/api/sessions', {
+  signIn (origin: string, username: string, password: string) {
+    return fetch(urljoin(origin, '/api/sessions'), {
       method: 'POST',
       headers: new Headers({'content-type': 'application/json'}),
       body: JSON.stringify({username, password})
     }).then((res) => res.json()).then((res) => {
       
-      this.setToken(res.token)
+      this.setToken(origin, res.token)
       
       return this.decodeToken(res.token);
     }).catch((err) => {
       return Promise.reject('Invalid username or password');
     });
   }
-  post (url: string, body: any) {
-    return this.fetch(url, {
+  post (origin: string, url: string, body: any) {
+    return this.fetch(origin, url, {
       method: 'POST',
       headers: {
         'content-type': 'application/json'
@@ -74,8 +76,8 @@ class SessionManager {
       body: JSON.stringify(body)
     });
   }
-  put (url: string, body: any) {
-    return this.fetch(url, {
+  put (origin: string, url: string, body: any) {
+    return this.fetch(origin, url, {
       method: 'PUT',
       headers: {
         'content-type': 'application/json'
@@ -83,7 +85,7 @@ class SessionManager {
       body: JSON.stringify(body)
     });
   }
-  fetch (input: RequestInfo, init: {
+  fetch (origin: string, input: string, init: {
     method: string,
     body: any, 
     headers?: {
@@ -91,41 +93,33 @@ class SessionManager {
     }
   } = {method: 'GET', body: {}}) {
     if (init.method === 'GET') {
-      return fetch(input, this.init({
+      return fetch(urljoin(origin, input), this.init(origin, {
         method: 'GET',
         headers: new Headers(init.headers)
       }));
     }
 
-    return fetch(input, this.init({
+    return fetch(urljoin(origin, input), this.init(origin, {
       ...init,
       headers: new Headers(init.headers)
     }));
   }
-  headers (headers: any = {}) {
+  private headers (origin: string, headers: any = {}) {
     if (headers instanceof Headers) {
-      headers.set('Authorization', `Bearer ${this.getToken()}`);
+      headers.set('Authorization', `Bearer ${this.getToken(origin)}`);
       return headers;
     }
     return new Headers(Object.assign({}, headers, {
-      Authorization: `Bearer ${this.getToken()}`
+      Authorization: `Bearer ${this.getToken(origin)}`
     }));
   }
-  init (init: RequestInit = {}) {
+  private init (origin: string, init: RequestInit = {}) {
     return Object.assign({}, init, {
-      headers: this.headers(init.headers)
+      headers: this.headers(origin, init.headers)
     });
   }
   logout () {
     this.storage.removeItem(this.tokenName);
-  }
-  destroy () {
-    this.logout();
-    const dbs =  [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers', 'libraries'];
-    return Promise.all(dbs.map((db) => {
-      const database = new PouchDB(db);
-      return database.destroy();
-    }));
   }
 }
 

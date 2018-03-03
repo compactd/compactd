@@ -1,22 +1,25 @@
 import PouchDB from 'pouchdb';
 import session from 'app/session';
+import {URL} from 'url';
 
 (PouchDB as any).adapter('socket', require('socket-pouch/client'));
 
-export const getDatabase = async function<T> (name: string) {
-  const res = await session.fetch('/api/database/'+ name);
+export const getDatabase = async function<T> (origin: string, name: string) {
+  const res = await session.fetch(origin, '/api/database/'+ name);
   const {token, ok} = await res.json();
+  const url = (process.env.NODE_ENV === 'production' ? 'wss://' + new URL(origin).hostname : 'ws://localhost:9001');
+  console.log('database url is', url, token);
   return new PouchDB<T>(token, {
     adapter: 'socket',
-    url: (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://' + (process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:9001')
+    url: url
   } as any);
 }
-export const getHttpDatabase = function<T> (name: string) {
-  return new PouchDB<T>(`${window.location.origin}/database/${name}`, {
+export const getHttpDatabase = function<T> (origin: string, name: string) {
+  return new PouchDB<T>(`${origin}/database/${name}`, {
     ajax: {
       cache: true,
       headers: {
-        Authorization: 'Bearer ' + session.getToken()
+        Authorization: 'Bearer ' + session.getToken(origin)
       }
     }
   });
@@ -32,10 +35,4 @@ function syncDB(local: PouchDB.Database, remote: PouchDB.Database) {
       reject(err);
     });
   });
-}
-
-export const syncDatabases = function (...dbs: string[]) {
-  return Promise.all(dbs.map((db) => {
-    return getDatabase(db).then(syncDB.bind(null, new PouchDB(db)));
-  }));
 }

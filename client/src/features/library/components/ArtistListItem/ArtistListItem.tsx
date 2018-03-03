@@ -7,6 +7,7 @@ import {MatchResult} from 'fuzzy';
 import * as classnames from 'classnames';
 import * as PropTypes from 'prop-types';
 import * as pluralize from 'pluralize';
+import { Databases } from 'definitions/state';
 
 require('./ArtistListItem.scss');
 
@@ -19,6 +20,7 @@ interface ArtistListItemProps {
   index?: number;
   visible?: boolean;
   tooltip?: 'none' | 'disabled' | 'on';
+  databases: Databases;
 }
 
 export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
@@ -60,7 +62,8 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
       emitter,
       index,
       visible,
-      tooltip
+      tooltip,
+      databases
     } = this.props;
     const slug = artistURI(artist).name;
     return <div className="artist-list-item"> 
@@ -72,6 +75,7 @@ export class ArtistListItem extends React.Component<ArtistListItemProps, {}>{
         index={index}
         tooltip={tooltip}
         subtitle='counters'
+        databases={databases}
         onClick={this.handleClick.bind(this)} />
     </div>
   }

@@ -3,22 +3,24 @@ import Session from '../app/session';
 import Map from './Map';
 
 export default class XHRSource extends AudioSource {
+  private origin: string;
   private static sources: Map<XHRSource> = {};
   private tokens: Map<string> = {};
   private prefetched: boolean;
   private track: string;
   public static readonly STREAM_ENDPOINT =  '/api/boombox/stream/' ;
 
-  private constructor (track: string) {
+  private constructor (origin: string, track: string) {
     super();
     this.track = track;
+    this.origin = origin;
   }
-  static from (track: string): XHRSource {
+  static from (origin: string, track: string): XHRSource {
     if (XHRSource.sources[track]) {
       return XHRSource.sources[track];
     }
 
-    return XHRSource.sources[track] = new XHRSource(track);
+    return XHRSource.sources[track] = new XHRSource(origin, track);
   } 
   getTrack () {
     return this.track;
@@ -27,12 +29,12 @@ export default class XHRSource extends AudioSource {
     if (this.isPrefetched()) {
       return;
     }
-    const {ok, token} = await (await fetch('/api/boombox/direct', {
+    const {ok, token} = await (await Session.fetch(this.origin, '/api/boombox/direct', {
       method: 'POST',
       body: JSON.stringify({track: this.track}),
-      headers: Session.headers({
+      headers: {
         'Content-Type': 'application/json'
-      })
+      }
     })).json();
 
     if (ok) {
@@ -45,12 +47,12 @@ export default class XHRSource extends AudioSource {
   async fetch(): Promise<string> {
     if (this.tokens[this.track]) return XHRSource.STREAM_ENDPOINT + this.tokens[this.track];
     
-    const {ok, token} = await (await fetch('/api/boombox/direct', {
+    const {ok, token} = await (await Session.fetch(this.origin, '/api/boombox/direct', {
       method: 'POST',
       body: JSON.stringify({track: this.track}),
-      headers: Session.headers({
+      headers: {
         'Content-Type': 'application/json'
-      })
+      }
     })).json();
 
     if (ok) {

@@ -126,6 +126,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
   }
   render (): JSX.Element {
     const {actions, player} = this.props;
+    const {origin, databases} = player;
     const track = player.stack[0];
     const date = new Date(null);
     
@@ -135,15 +136,15 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
 
     const duration = date.toISOString().substr(14, 5);
 
-    const source = XHRSource.from(player.stack[0] ? player.stack[0]._id : undefined);
-    const nextSource = XHRSource.from(player.stack[1] ? player.stack[1]._id : undefined);
+    const source = XHRSource.from(origin, player.stack[0] ? player.stack[0]._id : undefined);
+    const nextSource = XHRSource.from(origin, player.stack[1] ? player.stack[1]._id : undefined);
 
     const content = player.stack.length > 0 ?
       <div className="player-name">
         <span className="track-name">{player.stack[0].name}</span>
-        <span className="artist-name">{player.artistsById[player.stack[0].artist].name}</span>
+        <span className="artist-name">{(player.artistsById[player.stack[0].artist] || {name: ''}).name}</span>
         <span className="right-controls">          
-          <span className="fav-track"><FavComponent id={player.stack[0]._id} /></span>
+          <span className="fav-track"><FavComponent databases={databases} id={player.stack[0]._id} /></span>
           <span className="track-duration" ref={(ref) => this.trackTimeDiv = ref}>{`00:00 / ${duration}`}</span>  
         </span>
       </div> : <div className="player-name">
@@ -166,7 +167,7 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
       </div>
       <div className="player-track">
         {content}
-        <PlayerAudio source={source}
+        <PlayerAudio source={source} origin={origin}
           playing={player.playing} onEnd={this.onAudioEnd.bind(this)} expanded={this.state.waveform}
           timeUpdate={(time) => {
               window.requestAnimationFrame(() => {
@@ -186,9 +187,11 @@ export class PlayerStatus extends React.Component<PlayerStatusProps, {
         <SettingsLink />
         <div className="logout-button">
           <span className="pt-icon-log-out pt-icon" onClick={() => {
-            session.destroy().then(() =>{
-              window.location.reload();
-            });
+            // session.destroy().then(() =>{
+            //   window.location.reload();
+            // });
+
+            // TODO
           }}></span>
         </div>
         <div className="toggle-expand" onClick={() => this.setState({waveform: !this.state.waveform})}>

@@ -21,6 +21,6 @@ export class CompactdStore {
     const enhancer = this.compose(
       applyMiddleware(middleware, reduxThunk, reduxPromise)
     )(createStore);
-    return enhancer(reducers);
+    return (enhancer as any)(reducers);
   }
 }

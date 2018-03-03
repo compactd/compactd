@@ -2,6 +2,7 @@ import * as React from 'react';
 import {PlayerActions} from '../../actions.d';
 import {Track} from 'compactd-models';
 import {PlayerState, LibraryState} from 'definitions';
+import AsyncText from 'components/AsyncText/AsyncText';
 
 require('./PlaylistItem.scss');
 
@@ -38,7 +39,7 @@ export class PlaylistItem extends React.Component<PlaylistItemProps, {}>{
 
     return <div className="playlist-item" onClick={() => this.handleItemClick()}>
       <span className="playlist-duration">{duration}</span>
-      <span className="playlist-item-name">{track.name} ― {player.artistsById[track.artist].name}</span>
+      <span className="playlist-item-name">{track.name} <AsyncText docId={track.artist} dbName={player.databases.artists} keyName="name" databases={player.databases}/></span>
     </div>
   }
 }

@@ -55,6 +55,7 @@ export class StoreAlbumView extends React.Component<StoreAlbumViewProps, {
   renderResults () {
     const id = join('library', this.props.artist, this.props.album);
     const results = this.props.library.resultsById[id];
+    const {origin, databases} = this.props.library;
     
     if (!results) {
       return <div className="album-details-loader">
@@ -65,12 +66,12 @@ export class StoreAlbumView extends React.Component<StoreAlbumViewProps, {
     return Object.keys(results).map((storeId) => {
       const items = results[storeId];
       return <div className="store-row">
-        <div className="row-header"><AsyncText docId={storeId} dbName="stores" keyName="name"/></div>
+        <div className="row-header"><AsyncText databases={databases} docId={storeId} dbName={databases.stores} keyName="name"/></div>
         <div className="row-content">
           {items.slice(0, this.state.expanded[storeId] ? items.length : 3).map((item) => {
             return <div className="result-row" onClick={() => {
               const id = join('/library', this.props.artist);
-              session.post('/api/' + storeId, {result: item._id});
+              session.post(origin, '/api/' + storeId, {result: item._id});
               const { history } = this.context.router;
               history.push(id);
             }}>

@@ -16,7 +16,7 @@ class SocketEventEmitter {
       }
     })
   }
-  connect () {
+  connect (origin: string) {
     
     this.socket = io.connect();
   
@@ -25,7 +25,7 @@ class SocketEventEmitter {
     this.socket.on('connect', () => {
       setTimeout(() => {
 
-        this.socket.emit('authenticate', {token: Session.getToken()});
+        this.socket.emit('authenticate', {token: Session.getToken(origin)});
       }, 100)
       Toaster.show({
         icon: 'feed-subscribed' as any,

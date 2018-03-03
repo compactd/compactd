@@ -82,7 +82,7 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     } else {
       this.props.actions.fetchArtist(this.props.artist);
     }
-    this.changes = LibraryProvider.getInstance().onDocAdded('albums', (id) => {
+    this.changes = LibraryProvider.getInstance().onDocAdded(this.props.library.databases.albums, (id) => {
       if (id.startsWith(artistId)) {
         this.props.actions.fetchArtist(this.props.artist);
       }
@@ -200,13 +200,14 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
   
   _renderItem (props: ListProps) {
     const {index, style, parent} = props;
-    const {artist} = this.props;
+    const {artist, library} = this.props;
     const artistId = `library/${artist}`;
     const item = this.items[index];
     if (item.startsWith('library/')) {
       const active = this.props.match.params.album === albumURI(item).name;
       return <AlbumComponent
               id={item}
+              databases={library.databases}
               onClick={this.handleAlbumClick.bind(this, item, active)}
               active={active}
               layout="medium"
@@ -244,7 +245,8 @@ export class AlbumsListView extends React.Component<AlbumsListViewProps, {
     
     const header = (this.props.artist && artist) ?
         <div className="artist-header">
-          <ArtistComponent layout="compact" id={artistId} theme="dark" />
+          <ArtistComponent 
+              databases={library.databases} layout="compact" id={artistId} theme="dark" />
         </div>  : <div className="pt-input-group">
           <span className="pt-icon pt-icon-search"></span>
           <input className="pt-input" type="search"

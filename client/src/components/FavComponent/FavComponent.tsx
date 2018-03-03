@@ -6,11 +6,13 @@ import session from "app/session";
 import Map from 'models/Map';
 import toaster from "app/toaster";
 import { Track } from "definitions";
+import { Databases } from "definitions/state";
 
 
 interface FavComponentProps {
   id: string;
   onClick?: Function;
+  databases: Databases;
 }
 
 export default class FavComponent extends React.Component<FavComponentProps, {
@@ -41,7 +43,7 @@ export default class FavComponent extends React.Component<FavComponentProps, {
     if (this.feed) {
       LibraryProvider.getInstance().cancelFeeds([this.feed]);
     }
-    this.feed = LibraryProvider.getInstance().liveFeed('tracks', arg, (doc: Track) => {
+    this.feed = LibraryProvider.getInstance().liveFeed(this.props.databases.tracks, arg, (doc: Track) => {
       this.setState({
         liked: {
           ...this.state.liked,
@@ -84,7 +86,7 @@ export default class FavComponent extends React.Component<FavComponentProps, {
           [this.props.id]: val
         }
       });
-      const res = await session.fetch('/api/tracks/toggle-fav', {
+      const res = await session.fetch(this.props.databases.origin, '/api/tracks/toggle-fav', {
         method: 'POST',
         body: JSON.stringify({track: this.props.id}),
         headers: {

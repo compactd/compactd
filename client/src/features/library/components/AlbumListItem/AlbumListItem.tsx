@@ -8,11 +8,13 @@ import * as classnames from 'classnames';
 import BetterImage from 'components/BetterImage';
 import AlbumComponent from 'components/AlbumComponent';
 import * as pluralize from 'pluralize';
+import { Databases } from 'definitions/state';
 
 require('./AlbumListItem.scss');
 
 interface AlbumListItemProps {
   actions: LibraryActions;
+  databases: Databases;
   album: string;
   all: boolean;
   active?: boolean;
@@ -58,7 +60,8 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
       hash,
       emitter,
       index,
-      visible
+      visible,
+      databases
     } = this.props;
     
     return <div className="album-list-item">
@@ -69,6 +72,7 @@ export class AlbumListItem extends React.Component<AlbumListItemProps, {}>{
           subtitle="counters"
           id={album} 
           index={index}
+          databases={databases}
           onClick={this.handleClick.bind(this)}/>
       </div>
   }

@@ -45,7 +45,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
         onKeyDown={(evt) => {
           evt.preventDefault();
           evt.stopPropagation();
-          actions.replacePlayerStack(album);
+          actions.replacePlayerStack({album});
         }}/>
     </Hotkeys>)
   }
@@ -65,7 +65,7 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     const {actions, library, artist, player} = this.props;
     const id = this.getAlbumId();
     const album = library.albumsById[id];
-    this.props.actions.replacePlayerStack(album, !this.state.showHidden);
+    this.props.actions.replacePlayerStack({album}, {filterHidden: !this.state.showHidden});
   }
   renderAlbumContent () {
     const {actions, library, artist, player} = this.props;
@@ -123,11 +123,12 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
     
     return <div className="album-details-view">
       <ArtworkEditDialog
+        origin={library.origin}
         item={album._id}
         isOpen={this.state.showArtworkEdit}
         onClose={() => this.setState({showArtworkEdit: false})}/>
       <div className="album-header">
-        <AlbumComponent id={id} layout="large" subtitle={['artist', 'year']}/>
+        <AlbumComponent id={id} layout="large" subtitle={['artist', 'year']} databases={library.databases}/>
         <div className="albums-actions">
           <Popover content={
             <Menu>
@@ -136,10 +137,10 @@ export class AlbumDetailsView extends React.Component<AlbumDetailsViewProps, {sh
               {/* <MenuItem iconName="text-highlight" text="Change title case"/> */}
               <MenuDivider title="Playback" />
               <MenuItem iconName="play" text="Listen to this album" onClick={() => {
-                actions.replacePlayerStack(album);
+                actions.replacePlayerStack({album});
               }}/>
               <MenuItem iconName="random" text="Shuffle" onClick={() => {
-                actions.replacePlayerStack(album, false, true);
+                actions.replacePlayerStack({album}, {shuffle: true});
               }}/>
             </Menu>
           } position={Position.BOTTOM_RIGHT}>

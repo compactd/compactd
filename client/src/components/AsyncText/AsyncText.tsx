@@ -2,12 +2,14 @@ import * as React from "react";
 import Map from 'models/Map';
 import { getDatabase, getHttpDatabase } from "app/database";
 import PouchDB from 'pouchdb';
+import { Databases } from "definitions/state";
 
 export interface AsyncTextProps {
   docId: string;
   dbName: string;
   keyName: string;
   pouch?: 'http' | 'local' | 'socket';
+  databases: Databases;
 }
 
 export default class AsyncText extends React.Component<AsyncTextProps, {resolved: Map<string>}>{
@@ -16,13 +18,13 @@ export default class AsyncText extends React.Component<AsyncTextProps, {resolved
     this.state = {resolved: {}};
   }
   async getPouch (props = this.props) {
-    switch (this.props.pouch || 'http') {
+    switch (this.props.pouch || 'local') {
       case 'http':
-        return getHttpDatabase(props.dbName);
+        return getHttpDatabase(this.props.databases.origin, props.dbName);
       case 'local':
         return new PouchDB(props.dbName);
       case 'socket':
-        return getDatabase(props.dbName);
+        return getDatabase(this.props.databases.origin, props.dbName);
     }
   }
   async load (props = this.props) {

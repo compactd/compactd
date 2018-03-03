@@ -9,6 +9,7 @@ import { match } from 'react-router';
 import * as PropTypes from 'prop-types';
 import { filter } from 'fuzzaldrin';
 import PlaceholderComponent from 'components/PlaceholderComponent/PlaceholderComponent';
+import { Databases } from 'definitions/state';
 
 require('./ArtistListView.scss');
 
@@ -20,6 +21,7 @@ interface ArtistListViewProps {
   placeholderState: 'off' | 'on' | 'loading';
   onPlaceholderClick?: Function;
   minimal?: boolean;
+  databases: Databases;
 }
 
 export class ArtistListView extends React.Component<ArtistListViewProps, {
@@ -77,7 +79,8 @@ export class ArtistListView extends React.Component<ArtistListViewProps, {
                 active
               } tooltip={this.props.minimal ? 'on': 'disabled'} onClick={
                 this.handleItemClick.bind(this, item, active)
-              } id={item} layout="medium" theme="dark" subtitle="counters" />
+              } id={item} layout="medium" theme="dark" subtitle="counters"
+              databases={this.props.databases} />
     } else if (item.startsWith('placeholder?')) {
       const [o, filter] = item.split('?');
       return <PlaceholderComponent 
@@ -133,6 +136,7 @@ export class ArtistListView extends React.Component<ArtistListViewProps, {
   }
   render (): JSX.Element {
     const {actions} = this.props;
+    console.log('render()', this.props.databases);
     return <div className="artist-list-view" ref={(ref) => {
       this.div = ref;
       this.computeHeight(ref);
