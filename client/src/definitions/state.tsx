@@ -1,4 +1,4 @@
-import * as Compactd from './common.d';
+import * as Compactd from './common';
 import {MusicContentState} from 'app/content-decorator';
 import {DSAlbum, DSArtist, DSTrack, DSEntity, Library, Tracker, Release} from 'compactd-models';
 export type ResultEntry = {
@@ -56,6 +56,10 @@ export interface LibraryState {
   origin?: string
 }
 
+export enum AppError {
+  OfflineHost, Unknown, FetchFailed
+}
+
 export interface AppState {
   loggingIn?: boolean;
   /**
@@ -81,6 +85,7 @@ export interface AppState {
   user?: string;
   databases: Databases;
   origin?: string;
+  error?: AppError;
 }
 
 export interface Databases {
