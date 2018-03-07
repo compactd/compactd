@@ -327,9 +327,9 @@ export class YoutubeStore extends Store {
         return new Promise<void>((resolve, reject) => {
 
           const stream = ytdl(video.id, {quality: 'highestaudio'});
-          const number = ('0' + (+video.index + 1)).slice(-2);
-          const itemTitle = removeRedundantText(video.title, artist, album, (video.index + 1).toString(), number);
-          
+          const number = ('0' + video.index).slice(-2);
+          const itemTitle = removeRedundantText(video.title, artist, album, video.index.toString(), number);
+
           const tags = [['title', itemTitle], ['artist', author.name], ['album', title], ['track', number]];
 
           const command = FFmpeg(stream, {}).audioBitrate(128);

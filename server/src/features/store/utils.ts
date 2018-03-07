@@ -25,7 +25,7 @@ export function removeRedundantText (textToTransform: string, ...queries: string
   return textToTransform.replace(regex, '')
     // Remove capped text inside parenthesis at the end of the name
     // Such as [OFFICIAL CLIP] or (HQ)
-    .replace(/(\[([A-Z\u00C0-\u00DC]\s?)+\])|(\(([A-Z\u00C0-\u00DC]\s?)+\))\s*$/i, '');
+    .replace(/(\s*\[([A-Z\u00C0-\u00DC]\s?)+\])|(\s*\(([A-Z\u00C0-\u00DC]\s?)+\))\s*$/i, '');
 }
 
 export function escapeRegExp(str: string) {
