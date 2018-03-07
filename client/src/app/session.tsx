@@ -11,7 +11,7 @@ class SessionManager {
     this.storage = storage;
   }
   public getUser (origin: string) {
-    return this.decodeToken(origin).user;
+    return this.decodeToken(origin, this.getToken(origin)).user;
   }
   public getToken (origin: string) {
     return this.storage.getItem(this.tokenName + hash(origin));
@@ -19,7 +19,7 @@ class SessionManager {
   protected setToken (origin: string, token: string) {
     this.storage.setItem(this.tokenName + hash(origin), token);
   }
-  protected decodeToken (origin: string, token = this.getToken(origin)) {
+  protected decodeToken (origin: string, token: string) {
     if (!token) return null;
     return jwt(token) as {
       exp: number,
@@ -30,7 +30,7 @@ class SessionManager {
     }
   }
   isSignedIn (origin: string) {
-    const session = this.decodeToken(origin);
+    const session = this.decodeToken(origin,  this.getToken(origin));
     if (!session) return false;
     if (session.exp > Date.now()) {
       return false;
@@ -58,11 +58,9 @@ class SessionManager {
       method: 'POST',
       headers: new Headers({'content-type': 'application/json'}),
       body: JSON.stringify({username, password})
-    }).then((res) => res.json()).then((res) => {
-      
-      this.setToken(origin, res.token)
-      
-      return this.decodeToken(res.token);
+    }).then((res) => res.json()).then(({token}) => {
+      this.setToken(origin, token)
+      return this.decodeToken(origin, token);
     }).catch((err) => {
       return Promise.reject('Invalid username or password');
     });
