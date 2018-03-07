@@ -33,6 +33,8 @@ const initialState: Defs.PlayerState = decorator.initialState({
 export const reducer = decorator.createReducer(initialState, (state: Defs.PlayerState = initialState,
   action: PlayerAction | SetOrigin): Defs.PlayerState => {
   switch (action.type) {
+    case ActionTypes.RESET_APP:
+      return initialState;
     case ActionTypes.SET_ORIGIN:
       const {origin} = action as any;
       const prefix = hash(origin).substring(0, 6) + '_';

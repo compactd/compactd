@@ -56,6 +56,8 @@ const getParent = (str: string) => {
 export function reducer (state: Defs.LibraryState = initialState,
   action: any): Defs.LibraryState {
   switch (action.type) {
+    case ActionTypes.RESET_APP:
+      return initialState;
     case ActionTypes.SET_ORIGIN:
       const prefix = hash(action.origin).substring(0, 6) + '_';
       return {

@@ -16,6 +16,7 @@
     "build:client": "webpack --config ./config/webpack.production.js --progress",
     "build:electron": "webpack --config ./config/webpack.electron-main.js",
     "electron-main:build": "webpack --config ./config/webpack.electron-main.js",
+    "electron:serve": "webpack-serve --config ./config/webpack.electron-renderer.js",
     "electron:dev": "concurrently --allow-restart --prefix-colors \"red,blue\" --names \"webpack,electron\" \"webpack-serve --config ./config/webpack.electron-renderer.js\" \"electron ./electron/dist/main.js\"",
     "electron": "npm run electron-main:build && npm run electron:dev",
     "run:api": "npm run build:server && cross-env WALTZ_AUTH=1 NO_WEBPACK=1 node server/dev",

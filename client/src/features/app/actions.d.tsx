@@ -1,5 +1,6 @@
 import {Artist, Album} from 'definitions';
 import { ActionTypes } from 'features/app';
+import { AppError } from 'definitions/state';
 
 interface AppActionBase {
   type: string;
@@ -35,10 +36,12 @@ export interface SetOrigin {
 }
 
 export type AppAction = SetUserAction | ResolveStateAction | StartSyncAction
-  | UpdateSyncAction | EndSyncAction | SetOrigin;
+  | UpdateSyncAction | EndSyncAction | SetOrigin | {type: ActionTypes.RESET_APP} | {type: ActionTypes.SET_ERROR, error: AppError};
 
 export type AppActions = {
   fetchState: () => void;
   login: (username: string, password: string) => void;
   sync: (origin: string) => void;
+  resetApplication: () => void;
+  setOrigin: (origin: string) => void;
 }

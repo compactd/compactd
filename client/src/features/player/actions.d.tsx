@@ -1,5 +1,6 @@
 import {Artist, Album, Track} from 'definitions';
 import { MusicContentAction, ActionCreators } from 'app/content-decorator';
+import { ActionTypes } from 'features/app';
 
 interface PlayerActionBase {
   type: string;
@@ -52,7 +53,7 @@ export type PlayerAction =  PlayNextAction |
                             TogglePlaybackAction |
                             JumpToAction |
                             PlayAfterAction |
-                            PlayNextAction
+                            PlayNextAction | {type: ActionTypes.RESET_APP}
 
 // Album | [Album, number] | Track[] | Track
 

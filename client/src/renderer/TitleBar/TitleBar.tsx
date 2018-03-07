@@ -7,20 +7,20 @@ import {remote} from 'electron';
 import * as classNames from 'classnames';
 require('./TitleBar.scss');
 
-export class TitleBar extends React.Component<{origin: URL, dark: boolean}> {
+export class TitleBar extends React.Component<{origin: URL, dark: boolean, onOriginClick: Function}> {
   renderOriginMenu () {
-    return <div className="origin-menu" onClick={() => console.log('origin')}>
+    return <div className={"origin-menu"} onClick={() => this.props.onOriginClick()}>
     <Icon iconName="chevron-down" />
       {this.props.origin.hostname}
     </div>
   }
   renderWindows () {
     return <WinTitleBar>
-    {this.renderOriginMenu()}
+      {this.renderOriginMenu()}
     </WinTitleBar>
   }
   renderOSX () {
-    return <OSXTitlebar title=" "
+    return <OSXTitlebar title=""
         controls
         transparent={true}
         isFullscreen={false}

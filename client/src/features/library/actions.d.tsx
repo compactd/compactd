@@ -1,4 +1,5 @@
 import {Album, Artist, Track} from 'compactd-models';
+import { ActionTypes } from 'features/app';
 
 interface LibraryActionBase {
   type: string;
@@ -69,7 +70,7 @@ export type LibraryAction =
   ActionResolveTrack |
   ToggleHiddenAction |
   DoRemoveAction |
-  OfferRemoveAction;
+  OfferRemoveAction | {type: ActionTypes.RESET_APP};
 
 export type LibraryActions = {
   fetchArtist: (artist: string) => void;

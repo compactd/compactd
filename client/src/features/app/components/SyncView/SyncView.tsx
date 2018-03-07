@@ -11,7 +11,10 @@ interface SyncViewProps {
 }
 
 export class SyncView extends React.Component<SyncViewProps, {}>{
-  componentDidMount () {}
+  componentDidMount () {
+    const {actions, app} = this.props;
+    actions.sync(app.origin);
+  }
   render (): JSX.Element {
     const {actions} = this.props;
     return <div className="sync-view">

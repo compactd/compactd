@@ -10,7 +10,8 @@ import Artwork from 'app/Artwork';
 import Session from 'app/session';
 import * as hash from 'md5';
 import { wrapDatabaseFromState } from 'definitions/utils';
-import { Databases } from 'definitions/state';
+import { Databases, AppError } from 'definitions/state';
+
 
 export enum ActionTypes {
   RESOLVE_STATE = 'compactd/app/RESOLVE_STATE',
@@ -19,7 +20,9 @@ export enum ActionTypes {
   UPDATE_SYNC = 'compactd/app/UPDATE_SYNC',
   END_SYNC = 'compactd/app/END_SYNC',
   SHOW_ERROR = 'compactd/app/SHOW_ERROR',
-  SET_ORIGIN = 'compactd/app/SET_ORIGIN'
+  SET_ORIGIN = 'compactd/app/SET_ORIGIN',
+  RESET_APP = 'compactd/app/RESET_APP',
+  SET_ERROR = 'compactd/app/SET_ERROR'
 }
 
 const initialState: Defs.AppState = {
@@ -33,6 +36,13 @@ const initialState: Defs.AppState = {
 export function reducer (state: Defs.AppState = initialState,
   action: AppAction): Defs.AppState {
   switch (action.type) {
+    case ActionTypes.SET_ERROR:
+      return {
+        ...state,
+        error: action.error
+      }
+    case ActionTypes.RESET_APP:
+      return initialState;
     case ActionTypes.SET_ORIGIN:
       const prefix = hash(action.origin).substring(0, 6) + '_';
       return {
@@ -107,6 +117,14 @@ const fetchState = wrapDatabaseFromState(function ({origin}) {
       type: ActionTypes.RESOLVE_STATE,
       configured: true
     }
+  }).catch((err: Error) => {
+    console.log(err);
+    if (err.message.match(/Failed to fetch/)) {
+      return {type: ActionTypes.SET_ERROR, error: AppError.FetchFailed};
+    }
+    if (err.message.match(/Unexpected token/)) {
+      return {type: ActionTypes.SET_ERROR, error: AppError.FetchFailed};
+    }
   });
 });
 
@@ -115,7 +133,6 @@ function syncDB (origin: string, dbs: string[], max: number): thunk.ThunkAction<
     const dbName = dbs[0];
     const db = new PouchDB((getState().app.databases as any)[dbName]);
     const remote = getHttpDatabase(origin, dbName);
-    console.log('sync', db, '->', remote)
     db.replicate.from(remote).on('complete', (info) => {
       dispatch({
         type: ActionTypes.UPDATE_SYNC,
@@ -147,15 +164,12 @@ function syncDB (origin: string, dbs: string[], max: number): thunk.ThunkAction<
   }
 }
 function sync (origin: string): thunk.ThunkAction<void, Defs.CompactdState, void>  {
-  console.log('sync', origin);
   return (dispatch, getState) => {
     if (getState().app.syncing) {
       return;
     }
-    dispatch({
-      type: ActionTypes.SET_ORIGIN,
-      origin
-    });
+
+    dispatch({type: ActionTypes.START_SYNC});
 
     const dbs = [ 'artists', 'albums', 'tracks', 'artworks', 'files', 'trackers', 'libraries'];
 
@@ -164,6 +178,14 @@ function sync (origin: string): thunk.ThunkAction<void, Defs.CompactdState, void
   }
 }
 
+function resetApplication () {
+  return {type: ActionTypes.RESET_APP};
+}
+
+function setOrigin (origin: string) {
+  return {type: ActionTypes.SET_ORIGIN, origin};
+}
+
 export const actions = {
-  sync, fetchState, login
+  sync, fetchState, login, resetApplication, setOrigin
 }
