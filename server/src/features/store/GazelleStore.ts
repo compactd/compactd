@@ -6,6 +6,7 @@ import { EventEmitter } from "events";
 import HashMap from "../../helpers/HashMap";
 import { StoreOptionSchemaEntry } from "./StoreOptionsSchema";
 import { join } from "path";
+import { mainStory } from "storyboard";
 
 const IP_ADRESS_REGEX = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 const DOMAIN_REGEX    = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/;
@@ -63,21 +64,20 @@ export default class GazelleStore extends TrackerStore {
         icon: 'caret-down',
         value: `${leechers}`,
         desc: 'Number of leechers'
-      }]
+      }],
+      labels: {}
     }));
   }
 
-  fetchResult(id: string): EventEmitter {
+  fetchResult(id: string) {
     const eventEmitter = new EventEmitter();
     const [results, artist, album, sid] = id.split('/');
 
     this.indexer.downloadRelease(sid).then((buffer) => {
-      return this.downloadFile(buffer, eventEmitter, id);
+      return this.downloadFile(buffer, id);
     }).catch((err) => {
-      eventEmitter.emit('error', err);
+      mainStory.error('store', 'Error with ' + sid, {attach: err});
     });
-
-    return eventEmitter;
   }
   
 }

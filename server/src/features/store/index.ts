@@ -6,10 +6,12 @@ import Store from './Store';
 import GazelleStore from './GazelleStore';
 import SoundCloudStore from './SoundCloudStore';
 import * as slug from 'slug';
+import { YoutubeStore } from './YoutubeStore';
 
 const STORES = {
   gazelle: GazelleStore,
-  soundcloud: SoundCloudStore
+  soundcloud: SoundCloudStore,
+  youtube: YoutubeStore
 }
 
 /**

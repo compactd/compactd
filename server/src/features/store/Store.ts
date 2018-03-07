@@ -37,5 +37,5 @@ export default abstract class Store {
    * @param sid the store id for the element
    * @return an event emitter
    */
-  abstract fetchResult (sid: string): EventEmitter;
+  abstract fetchResult (sid: string): void;
 }

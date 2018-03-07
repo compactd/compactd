@@ -18,7 +18,6 @@ import { runInNewContext, runInContext, createContext } from "vm";
 import { writeFile } from "fs";
 import { promisify } from "util";
 import { join } from "path";
-import * as PQueue from 'p-queue';
 import * as mkdirp from 'mkdirp';
 import * as filenamify from 'filenamify';
 import { Scanner } from "../scanner/Scanner";
@@ -81,22 +80,18 @@ export default class SoundCloudStore extends Store {
       });
 
       return {
-        _id: path.join('results', slug(artist, {lower: true}),  slug(album, {lower: true}), url.pathname),
+        _id: path.join('results', slug(artist, {lower: true}),  slug(album, {lower: true}), this.name, url.pathname),
         name:  title,
         format: 'mp3',
         store: this._id,
         sid: url.pathname,
-        stats: [].concat(nonFree ? {
-          icon: 'eye-open',
-          name: 'Preview Only',
-          desc: 'Only first 30s are downloadable',
-          value: '30s'
-        } : []).concat([{
+        stats: [{
           icon: 'heart',
           name: 'Likes',
           desc: 'Number of soundcloud likes',
           value: likes_count
-        }])
+        }],
+        labels: Object.assign({}, nonFree ? {preview: 'Only first 30s are available'} : {})
       }
     });
   }
@@ -286,9 +281,9 @@ export default class SoundCloudStore extends Store {
     await promisify(writeFile)(join(dir, filenamify(`${tags.number} - ${prop.title}.mp3`)), tagged);
   }
 
-  fetchResult(id: string): EventEmitter {
-    const eventEmitter = new EventEmitter();
-    const [o, artist, album, ...splatSid] = id.split('/');
+  fetchResult(id: string) {
+    const [o, artist, album, storeName, ...splatSid] = id.split('/');
+    assert.equal(storeName, this.name);
     const sid = splatSid.join('/');
 
     const downloads = new PouchDB<any>('downloads');
@@ -340,7 +335,6 @@ export default class SoundCloudStore extends Store {
             });
           }).catch((err) => {
             mainStory.error('store', `Error`, {attach: err});
-            eventEmitter.emit('error', err);
             return downloads.get(dlId).then((doc) => {
               downloads.put({...doc, progress: (++done) / arr.length, errors: (doc.errors || 0) + 1});
             });
@@ -356,10 +350,7 @@ export default class SoundCloudStore extends Store {
       return scanner.scan(PouchDB, dirname);
     }).catch((err) => {
       mainStory.error('store', `Error for ${urljoin(SITE_HOST, sid)}`, {attach: err});
-      eventEmitter.emit('error', err);
     });
-
-    return eventEmitter;
   }
 
   async fetchResultName (sid: string) {

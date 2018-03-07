@@ -23,7 +23,7 @@ export default abstract class TrackerStore extends Store {
     });
   }
 
-  protected async downloadFile (buffer: Buffer, eventEmitter: EventEmitter, resId?: string) {
+  protected async downloadFile (buffer: Buffer, resId?: string) {
     await this.client.connect();
     
     const downloads = new PouchDB('downloads');
@@ -51,14 +51,10 @@ export default abstract class TrackerStore extends Store {
     
     const dl = await this.client.getTorrent(download.hash);
 
-    dl.removeAllListeners();
-
     dl.once('finish', async () => {
-      eventEmitter.emit('finish', {});
     });
 
     dl.on('progress', (progress) => {
-      eventEmitter.emit('finish', {progress});
     })
 
     dl.liveFeed(POLLING_INTERVAL);

@@ -9,5 +9,6 @@ export default interface ResultEntry {
     icon: string,
     value: string,
     desc: string
-  })[]
+  })[];
+  labels: {[name: string]: string}
 }

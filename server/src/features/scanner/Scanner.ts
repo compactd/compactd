@@ -287,7 +287,7 @@ export class Scanner extends events.EventEmitter {
           await Promise.all(databaseOperations);
 
         } catch (err) {
-          mainStory.error('scanner', err.message);
+          mainStory.error('scanner', err.message, {attach: err});
         }
     }
   }
