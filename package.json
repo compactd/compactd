@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "tslint -t codeFrame 'server/**/*.ts'",
+    "build": "tsc -p ./server",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "prebuild": "rimraf server/dist",
     "precommit": "lint-staged",
