@@ -13,6 +13,11 @@
     "test:watch": "jest --watch",
     "test:prod": "npm run lint && npm run test -- --coverage --no-cache"
   },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  },
   "_moduleAliases": {
     "@controllers": "./server/dist/controllers",
     "@modules": "./server/dist/modules"
