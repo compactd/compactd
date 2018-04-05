@@ -19,8 +19,12 @@
     }
   },
   "_moduleAliases": {
+    "@modules": "./server/dist/modules",
     "@controllers": "./server/dist/controllers",
-    "@modules": "./server/dist/modules"
+    "@models": "./server/dist/models",
+    "@utils": "./server/dist/utils",
+    "@helpers": "./server/dist/helpers",
+    "@services": "./server/dist/services"
   },
   "lint-staged": {
     "{server,client}/**/*.ts": [
@@ -32,6 +36,11 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "./server/tests/tsconfig.json"
+      }
+    },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
@@ -42,6 +51,14 @@
       "/node_modules/",
       "/test/"
     ],
+    "moduleNameMapper": {
+      "^@modules/(.+)": "<rootDir>/server/src/modules/$1",
+      "^@controllers/(.+)": "<rootDir>/server/src/controllers/$1",
+      "^@models/(.+)": "<rootDir>/server/src/models/$1",
+      "^@utils/(.+)": "<rootDir>/server/src/utils/$1",
+      "^@helpers/(.+)": "<rootDir>/server/src/helpers/$1",
+      "^@services/(.+)": "<rootDir>/server/src/services/$1"
+    },
     "coverageThreshold": {
       "global": {
         "branches": 90,
@@ -87,6 +104,7 @@
     "lint-staged": "^7.0.4",
     "prettier": "^1.11.1",
     "rimraf": "^2.6.2",
+    "supertest": "^3.0.0",
     "ts-jest": "^22.4.2",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
