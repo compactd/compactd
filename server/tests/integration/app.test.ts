@@ -1,8 +1,10 @@
-import express from 'express';
-import request from 'supertest';
-import { Test } from '@nestjs/testing';
 import AppModule from '@modules/AppModule';
 import AppService from '@services/AppService';
+
+import { Test } from '@nestjs/testing';
+
+import express from 'express';
+import request from 'supertest';
 
 const { version } = require('../../../package.json');
 

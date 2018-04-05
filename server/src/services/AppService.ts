@@ -3,7 +3,7 @@ const { version } = require('../../../package.json');
 
 @Component()
 export default class AppService {
-  getVersion(): string {
+  public getVersion(): string {
     return version;
   }
 }

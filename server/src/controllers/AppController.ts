@@ -5,7 +5,7 @@ import AppService from '@services/AppService';
 export default class AppController {
   constructor(private readonly appService: AppService) {}
   @Get('status')
-  getStatus() {
+  public getStatus() {
     return {
       version: this.appService.getVersion()
     };
