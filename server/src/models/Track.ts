@@ -11,11 +11,11 @@ import {
 import Album from '@models/Album';
 import File from '@models/File';
 
-interface ITrack {
+export interface ITrack {
   _id: string;
   name: string;
   artist: string;
-  track_artist: string;
+  track_artist?: string;
   album: string;
   added: string;
   file: string;
@@ -38,7 +38,7 @@ class Track extends BaseEntity<ITrack> {
 
   @SlothField()
   // tslint:disable-next-line:variable-name
-  public track_artist = '';
+  public track_artist?;
 
   @SlothRel({ belongsTo: () => Album })
   public album = '';

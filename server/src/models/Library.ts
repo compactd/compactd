@@ -30,7 +30,7 @@ class Library extends BaseEntity<ILibrary> {
   @SlothField() public added = new Date().toUTCString();
 
   @SlothRel({ hasMany: () => File })
-  public files = () => File;
+  public files?: () => File;
 }
 
-export default new SlothDatabase(Library);
+export default new SlothDatabase<ILibrary, Library>(Library);
