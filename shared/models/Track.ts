@@ -6,10 +6,10 @@ import {
   SlothField,
   SlothRel,
   SlothURI
-} from 'slothdb';
+} from "slothdb";
 
-import Album from '@models/Album';
-import File from '@models/File';
+import Album from "./Album";
+import File from "./File";
 
 export interface ITrack {
   _id: string;
@@ -25,28 +25,28 @@ export interface ITrack {
   position: string;
 }
 
-@SlothEntity('tracks')
+@SlothEntity("tracks")
 class Track extends BaseEntity<ITrack> {
-  @SlothURI<ITrack>('library', 'album', 'position', 'name')
+  @SlothURI<ITrack>("library", "album", "position", "name")
   // tslint:disable-next-line:variable-name
-  public _id = '';
+  public _id = "";
 
-  @SlothField() public name = '';
+  @SlothField() public name = "";
 
   @SlothRel({ belongsTo: () => Album })
-  public artist = '';
+  public artist = "";
 
   @SlothField()
   // tslint:disable-next-line:variable-name
   public track_artist?;
 
   @SlothRel({ belongsTo: () => Album })
-  public album = '';
+  public album = "";
 
   @SlothField() public added = new Date().toJSON();
 
   @SlothRel({ belongsTo: () => File })
-  public file = '';
+  public file = "";
 
   @SlothField() public number = 1;
 
@@ -58,16 +58,16 @@ class Track extends BaseEntity<ITrack> {
   /**
    * Disc number
    */
-  @SlothField() public disc = '0';
+  @SlothField() public disc = "0";
 
   /**
    * <disc[#]>.<number[##]>
    */
-  @SlothField() public position = '0.01';
+  @SlothField() public position = "0.01";
 
   public rels = {
-    album: belongsToMapper(this, 'album'),
-    artist: belongsToMapper(this, 'artist')
+    album: belongsToMapper(this, "album"),
+    artist: belongsToMapper(this, "artist")
   };
 
   @SlothRel({ hasMany: () => File, cascade: false })

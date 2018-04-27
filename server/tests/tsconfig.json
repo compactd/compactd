@@ -3,26 +3,23 @@
     "target": "es6",
     "module": "commonjs",
     "lib": ["es7"],
-    "sourceMap": true, 
-    "rootDir": "../", 
+    "sourceMap": true,
+    "rootDir": "../",
     "strict": true,
     "noImplicitAny": false,
-    "baseUrl": "../src", 
+    "baseUrl": "../src",
     "paths": {
       "@modules/*": ["./modules/*"],
       "@controllers/*": ["./controllers/*"],
-      "@models/*": ["./models/*"],
       "@utils/*": ["./utils/*"],
       "@helpers/*": ["./helpers/*"],
       "@constants/*": ["./constants/*"],
       "@middlewares/*": ["./middlewares/*"],
       "@services/*": ["./services/*"]
-    }, 
+    },
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": [
-    "./"
-  ]
+  "include": ["./"]
 }

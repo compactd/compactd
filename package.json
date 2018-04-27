@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "lint": "tslint -t codeFrame 'server/**/*.ts'",
-    "build": "tsc -p ./server",
+    "build": "npm run build:shared && npm run build:server",
+    "build:server": "tsc -p ./server",
+    "build:shared": "tsc -p ./shared",
     "commitmsg": "commitlint -e $GIT_PARAMS",
-    "prebuild": "rimraf server/dist",
+    "prebuild:server": "rimraf server/dist",
+    "prebuild:shared": "rimraf --glob shared/**/*.js{,.map}",
     "precommit": "lint-staged",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
     "test": "jest",
@@ -22,11 +25,9 @@
   "_moduleAliases": {
     "@modules": "./server/dist/modules",
     "@controllers": "./server/dist/controllers",
-    "@models": "./server/dist/models",
     "@utils": "./server/dist/utils",
     "@helpers": "./server/dist/helpers",
     "@services": "./server/dist/services",
-    "@constants": "./server/dist/constants",
     "@middlewares": "./server/dist/middlewares"
   },
   "lint-staged": {
@@ -47,23 +48,14 @@
       }
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/test/"
-    ],
+    "moduleFileExtensions": ["ts", "tsx", "js"],
+    "coveragePathIgnorePatterns": ["/node_modules/", "/test/"],
     "moduleNameMapper": {
       "^@modules/(.+)": "<rootDir>/server/src/modules/$1",
       "^@controllers/(.+)": "<rootDir>/server/src/controllers/$1",
-      "^@models/(.+)": "<rootDir>/server/src/models/$1",
       "^@utils/(.+)": "<rootDir>/server/src/utils/$1",
       "^@helpers/(.+)": "<rootDir>/server/src/helpers/$1",
       "^@services/(.+)": "<rootDir>/server/src/services/$1",
-      "^@constants/(.+)": "<rootDir>/server/src/constants/$1",
       "^@middlewares/(.+)": "<rootDir>/server/src/middlewares/$1"
     },
     "coverageThreshold": {
@@ -80,10 +72,7 @@
     "type": "git",
     "url": "git+https://github.com/compactd/compactd.git"
   },
-  "keywords": [
-    "music-player",
-    "player"
-  ],
+  "keywords": ["music-player", "player"],
   "author": "vinz243",
   "license": "MIT",
   "bugs": {
@@ -105,8 +94,10 @@
     "jsonwebtoken": "^8.2.1",
     "mime-types": "^2.1.18",
     "module-alias": "^2.0.6",
+    "mz": "^2.7.0",
     "pouchdb": "^6.4.3",
     "reflect-metadata": "^0.1.10",
+    "shared": "file:shared",
     "slothdb": "^2.0.0",
     "uuid": "^3.2.1",
     "walk": "^2.3.13"
@@ -122,6 +113,7 @@
     "@types/jest": "^22.2.2",
     "@types/jsonwebtoken": "^7.2.6",
     "@types/mime-types": "^2.1.0",
+    "@types/mz": "0.0.32",
     "@types/node": "^9.6.2",
     "@types/pouchdb": "^6.3.2",
     "@types/supertest": "^2.0.4",

@@ -4,15 +4,13 @@ import * as jwt from 'jsonwebtoken';
 import * as os from 'os';
 import * as path from 'path';
 
-import TokenAudience from '@constants/TokenAudience';
 import ConfigService from '@services/ConfigService';
+import TokenAudience from 'shared/constants/TokenAudience';
 
 @Component()
 export default class TokenService {
   private configService: ConfigService;
-  constructor(
-    /*@Inject(ServiceToken.ConfigService) */ configService: ConfigService
-  ) {
+  constructor(configService: ConfigService) {
     this.configService = configService;
   }
   public sign<T>(

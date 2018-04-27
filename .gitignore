@@ -6,3 +6,5 @@ clearCouch.bat
 .vscode/launch.json
 .DS_Store
 coverage
+shared/**/*.js
+shared/**/*.js.map

@@ -2,13 +2,15 @@ import { Component, Inject, NestMiddleware } from '@nestjs/common';
 import credential from 'credential';
 import { PouchFactory } from 'slothdb';
 
-import DepToken from '@constants/DepToken';
+import DepToken from 'shared/constants/DepToken';
 import {
   INVALID_USERNAME_OR_PASSWORD,
   MISSING_BODY_PARAMETER
-} from '@constants/httpErrors';
-import TokenAudience from '@constants/TokenAudience';
-import User from '@models/User';
+} from 'shared/constants/httpErrors';
+import TokenAudience from 'shared/constants/TokenAudience';
+
+import User from 'shared/models/User';
+
 import TokenService from '@services/TokenService';
 import { atob, btoa } from '@utils/strings';
 

@@ -6,11 +6,11 @@ import {
   SlothField,
   SlothRel,
   SlothURI
-} from 'slothdb';
+} from "slothdb";
 
-import Artist from '@models/Artist';
-import File from '@models/File';
-import Track from '@models/Track';
+import Artist from "./Artist";
+import File from "./File";
+import Track from "./Track";
 
 export interface IAlbum {
   _id: string;
@@ -19,20 +19,20 @@ export interface IAlbum {
   added: string;
 }
 
-@SlothEntity('albums')
+@SlothEntity("albums")
 class Album extends BaseEntity<IAlbum> {
   public rels = {
-    artist: belongsToMapper(this, 'artist')
+    artist: belongsToMapper(this, "artist")
   };
 
-  @SlothURI<IAlbum>('library', 'artist', 'name')
+  @SlothURI<IAlbum>("library", "artist", "name")
   // tslint:disable-next-line:variable-name
-  public _id = '';
+  public _id = "";
 
-  @SlothField() public name = '';
+  @SlothField() public name = "";
 
   @SlothRel({ belongsTo: () => Artist, cascade: true })
-  public artist = '';
+  public artist = "";
 
   @SlothField() public added = new Date().toJSON();
   @SlothRel({ hasMany: () => Track })

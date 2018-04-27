@@ -17,10 +17,9 @@ export class AuthMiddleware implements NestMiddleware {
 
       const [bearer, token, empty] = authHeader.split(' ');
 
-      if (empty.length !== 0 || bearer !== 'Bearer') {
+      if (empty || bearer !== 'Bearer') {
         return res.status(401).send({ error: 'Invalid authorization header' });
       }
-
       const user = this.authService.verifyToken(token);
 
       if (user) {

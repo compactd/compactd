@@ -1,4 +1,5 @@
-import DepToken from '@constants/DepToken';
+import DepToken from 'shared/constants/DepToken';
+
 import AppModule from '@modules/AppModule';
 import AuthService from '@services/AuthService';
 import ConfigService from '@services/ConfigService';

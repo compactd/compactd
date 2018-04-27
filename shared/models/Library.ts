@@ -6,26 +6,20 @@ import {
   SlothField,
   SlothRel,
   SlothURI
-} from 'slothdb';
+} from "slothdb";
 
-import File from '@models/File';
+import { ILibrary } from "../definitions/library";
+import File from "./File";
 
-interface ILibrary {
-  _id: string;
-  name: string;
-  path: string;
-  added: string;
-}
-
-@SlothEntity('libraries')
+@SlothEntity("libraries")
 class Library extends BaseEntity<ILibrary> {
-  @SlothURI('libraries', 'name')
+  @SlothURI("libraries", "name")
   // tslint:disable-next-line:variable-name
-  public _id = '';
+  public _id = "";
 
-  @SlothField() public name = '';
+  @SlothField() public name = "";
 
-  @SlothField() public path = '';
+  @SlothField() public path = "";
 
   @SlothField() public added = new Date().toJSON();
 

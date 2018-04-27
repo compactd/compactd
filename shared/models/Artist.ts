@@ -5,26 +5,26 @@ import {
   SlothField,
   SlothRel,
   SlothURI
-} from 'slothdb';
+} from "slothdb";
 
-import Album from '@models/Album';
-import File from '@models/File';
-import Track from '@models/Track';
+import Album from "./Album";
+import File from "./File";
+import Track from "./Track";
 
 export interface IArtist {
   _id: string;
   name: string;
 }
 
-@SlothEntity('artists')
+@SlothEntity("artists")
 class ArtistEntity extends BaseEntity<IArtist> {
-  @SlothURI('library', 'name')
+  @SlothURI("library", "name")
   // tslint:disable-next-line:variable-name
-  public _id: string = '';
+  public _id: string = "";
   /**
    * Artist name
    */
-  @SlothField() public name: string = '';
+  @SlothField() public name: string = "";
 
   @SlothRel({ hasMany: () => Album })
   public albums = () => Album;

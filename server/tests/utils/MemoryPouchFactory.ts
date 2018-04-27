@@ -1,5 +1,5 @@
-import DepToken from '@constants/DepToken';
 import PouchDB from 'pouchdb';
+import DepToken from 'shared/constants/DepToken';
 
 PouchDB.plugin(require('pouchdb-adapter-memory'));
 

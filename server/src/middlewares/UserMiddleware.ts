@@ -1,11 +1,11 @@
 import { ExpressMiddleware, Middleware, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+import AuthService from '@services/AuthService';
 import {
   INVALID_AUTHORIZATION_HEADER,
   INVALID_TOKEN
-} from '@constants/httpErrors';
-import AuthService from '@services/AuthService';
+} from 'shared/constants/httpErrors';
 
 @Middleware()
 export class UserMiddleware implements NestMiddleware {

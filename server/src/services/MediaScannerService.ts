@@ -2,16 +2,16 @@ import { Component } from '@nestjs/common';
 import ffmpeg from 'fluent-ffmpeg';
 import { readFile, statSync } from 'fs';
 import * as mime from 'mime-types';
+import { dirname, join } from 'path';
 import { PouchFactory } from 'slothdb';
 import { v4 } from 'uuid';
 
-import Album from '@models/Album';
-import Artist from '@models/Artist';
-import File, { FileEntity, FileIndex } from '@models/File';
-import Library from '@models/Library';
-import ResourceType from '@models/ResourceType';
-import Track from '@models/Track';
-import { dirname, join } from 'path';
+import Album from 'shared/models/Album';
+import Artist from 'shared/models/Artist';
+import File, { FileEntity, FileIndex } from 'shared/models/File';
+import Library from 'shared/models/Library';
+import ResourceType from 'shared/models/ResourceType';
+import Track from 'shared/models/Track';
 
 import Debug from 'debug';
 

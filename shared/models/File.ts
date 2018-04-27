@@ -8,12 +8,12 @@ import {
   SlothRel,
   SlothURI,
   SlothView
-} from 'slothdb';
-import uuid from 'uuid/v1';
+} from "slothdb";
+import uuid from "uuid/v1";
 
-import Album from '@models/Album';
-import Library from '@models/Library';
-import ResourceType from '@models/ResourceType';
+import Album from "./Album";
+import Library from "./Library";
+import ResourceType from "./ResourceType";
 
 interface IFile {
   _id: string;
@@ -30,51 +30,51 @@ interface IFile {
 }
 
 export enum FileIndex {
-  ByAlbumTag = 'views/by_album_tag',
-  ByJobId = 'views/by_job',
-  ByPath = 'views/by_path',
-  UnprocessedFiles = 'views/unprocessed_files'
+  ByAlbumTag = "views/by_album_tag",
+  ByJobId = "views/by_job",
+  ByPath = "views/by_path",
+  UnprocessedFiles = "views/unprocessed_files"
 }
 
-@SlothEntity('files')
+@SlothEntity("files")
 export class FileEntity extends BaseEntity<IFile> {
-  @SlothURI('files', 'uid')
+  @SlothURI("files", "uid")
   // tslint:disable-next-line:variable-name
-  public _id = '';
+  public _id = "";
 
   @SlothField() public uid = uuid();
 
   @SlothIndex()
   @SlothField()
-  public path = '';
+  public path = "";
 
   /**
    * Dirname, relative to library path
    */
   @SlothIndex()
   @SlothField()
-  public dir = '';
+  public dir = "";
 
   @SlothIndex()
   @SlothRel({ belongsTo: () => Library })
-  public library = '';
+  public library = "";
 
   @SlothField() public added = new Date().toJSON();
 
   @SlothField() public mtime = 0;
 
-  @SlothField('mime') public mimeType = '';
+  @SlothField("mime") public mimeType = "";
 
-  @SlothField('res_type') public resourceType = ResourceType.UNKNOWN;
+  @SlothField("res_type") public resourceType = ResourceType.UNKNOWN;
 
   @SlothView(
     /* istanbul ignore next */ function unprocessedFiles(doc: any, emit) {
       // tslint:disable-next-line:no-unused-expression
       doc.res_id || emit(doc.mime);
     },
-    'unprocessed_files'
+    "unprocessed_files"
   )
-  @SlothField('res_id')
+  @SlothField("res_id")
   public resourceID?;
 
   @SlothView<IFile>(
@@ -84,13 +84,13 @@ export class FileEntity extends BaseEntity<IFile> {
         emit(doc.tags.album);
       }
     },
-    'by_album_tag'
+    "by_album_tag"
   )
   @SlothField()
   public tags?: any;
 
   public rels = {
-    library: belongsToMapper(this, 'library')
+    library: belongsToMapper(this, "library")
   };
 }
 

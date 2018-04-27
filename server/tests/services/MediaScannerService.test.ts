@@ -1,9 +1,9 @@
 import MediaScannerService from '@services/MediaScannerService';
 
-import Album, { IAlbum } from '@models/Album';
-import Artist, { IArtist } from '@models/Artist';
-import Library from '@models/Library';
-import Track, { ITrack } from '@models/Track';
+import Album, { IAlbum } from 'shared/models/Album';
+import Artist, { IArtist } from 'shared/models/Artist';
+import Library from 'shared/models/Library';
+import Track, { ITrack } from 'shared/models/Track';
 
 import PouchDB from 'pouchdb';
 
