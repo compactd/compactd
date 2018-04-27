@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "module": "commonjs",
     "lib": ["es7"],
     "sourceMap": true, 
@@ -14,6 +14,8 @@
       "@models/*": ["./models/*"],
       "@utils/*": ["./utils/*"],
       "@helpers/*": ["./helpers/*"],
+      "@constants/*": ["./constants/*"],
+      "@middlewares/*": ["./middlewares/*"],
       "@services/*": ["./services/*"]
     }, 
     "esModuleInterop": true,

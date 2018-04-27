@@ -59,7 +59,7 @@ export class FileEntity extends BaseEntity<IFile> {
   @SlothRel({ belongsTo: () => Library })
   public library = '';
 
-  @SlothField() public added = new Date().toUTCString();
+  @SlothField() public added = new Date().toJSON();
 
   @SlothField() public mtime = 0;
 

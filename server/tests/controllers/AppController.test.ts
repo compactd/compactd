@@ -16,7 +16,10 @@ describe('AppController', () => {
     it('should return a status object', async () => {
       jest.spyOn(appService, 'getVersion').mockImplementation(() => 'foobar');
 
-      expect(appController.getStatus()).toEqual({ version: 'foobar' });
+      expect(appController.getStatus(null)).toEqual({
+        user: null,
+        version: 'foobar'
+      });
     });
   });
 });

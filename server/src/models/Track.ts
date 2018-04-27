@@ -43,7 +43,7 @@ class Track extends BaseEntity<ITrack> {
   @SlothRel({ belongsTo: () => Album })
   public album = '';
 
-  @SlothField() public added = new Date().toUTCString();
+  @SlothField() public added = new Date().toJSON();
 
   @SlothRel({ belongsTo: () => File })
   public file = '';

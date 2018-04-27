@@ -34,8 +34,7 @@ class Album extends BaseEntity<IAlbum> {
   @SlothRel({ belongsTo: () => Artist, cascade: true })
   public artist = '';
 
-  @SlothField() public added = new Date().toUTCString();
-
+  @SlothField() public added = new Date().toJSON();
   @SlothRel({ hasMany: () => Track })
   public tracks = () => Track;
 

@@ -15,8 +15,8 @@ import { dirname, join } from 'path';
 
 import Debug from 'debug';
 
-const debug = Debug('media-scanner');
-const warn = Debug('media-scanner:warn');
+const debug = Debug('compactd:media-scanner');
+const warn = Debug('compactd:media-scanner:warn');
 const walk = require('walk');
 
 @Component()

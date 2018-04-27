@@ -22,7 +22,7 @@ describe('App', () => {
 
   it(`GET /api/status`, () => {
     return request(server)
-      .get('/api/status')
+      .get('/status')
       .expect(200)
       .expect({
         version
