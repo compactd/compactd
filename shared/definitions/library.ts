@@ -1,3 +1,6 @@
+import JobStatus from "shared/constants/JobStatus";
+import { IJob } from "shared/definitions/jobs";
+
 export interface ILibrary {
   _id: string;
   name: string;
@@ -7,8 +10,8 @@ export interface ILibrary {
 
 export enum LibraryEndpoint {
   ListDirs = "/libraries/_list_dirs",
-  CreateLibrary = "/libraries",
-  ListLibraries = "/libraries"
+  Libraries = "/libraries",
+  LibraryScans = "/libraries/:id/scans"
 }
 
 export interface IListDirsReq {
@@ -29,4 +32,20 @@ export interface ICreateLibraryPayload {
 
 export interface ICreateLibraryResponse {
   libraries: ILibrary;
+}
+
+export interface ILibraryScansParams {
+  id: string;
+}
+
+export interface ILibraryScansQuery {
+  status: JobStatus;
+}
+
+export interface ICreateLibraryResponse {
+  jobs: IJob;
+}
+
+export interface IFindLibraryScansResponse {
+  jobs: IJob[];
 }

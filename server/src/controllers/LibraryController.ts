@@ -1,7 +1,17 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query
+} from '@nestjs/common';
 import LibraryService from '@services/LibraryService';
 import {
   ICreateLibraryPayload,
+  ILibraryScansParams,
+  ILibraryScansQuery,
   IListDirRes,
   IListDirsReq,
   LibraryEndpoint
@@ -10,7 +20,8 @@ import {
 @Controller()
 export default class LibraryController {
   constructor(private readonly libraryService: LibraryService) {}
-  @Get(LibraryEndpoint.ListLibraries)
+
+  @Get(LibraryEndpoint.Libraries)
   public async getLibraries() {
     return {
       libraries: (await this.libraryService.getLibraries()).map(el =>
@@ -18,10 +29,28 @@ export default class LibraryController {
       )
     };
   }
-  @Post(LibraryEndpoint.CreateLibrary)
+
+  @Post(LibraryEndpoint.Libraries)
   public async createLibrary(@Body() payload: ICreateLibraryPayload) {
     return {
       libraries: await this.libraryService.createLibrary(payload)
+    };
+  }
+
+  @Post(LibraryEndpoint.LibraryScans)
+  public async scanLibrary(@Param() { id }) {
+    return {
+      jobs: await this.libraryService.scanLibrary(id)
+    };
+  }
+
+  @Get(LibraryEndpoint.LibraryScans)
+  public async getLibraryScans(
+    @Param() { id }: ILibraryScansParams,
+    @Query() { status }: ILibraryScansQuery
+  ) {
+    return {
+      jobs: await this.libraryService.getScans({ id }, { status })
     };
   }
 

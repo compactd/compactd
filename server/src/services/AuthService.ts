@@ -48,15 +48,13 @@ export default class AuthService {
   }
 
   public async createToken(username: string, password: string) {
-    debug('Trying to find user %s', username);
+    debug('trying to login user %s', username);
 
     if (!password || !username) {
       throw MISSING_BODY_PARAMETER;
     }
 
     const { _id } = User.create(this.factory, { username });
-
-    debug(`Looking for user '%s'`, _id);
 
     let hash = '';
 
@@ -74,7 +72,7 @@ export default class AuthService {
 
     const user = { _id, username };
 
-    debug('Creating token for %O', user);
+    debug('creating token for %O', user);
 
     return this.tokenService.sign(
       { user },

@@ -3,6 +3,7 @@ import {
   Module,
   NestMiddleware,
   NestModule,
+  OnModuleInit,
   RequestMethod
 } from '@nestjs/common';
 
@@ -17,7 +18,9 @@ import { UserMiddleware } from '@middlewares/UserMiddleware';
 import AppService from '@services/AppService';
 import AuthService from '@services/AuthService';
 import ConfigService from '@services/ConfigService';
+import JobService from '@services/JobService';
 import LibraryService from '@services/LibraryService';
+import MediaScannerService from '@services/MediaScannerService';
 import TokenService from '@services/TokenService';
 
 @Module({
@@ -27,11 +30,17 @@ import TokenService from '@services/TokenService';
     ConfigService,
     TokenService,
     LibraryService,
-    PouchDBFactory
+    PouchDBFactory,
+    JobService,
+    MediaScannerService
   ],
   controllers: [AppController, AuthController, LibraryController]
 })
-export default class AppModule implements NestModule {
+export default class AppModule implements NestModule, OnModuleInit {
+  constructor(private readonly jobService: JobService) {}
+  public onModuleInit() {
+    this.jobService.processQueue();
+  }
   public configure(consumer: MiddlewaresConsumer) {
     return consumer
       .apply(UserMiddleware)

@@ -1,4 +1,4 @@
-import { Component } from '@nestjs/common';
+import { Component, Inject, OnModuleInit } from '@nestjs/common';
 import ffmpeg from 'fluent-ffmpeg';
 import { readFile, statSync } from 'fs';
 import * as mime from 'mime-types';
@@ -13,17 +13,32 @@ import Library from 'shared/models/Library';
 import ResourceType from 'shared/models/ResourceType';
 import Track from 'shared/models/Track';
 
+import JobService from '@services/JobService';
 import Debug from 'debug';
+import DepToken from 'shared/constants/DepToken';
+import JobId from 'shared/constants/JobId';
 
 const debug = Debug('compactd:media-scanner');
 const warn = Debug('compactd:media-scanner:warn');
 const walk = require('walk');
 
 @Component()
-export default class MediaScannerService {
+export default class MediaScannerService implements OnModuleInit {
+  constructor(
+    @Inject(DepToken.DatabaseFactory)
+    private readonly factory: PouchFactory<any>,
+    private readonly jobService: JobService
+  ) {}
+  public onModuleInit() {
+    this.jobService.define(JobId.ScanLibrary, ({ library }) => {
+      return this.runScan(this.factory, library);
+    });
+  }
   public async runScan(factory: PouchFactory<any>, libraryId: string) {
-    debug('Starting scan...');
+    debug("starting scan for library '%s'", libraryId);
     const library = await Library.findById(factory, libraryId);
+
+    debug('found library %o', library.getProps());
 
     await this.scanFolderAndCreateFiles(factory, library._id, library.path);
 
@@ -31,6 +46,8 @@ export default class MediaScannerService {
       factory,
       FileIndex.UnprocessedFiles
     );
+
+    debug('received %s files to process', filesToProcess.length);
 
     const filesByAlbum: {
       [album: string]: FileEntity[];
@@ -54,7 +71,7 @@ export default class MediaScannerService {
         const artist = await Artist.create(factory, { name: artistName });
 
         if (!await artist.exists()) {
-          debug(`Creating artist %o`, artist.getDocument());
+          debug(`creating artist %o`, artist.getDocument());
           await artist.save();
         }
 
@@ -64,7 +81,7 @@ export default class MediaScannerService {
         });
 
         if (!await album.exists()) {
-          debug(`Creating album %o`, album.getDocument());
+          debug(`creating album %o`, album.getDocument());
           await album.save();
         }
         await Promise.all(
@@ -101,7 +118,7 @@ export default class MediaScannerService {
     await jobs.reduce(
       (promise, fn) =>
         promise.then(() => fn()).catch(err => {
-          debug('Error processing file entity %O', err);
+          debug('error processing file entity %O', err);
           return Promise.resolve();
         }),
       Promise.resolve()
@@ -187,12 +204,12 @@ export default class MediaScannerService {
       });
 
       walker.on('errors', (root, nodeStatsArray, next) => {
-        debug(`Walker received errors for %s: %O`, root, nodeStatsArray);
+        debug(`walker received errors for %s: %O`, root, nodeStatsArray);
         next();
       });
 
       walker.on('end', () => {
-        debug('Finished scanning library');
+        debug('finished scanning library');
         resolve();
       });
     });

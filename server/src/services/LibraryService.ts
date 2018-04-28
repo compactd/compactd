@@ -1,16 +1,23 @@
-import { Component, Inject } from '@nestjs/common';
+import { Component, Inject, OnModuleInit } from '@nestjs/common';
 import { lstat, readdir } from 'mz/fs';
 import { join, resolve } from 'path';
 import { PouchFactory } from 'slothdb';
 
+import JobService from '@services/JobService';
 import DepToken from 'shared/constants/DepToken';
+import JobId from 'shared/constants/JobId';
+
 import {
   ACCESS_DENIED,
   INVALID_BODY_PARAMETER
 } from 'shared/constants/httpErrors';
 
 import Debug from 'debug';
-import { ICreateLibraryPayload } from 'shared/definitions/library';
+import {
+  ICreateLibraryPayload,
+  ILibraryScansParams,
+  IScanLibraryQuery
+} from 'shared/definitions/library';
 import Library from 'shared/models/Library';
 
 const debug = Debug('compactd:library');
@@ -35,8 +42,10 @@ const UNSAFE_ROOTS = [
 export default class LibraryService {
   constructor(
     @Inject(DepToken.DatabaseFactory)
-    private readonly factory: PouchFactory<any>
+    private readonly factory: PouchFactory<any>,
+    private readonly jobService: JobService
   ) {}
+
   public async createLibrary({ name, path }: ICreateLibraryPayload) {
     const lib = await Library.put(this.factory, {
       name,
@@ -45,8 +54,23 @@ export default class LibraryService {
 
     return lib.getProps();
   }
+
+  public scanLibrary(name: string) {
+    const library = Library.joinURIParams({ name });
+    debug('scan library %s', library);
+    return this.jobService.schedule({
+      jobId: JobId.ScanLibrary,
+      payload: { library },
+      priority: 5
+    });
+  }
+
   public getLibraries() {
     return Library.findAllDocs(this.factory);
+  }
+
+  public getScans({ id }: ILibraryScansParams, { status }: IScanLibraryQuery) {
+    return this.jobService.findJobsByJobId(JobId.ScanLibrary, status);
   }
 
   public async listDirs(dir: string) {
