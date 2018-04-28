@@ -8,7 +8,6 @@ import TokenService from '@services/TokenService';
 import {
   ICreateLibraryResponse,
   IFindLibraryScansResponse,
-  ILibraryScansResponse,
   LibraryEndpoint
 } from 'shared/definitions/library';
 
@@ -107,7 +106,7 @@ describe('Library create/list', () => {
       .expect(201);
 
     expect(body).toMatchObject({
-      libraries: { _id: 'libraries/foo-bar', name: 'Foo bar', path: '/foo/bar' }
+      library: { _id: 'libraries/foo-bar', name: 'Foo bar', path: '/foo/bar' }
     });
   });
 
@@ -160,14 +159,14 @@ describe('Library scanner', () => {
       .expect(201)) as { body: ICreateLibraryResponse };
 
     expect(body).toMatchObject({
-      jobs: {
+      job: {
         jobId: JobId.ScanLibrary,
         payload: { library: 'libraries/foo-library' },
         status: 'pending'
       }
     });
 
-    scanId = body.jobs._id;
+    scanId = body.job._id;
   });
 
   test('Starts job', async () => {

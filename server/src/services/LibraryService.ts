@@ -16,7 +16,7 @@ import Debug from 'debug';
 import {
   ICreateLibraryPayload,
   ILibraryScansParams,
-  IScanLibraryQuery
+  ILibraryScansQuery
 } from 'shared/definitions/library';
 import Library from 'shared/models/Library';
 
@@ -69,7 +69,7 @@ export default class LibraryService {
     return Library.findAllDocs(this.factory);
   }
 
-  public getScans({ id }: ILibraryScansParams, { status }: IScanLibraryQuery) {
+  public getScans({ id }: ILibraryScansParams, { status }: ILibraryScansQuery) {
     return this.jobService.findJobsByJobId(JobId.ScanLibrary, status);
   }
 

@@ -33,14 +33,14 @@ export default class LibraryController {
   @Post(LibraryEndpoint.Libraries)
   public async createLibrary(@Body() payload: ICreateLibraryPayload) {
     return {
-      libraries: await this.libraryService.createLibrary(payload)
+      library: await this.libraryService.createLibrary(payload)
     };
   }
 
   @Post(LibraryEndpoint.LibraryScans)
   public async scanLibrary(@Param() { id }) {
     return {
-      jobs: await this.libraryService.scanLibrary(id)
+      job: await this.libraryService.scanLibrary(id)
     };
   }
 

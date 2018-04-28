@@ -1,5 +1,5 @@
-import JobStatus from "shared/constants/JobStatus";
-import { IJob } from "shared/definitions/jobs";
+import JobStatus from 'shared/constants/JobStatus';
+import { IJob } from 'shared/definitions/jobs';
 
 export interface ILibrary {
   _id: string;
@@ -9,9 +9,9 @@ export interface ILibrary {
 }
 
 export enum LibraryEndpoint {
-  ListDirs = "/libraries/_list_dirs",
-  Libraries = "/libraries",
-  LibraryScans = "/libraries/:id/scans"
+  ListDirs = '/libraries/_list_dirs',
+  Libraries = '/libraries',
+  LibraryScans = '/libraries/:id/scans'
 }
 
 export interface IListDirsReq {
@@ -31,7 +31,7 @@ export interface ICreateLibraryPayload {
 }
 
 export interface ICreateLibraryResponse {
-  libraries: ILibrary;
+  library: ILibrary;
 }
 
 export interface ILibraryScansParams {
@@ -43,7 +43,7 @@ export interface ILibraryScansQuery {
 }
 
 export interface ICreateLibraryResponse {
-  jobs: IJob;
+  job: IJob;
 }
 
 export interface IFindLibraryScansResponse {

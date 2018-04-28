@@ -8,6 +8,9 @@ export default class AppController {
   @Get('status')
   public getStatus(@User() user) {
     return {
+      flags: {
+        configured: this.appService.isConfigured()
+      },
       user,
       version: this.appService.getVersion()
     };

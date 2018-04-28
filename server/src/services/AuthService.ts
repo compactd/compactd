@@ -47,7 +47,11 @@ export default class AuthService {
     };
   }
 
-  public async createToken(username: string, password: string) {
+  public async createToken(
+    username: string,
+    password: string,
+    expires = '14d'
+  ) {
     debug('trying to login user %s', username);
 
     if (!password || !username) {
@@ -76,7 +80,7 @@ export default class AuthService {
 
     return this.tokenService.sign(
       { user },
-      { expires: '14d', audience: TokenAudience.Auth }
+      { expires, audience: TokenAudience.Auth }
     );
   }
 

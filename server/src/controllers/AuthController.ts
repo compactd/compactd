@@ -11,4 +11,11 @@ export default class AuthController {
       token: await this.authService.createToken(username, password)
     };
   }
+
+  @Post('users')
+  public async createUser(@Body() { username, password }) {
+    return {
+      user: await this.authService.createUser(username, password)
+    };
+  }
 }
