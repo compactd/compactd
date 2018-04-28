@@ -10,6 +10,8 @@ import {
 } from 'shared/constants/httpErrors';
 
 import Debug from 'debug';
+import { ICreateLibraryPayload } from 'shared/definitions/library';
+import Library from 'shared/models/Library';
 
 const debug = Debug('compactd:library');
 
@@ -35,6 +37,17 @@ export default class LibraryService {
     @Inject(DepToken.DatabaseFactory)
     private readonly factory: PouchFactory<any>
   ) {}
+  public async createLibrary({ name, path }: ICreateLibraryPayload) {
+    const lib = await Library.put(this.factory, {
+      name,
+      path: this.resolveDir(path)
+    });
+
+    return lib.getProps();
+  }
+  public getLibraries() {
+    return Library.findAllDocs(this.factory);
+  }
 
   public async listDirs(dir: string) {
     const path = this.resolveDir(dir);

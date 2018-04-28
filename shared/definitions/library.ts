@@ -1,5 +1,3 @@
-import { IResponseDTO } from "./common";
-
 export interface ILibrary {
   _id: string;
   name: string;
@@ -8,16 +6,27 @@ export interface ILibrary {
 }
 
 export enum LibraryEndpoint {
-  ListDirs = "/libraries/_list_dirs"
+  ListDirs = "/libraries/_list_dirs",
+  CreateLibrary = "/libraries",
+  ListLibraries = "/libraries"
 }
 
 export interface IListDirsReq {
   path: string;
 }
 
-export type IListDirRes = IResponseDTO<{
+export interface IListDirRes {
   dirs: Array<{
     path: string;
     name: string;
   }>;
-}>;
+}
+
+export interface ICreateLibraryPayload {
+  name: string;
+  path: string;
+}
+
+export interface ICreateLibraryResponse {
+  libraries: ILibrary;
+}

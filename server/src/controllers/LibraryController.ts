@@ -1,6 +1,7 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import LibraryService from '@services/LibraryService';
 import {
+  ICreateLibraryPayload,
   IListDirRes,
   IListDirsReq,
   LibraryEndpoint
@@ -9,15 +10,26 @@ import {
 @Controller()
 export default class LibraryController {
   constructor(private readonly libraryService: LibraryService) {}
+  @Get(LibraryEndpoint.ListLibraries)
+  public async getLibraries() {
+    return {
+      libraries: (await this.libraryService.getLibraries()).map(el =>
+        el.getProps()
+      )
+    };
+  }
+  @Post(LibraryEndpoint.CreateLibrary)
+  public async createLibrary(@Body() payload: ICreateLibraryPayload) {
+    return {
+      libraries: await this.libraryService.createLibrary(payload)
+    };
+  }
 
   @HttpCode(200)
   @Post(LibraryEndpoint.ListDirs)
   public async listDirs(@Body() { path }: IListDirsReq): Promise<IListDirRes> {
     return {
-      data: {
-        dirs: await this.libraryService.listDirs(path)
-      },
-      status: 'success'
+      dirs: await this.libraryService.listDirs(path)
     };
   }
 }

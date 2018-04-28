@@ -11,40 +11,19 @@ import { Test } from '@nestjs/testing';
 import express from 'express';
 import { join } from 'path';
 import request from 'supertest';
+import createTestServer from '../utils/createTestServer';
+import createTestUser from '../utils/createTestUser';
 import MemoryPouchFactory from '../utils/MemoryPouchFactory';
 
 const { version } = require('../../../package.json');
 
-describe(LibraryEndpoint.ListDirs, () => {
+describe('POST ' + LibraryEndpoint.ListDirs, () => {
   const server = express();
-
-  let authService: AuthService;
   let token = '';
 
   beforeAll(async () => {
-    const module = await Test.createTestingModule({
-      imports: [AppModule]
-    })
-      .overrideComponent(DepToken.DatabaseFactory)
-      .useFactory(MemoryPouchFactory as any)
-      .compile();
-
-    const app = module.createNestApplication(server);
-    await app.init();
-
-    authService = new AuthService(
-      new TokenService(new ConfigService()),
-      MemoryPouchFactory.useFactory()
-    );
-
-    await authService.createUser('user', 'pass');
-
-    const { body } = await request(server)
-      .post('/sessions')
-      .send({ username: 'user', password: 'pass' })
-      .expect(201);
-
-    token = body.token;
+    await createTestServer(server);
+    token = await createTestUser(server);
   });
 
   it(`Fails without a user`, () => {
@@ -58,27 +37,24 @@ describe(LibraryEndpoint.ListDirs, () => {
     const { body } = await request(server)
       .post(LibraryEndpoint.ListDirs)
       .send({ path: join(__dirname, '..') })
-      .set('authorization', `Bearer ${token}`)
+      .set('authorization', `${token}`)
       .expect(200);
 
     expect(body).toMatchObject({
-      data: {
-        dirs: [
-          {
-            name: 'controllers'
-          },
-          {
-            name: 'integration'
-          },
-          {
-            name: 'services'
-          },
-          {
-            name: 'utils'
-          }
-        ]
-      },
-      status: 'success'
+      dirs: [
+        {
+          name: 'controllers'
+        },
+        {
+          name: 'integration'
+        },
+        {
+          name: 'services'
+        },
+        {
+          name: 'utils'
+        }
+      ]
     });
   });
 
@@ -86,7 +62,7 @@ describe(LibraryEndpoint.ListDirs, () => {
     const { body } = await request(server)
       .post(LibraryEndpoint.ListDirs)
       .send({ path: '/dev/sda1' })
-      .set('authorization', `Bearer ${token}`)
+      .set('authorization', `${token}`)
       .expect(403);
   });
 
@@ -94,7 +70,7 @@ describe(LibraryEndpoint.ListDirs, () => {
     const { body } = await request(server)
       .post(LibraryEndpoint.ListDirs)
       .send({ path: '' })
-      .set('authorization', `Bearer ${token}`)
+      .set('authorization', `${token}`)
       .expect(400);
   });
 
@@ -102,7 +78,50 @@ describe(LibraryEndpoint.ListDirs, () => {
     const { body } = await request(server)
       .post(LibraryEndpoint.ListDirs)
       .send({ path: 'foo/bar' })
-      .set('authorization', `Bearer ${token}`)
+      .set('authorization', `${token}`)
       .expect(400);
+  });
+});
+
+describe('Library create/list', () => {
+  const server = express();
+  let token = '';
+
+  beforeAll(async () => {
+    await createTestServer(server);
+    token = await createTestUser(server);
+  });
+
+  test('Creates a library', async () => {
+    const { body } = await request(server)
+      .post(LibraryEndpoint.CreateLibrary)
+      .set('authorization', token)
+      .send({ name: 'Foo bar', path: '/foo/bar' })
+      .expect(201);
+
+    expect(body).toMatchObject({
+      libraries: { _id: 'libraries/foo-bar', name: 'Foo bar', path: '/foo/bar' }
+    });
+  });
+
+  test('List a library', async () => {
+    const { body } = await request(server)
+      .get(LibraryEndpoint.CreateLibrary)
+      .set('authorization', token)
+      .expect(200);
+
+    expect(body).toMatchObject({
+      libraries: [
+        { _id: 'libraries/foo-bar', name: 'Foo bar', path: '/foo/bar' }
+      ]
+    });
+  });
+
+  test('Fails to create unsafe library', async () => {
+    await request(server)
+      .post(LibraryEndpoint.CreateLibrary)
+      .set('authorization', token)
+      .send({ name: 'Foo bar', path: '/var/www' })
+      .expect(403);
   });
 });
