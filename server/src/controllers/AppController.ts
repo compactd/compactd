@@ -6,10 +6,10 @@ import { User } from '@utils/decorators';
 export default class AppController {
   constructor(private readonly appService: AppService) {}
   @Get('status')
-  public getStatus(@User() user) {
+  public async getStatus(@User() user) {
     return {
       flags: {
-        configured: this.appService.isConfigured()
+        configured: await this.appService.isConfigured()
       },
       user,
       version: this.appService.getVersion()

@@ -6,8 +6,10 @@ const { version } = require('../../../package.json');
 export default class AppService {
   constructor(private readonly libraryService: LibraryService) {}
 
-  public isConfigured() {
-    return this.libraryService.getLibraries().then(items => items.length !== 0);
+  public async isConfigured() {
+    const libs = await this.libraryService.getLibraries();
+
+    return libs.length !== 0;
   }
 
   public getVersion(): string {
